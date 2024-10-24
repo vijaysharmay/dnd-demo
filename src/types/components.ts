@@ -102,10 +102,16 @@ export type ComponentLibraryListItem = {
   label: string;
 };
 
+export type AttributePropertyConfig = {
+  propertyValue: string;
+  options: string[] | null;
+  showInProperties: boolean;
+};
+
 export type ComponentElementInstance = {
   id: string;
   type: ComponentElementType;
-  attributes: Record<string, string>;
+  attributes: Record<string, AttributePropertyConfig>;
   events: Record<string, () => void>;
 };
 
@@ -114,6 +120,7 @@ export type ComponentElement = {
   type: ComponentElementType;
   componentLibraryListItem: ComponentLibraryListItem;
   designerComponent: React.FC<{ elementInstance: ComponentElementInstance }>;
+  dragOverlayComponent: React.FC;
   renderComponent: React.FC;
   propertiesComponent: React.FC;
 };

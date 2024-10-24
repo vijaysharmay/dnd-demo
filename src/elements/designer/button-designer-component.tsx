@@ -4,24 +4,26 @@ import { MouseEventHandler } from "react";
 
 import DesignerElementLifeCycleOverlay from "./designer-element-lifecycle-overlay";
 
-const ButtonDesignerComponent: React.FC<{
+export const ButtonDesignerComponent: React.FC<{
   elementInstance: ComponentElementInstance;
 }> = ({ elementInstance }) => {
-  const { attributes, events } = elementInstance;
-  const { id, buttonText } = attributes;
+  const { id, attributes, events } = elementInstance;
+  const { buttonId, buttonText } = attributes;
   const { onClickHandler } = events;
   return (
     <DesignerElementLifeCycleOverlay forElement={id}>
       <div>
         <Button
-          id={id}
+          id={buttonId.propertyValue}
           onClick={onClickHandler as MouseEventHandler<HTMLButtonElement>}
         >
-          {buttonText}
+          {buttonText.propertyValue}
         </Button>
       </div>
     </DesignerElementLifeCycleOverlay>
   );
 };
 
-export default ButtonDesignerComponent;
+export const ButtonDragOverlayComponent = () => {
+  return <Button>Button</Button>;
+};

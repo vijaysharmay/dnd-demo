@@ -4,7 +4,8 @@ import { devtools, persist } from "zustand/middleware";
 
 interface ElementState {
   elements: ComponentElementInstance[];
-  activeElement: ComponentElementInstance | null;
+  activeElementId: string | null;
+  getElementById: (elementId: string) => ComponentElementInstance | undefined;
   setActiveElement: (elementId: string) => void;
   addElement: (index: number, element: ComponentElementInstance) => void;
   removeElement: (elementId: string) => void;
@@ -16,14 +17,21 @@ const useElementStore = create<ElementState>()(
     persist(
       (set, get) => ({
         elements: [],
-        activeElement: null,
+        activeElementId: null,
+        getElementById: (elementId: string) => {
+          const elements = get().elements;
+          const element = elements.find(
+            (x: ComponentElementInstance) => x.id === elementId
+          );
+          return element;
+        },
         setActiveElement: (elementId: string) => {
           const elements = get().elements;
           const activeElement = elements.find(
             (x: ComponentElementInstance) => x.id === elementId
           );
           if (activeElement) {
-            set({ activeElement });
+            set({ activeElementId: elementId });
           }
         },
         addElement: (index: number, element: ComponentElementInstance) => {

@@ -26,7 +26,7 @@ export default function Designer() {
         const newElement = libraryElements[
           elementType as ComponentElementType
         ].create(uuidv4());
-        addElement(0, newElement);
+        addElement(elements.length, newElement);
       }
     },
   });
@@ -42,7 +42,7 @@ export default function Designer() {
               droppable.isOver && "ring-2 ring-primary/20"
             )}
           >
-            {droppable.isOver && (
+            {droppable.isOver && elements.length === 0 && (
               <div className="p-4 w-full">
                 <div className="rounded-md bg-primary/20 h-[60px]"></div>
               </div>
@@ -66,10 +66,44 @@ function DesignerElementWrapper({
 }: {
   element: ComponentElementInstance;
 }) {
+  const topDroppable = useDroppable({
+    id: `${element.id}-top`,
+    data: {
+      type: element.type,
+      elementId: element.id,
+      isTopHalfDroppable: true,
+    },
+  });
+
+  const bottomDroppable = useDroppable({
+    id: `${element.id}-bottom`,
+    data: {
+      type: element.type,
+      elementId: element.id,
+      isBottomHalfDroppable: true,
+    },
+  });
+
   const DesignerComponent = libraryElements[element.type].designerComponent;
   return (
-    <div className="py-2">
-      <DesignerComponent elementInstance={element} />
+    <div className="relative h-[120px] flex flex-col text-foreground hover:cursor-pointer rounded-md ring-1 ring-accent ring-inset">
+      <div
+        ref={topDroppable.setNodeRef}
+        className={cn(
+          "absolute w-full h-[6px] rounded-t-md",
+          topDroppable.isOver && "bg-black opacity-45"
+        )}
+      ></div>
+      <div
+        ref={bottomDroppable.setNodeRef}
+        className={cn(
+          "absolute w-full h-[6px] rounded-b-md bottom-0",
+          bottomDroppable.isOver && "bg-black opacity-45"
+        )}
+      ></div>
+      <div className="flex py-2">
+        <DesignerComponent elementInstance={element} />
+      </div>
     </div>
   );
 }

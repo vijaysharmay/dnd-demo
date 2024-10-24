@@ -1,6 +1,10 @@
 import { ComponentElement, Input as InputType } from "@/types";
 import { InputIcon } from "@radix-ui/react-icons";
-import InputDesignerComponent from "./designer/input-designer-component";
+import {
+  InputDesignerComponent,
+  InputDragOverlayComponent,
+} from "./designer/input-designer-component";
+import { randInt } from "@/lib/utils";
 
 export const InputComponentElement: ComponentElement = {
   type: InputType,
@@ -8,11 +12,31 @@ export const InputComponentElement: ComponentElement = {
     id,
     type: InputType,
     attributes: {
-      id,
-      inputType: "text",
-      label: "Default Label",
-      helperText: "Default Helper Text",
-      placeHolder: "Default Placeholder",
+      inputId: {
+        propertyValue: `input-${randInt()}`,
+        showInProperties: false,
+        options: null,
+      },
+      inputType: {
+        propertyValue: "text",
+        showInProperties: true,
+        options: ["text", "password"],
+      },
+      label: {
+        propertyValue: "Default Label",
+        showInProperties: true,
+        options: null,
+      },
+      helperText: {
+        propertyValue: "Default Helper Text",
+        showInProperties: true,
+        options: null,
+      },
+      placeHolder: {
+        propertyValue: "Default Placeholder",
+        showInProperties: true,
+        options: null,
+      },
     },
     events: {},
   }),
@@ -21,6 +45,7 @@ export const InputComponentElement: ComponentElement = {
     label: InputType,
   },
   designerComponent: InputDesignerComponent,
+  dragOverlayComponent: InputDragOverlayComponent,
   propertiesComponent: () => <div>InputComponentElement</div>,
   renderComponent: () => <div>InputComponentElement</div>,
 };

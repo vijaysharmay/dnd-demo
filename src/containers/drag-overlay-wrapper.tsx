@@ -10,15 +10,12 @@ export default function DragOverlayWrapper() {
 
   useDndMonitor({
     onDragStart: (event) => {
-      console.log(event.active);
       setDraggedItem(event.active);
     },
-    onDragCancel: (event) => {
-      console.log(event.active);
+    onDragCancel: () => {
       setDraggedItem(null);
     },
-    onDragEnd: (event) => {
-      console.log(event.active);
+    onDragEnd: () => {
       setDraggedItem(null);
     },
   });

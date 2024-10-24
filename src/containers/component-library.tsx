@@ -55,15 +55,6 @@ export function LibraryListDragOverlay({
 }: {
   element: ComponentElement;
 }) {
-  const { componentLibraryListItem } = element;
-  const { label, icon } = componentLibraryListItem;
-  return (
-    <Button
-      variant={"outline"}
-      className={cn("p-2 flex-col items-center cursor-grab h-[60px] w-full")}
-    >
-      <div>{icon}</div>
-      <div>{label}</div>
-    </Button>
-  );
+  const DragOverLayComponent = element.dragOverlayComponent;
+  return <DragOverLayComponent />;
 }
