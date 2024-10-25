@@ -23,17 +23,17 @@ export const InputComponentElement: ComponentElement = {
         options: ["text", "password"],
       },
       label: {
-        propertyValue: "Default Label",
+        propertyValue: Math.random().toString(36).slice(2, 7),
         showInProperties: true,
         options: null,
       },
       helperText: {
-        propertyValue: "Default Helper Text",
+        propertyValue: Math.random().toString(36).slice(2, 7),
         showInProperties: true,
         options: null,
       },
       placeHolder: {
-        propertyValue: "Default Placeholder",
+        propertyValue: Math.random().toString(36).slice(2, 7),
         showInProperties: true,
         options: null,
       },

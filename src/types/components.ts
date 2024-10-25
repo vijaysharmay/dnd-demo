@@ -45,6 +45,8 @@ export const Toast = "Toast";
 export const Toggle = "Toggle";
 export const ToggleGroup = "ToggleGroup";
 export const Tooltip = "Tooltip";
+export const HContainer = "HContainer";
+export const VContainer = "VContainer";
 
 // export type ComponentElementType =
 //   | typeof Accordion
@@ -95,7 +97,11 @@ export const Tooltip = "Tooltip";
 //   | typeof ToggleGroup
 //   | typeof Tooltip;
 
-export type ComponentElementType = typeof Input | typeof Button;
+export type ComponentElementType =
+  | typeof Input
+  | typeof Button
+  | typeof HContainer
+  | typeof VContainer;
 
 export type ComponentLibraryListItem = {
   icon: React.ReactElement;

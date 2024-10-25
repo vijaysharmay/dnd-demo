@@ -4,9 +4,16 @@ import useElementStore from "@/store";
 import { ComponentElementInstance, ComponentElementType } from "@/types";
 import { DragEndEvent, useDndMonitor, useDroppable } from "@dnd-kit/core";
 import { v4 as uuidv4 } from "uuid";
+import DesignerElementWrapper from "./designer-element-wrapper";
 
 export default function Designer() {
-  const { elements, addElement } = useElementStore();
+  const {
+    elements,
+    addElement,
+    getElementIndexById,
+    moveElementV,
+    setActiveElement,
+  } = useElementStore();
   const droppable = useDroppable({
     id: "designer",
     data: {
@@ -20,13 +27,71 @@ export default function Designer() {
       if (!active || !over) return;
 
       const isLibraryListItem = active.data?.current?.isLibraryListItem;
+      const isDesignerElementDraggable =
+        active.data?.current?.isDesignerElementDraggable;
+      const hoveredElementId = over.data?.current?.id as string;
+      const hoveredElementIndex = getElementIndexById(hoveredElementId);
 
-      if (isLibraryListItem) {
+      if (isLibraryListItem && hoveredElementIndex !== undefined) {
         const elementType = active.data?.current?.type;
+        const isTop = over.data?.current?.isTopHalfDroppable;
+        const isBottom = over.data?.current?.isBottomHalfDroppable;
         const newElement = libraryElements[
           elementType as ComponentElementType
         ].create(uuidv4());
-        addElement(elements.length, newElement);
+
+        if (hoveredElementIndex > -1) {
+          if (isTop) {
+            addElement(hoveredElementIndex, newElement);
+          }
+
+          if (isBottom) {
+            addElement(hoveredElementIndex + 1, newElement);
+          }
+        } else {
+          addElement(0, newElement);
+        }
+
+        setActiveElement(newElement.id);
+      }
+
+      if (isDesignerElementDraggable && hoveredElementIndex !== undefined) {
+        const movedElementId = active.data?.current?.elementId;
+        const fromIndex = getElementIndexById(movedElementId);
+        const isTop = over.data?.current?.isTopHalfDroppable;
+        const isBottom = over.data?.current?.isBottomHalfDroppable;
+
+        // YUCK *vomits all over the place* !!!
+        // if (fromIndex !== undefined) {
+        //   if (fromIndex !== hoveredElementIndex) {
+        //     if (isTop) {
+        //       if (fromIndex !== hoveredElementIndex - 1) {
+        //         moveElementV(movedElementId, fromIndex, hoveredElementIndex);
+        //       }
+        //     }
+
+        //     if (isBottom) {
+        //       if (fromIndex !== hoveredElementIndex + 1) {
+        //         moveElementV(movedElementId, fromIndex, hoveredElementIndex);
+        //       }
+        //     }
+        //   }
+        // }
+        if (fromIndex !== hoveredElementIndex) {
+          const targetIndex = isTop
+            ? hoveredElementIndex - 1
+            : isBottom
+            ? hoveredElementIndex + 1
+            : hoveredElementIndex;
+
+          if (fromIndex !== targetIndex) {
+            moveElementV(
+              movedElementId,
+              fromIndex as number,
+              hoveredElementIndex
+            );
+          }
+        }
       }
     },
   });
@@ -38,7 +103,7 @@ export default function Designer() {
           <div
             ref={droppable.setNodeRef}
             className={cn(
-              "p-4 gap-4 h-full flex-col flex-grow flex-1 m-auto overflow-y-auto justify-start",
+              "p-4 gap-4 h-full flex-col flex-1 m-auto overflow-y-auto justify-start gap-y-12",
               droppable.isOver && "ring-2 ring-primary/20"
             )}
           >
@@ -58,52 +123,5 @@ export default function Designer() {
         </div>
       </div>
     </>
-  );
-}
-
-function DesignerElementWrapper({
-  element,
-}: {
-  element: ComponentElementInstance;
-}) {
-  const topDroppable = useDroppable({
-    id: `${element.id}-top`,
-    data: {
-      type: element.type,
-      elementId: element.id,
-      isTopHalfDroppable: true,
-    },
-  });
-
-  const bottomDroppable = useDroppable({
-    id: `${element.id}-bottom`,
-    data: {
-      type: element.type,
-      elementId: element.id,
-      isBottomHalfDroppable: true,
-    },
-  });
-
-  const DesignerComponent = libraryElements[element.type].designerComponent;
-  return (
-    <div className="relative h-[120px] flex flex-col text-foreground hover:cursor-pointer rounded-md ring-1 ring-accent ring-inset">
-      <div
-        ref={topDroppable.setNodeRef}
-        className={cn(
-          "absolute w-full h-[6px] rounded-t-md",
-          topDroppable.isOver && "bg-black opacity-45"
-        )}
-      ></div>
-      <div
-        ref={bottomDroppable.setNodeRef}
-        className={cn(
-          "absolute w-full h-[6px] rounded-b-md bottom-0",
-          bottomDroppable.isOver && "bg-black opacity-45"
-        )}
-      ></div>
-      <div className="flex py-2">
-        <DesignerComponent elementInstance={element} />
-      </div>
-    </div>
   );
 }

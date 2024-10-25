@@ -11,14 +11,16 @@ export function ComponentLibrary() {
       <div className="text-center w-full font-semibold text-muted-foreground">
         Library
       </div>
-      {elementKeys.map((key: string) => {
-        return (
-          <LibraryListDraggableItem
-            key={key}
-            element={libraryElements[key as ComponentElementType]}
-          />
-        );
-      })}
+      <div className="grid xs:grid-cols-1 lg:grid-cols-2 grow gap-2">
+        {elementKeys.map((key: string) => {
+          return (
+            <LibraryListDraggableItem
+              key={key}
+              element={libraryElements[key as ComponentElementType]}
+            />
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -38,14 +40,14 @@ function LibraryListDraggableItem({ element }: { element: ComponentElement }) {
       ref={draggable.setNodeRef}
       variant={"outline"}
       className={cn(
-        "p-2 flex-col items-center cursor-grab h-[80px] w-full text-md",
+        "flex-col cursor-grab text-md h-full",
         draggable.isDragging && "ring-2 ring-primary"
       )}
       {...draggable.listeners}
       {...draggable.attributes}
     >
       <div>{icon}</div>
-      <div>{label}</div>
+      <p className="sm:text-xs">{label}</p>
     </Button>
   );
 }

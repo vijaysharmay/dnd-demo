@@ -1,4 +1,4 @@
-import { Button, ComponentElement } from "@/types";
+import { ComponentElement, HContainer } from "@/types";
 import { ButtonIcon } from "@radix-ui/react-icons";
 import {
   ButtonDesignerComponent,
@@ -6,11 +6,11 @@ import {
 } from "./designer/button-designer-component";
 import { randInt } from "@/lib/utils";
 
-export const ButtonComponentElement: ComponentElement = {
-  type: Button,
+export const HContainerComponentElement: ComponentElement = {
+  type: HContainer,
   create: (id: string) => ({
     id,
-    type: Button,
+    type: HContainer,
     attributes: {
       buttonId: {
         propertyValue: `button-${randInt()}`,
@@ -34,7 +34,7 @@ export const ButtonComponentElement: ComponentElement = {
   }),
   componentLibraryListItem: {
     icon: <ButtonIcon />,
-    label: Button,
+    label: HContainer,
   },
   designerComponent: ButtonDesignerComponent,
   dragOverlayComponent: ButtonDragOverlayComponent,
