@@ -1,10 +1,11 @@
-import { ComponentElement, HContainer } from "@/types";
-import { ButtonIcon } from "@radix-ui/react-icons";
-import {
-  ButtonDesignerComponent,
-  ButtonDragOverlayComponent,
-} from "./designer/button-designer-component";
 import { randInt } from "@/lib/utils";
+import { ComponentElement, HContainer } from "@/types";
+import { Columns3Icon } from "lucide-react";
+
+import {
+  HContainerDesignerComponent,
+  HContainerDragOverlayComponent,
+} from "./designer/hcontainer-designer-component";
 
 export const HContainerComponentElement: ComponentElement = {
   type: HContainer,
@@ -12,32 +13,35 @@ export const HContainerComponentElement: ComponentElement = {
     id,
     type: HContainer,
     attributes: {
-      buttonId: {
-        propertyValue: `button-${randInt()}`,
+      hContainerId: {
+        propertyValue: `hcontainer-${randInt()}`,
         showInProperties: true,
         options: null,
       },
-      buttonText: {
-        propertyValue: Math.random().toString(36).slice(2, 7),
+      width: {
+        propertyValue: `300px`,
         showInProperties: true,
         options: null,
       },
-      variant: {
-        propertyValue: "default",
-        options: ["default", "outline"],
+      height: {
+        propertyValue: `300px`,
         showInProperties: true,
+        options: null,
+      },
+      columns: {
+        propertyValue: `3`,
+        showInProperties: true,
+        options: null,
       },
     },
-    events: {
-      onClickHandler: () => {},
-    },
+    events: {},
   }),
   componentLibraryListItem: {
-    icon: <ButtonIcon />,
+    icon: <Columns3Icon />,
     label: HContainer,
   },
-  designerComponent: ButtonDesignerComponent,
-  dragOverlayComponent: ButtonDragOverlayComponent,
+  designerComponent: HContainerDesignerComponent,
+  dragOverlayComponent: HContainerDragOverlayComponent,
   propertiesComponent: () => <div>ButtonComponentElement</div>,
   renderComponent: () => <div>ButtonComponentElement</div>,
 };
