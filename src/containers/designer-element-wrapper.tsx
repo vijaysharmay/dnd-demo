@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 import useElementStore from "@/store";
 import { ComponentElementInstance } from "@/types";
 import { useDraggable, useDroppable } from "@dnd-kit/core";
-import { EditIcon, Trash2Icon } from "lucide-react";
+import { Trash2Icon } from "lucide-react";
 import { useState } from "react";
 
 export default function DesignerElementWrapper({
@@ -12,7 +12,12 @@ export default function DesignerElementWrapper({
   element: ComponentElementInstance;
 }) {
   const [isHoveredOn, setIsHoveredOn] = useState(false);
-  const { removeElement, setActiveElement } = useElementStore();
+  const {
+    removeElement,
+    setActiveElementId,
+    setActiveElement,
+    activeElementId,
+  } = useElementStore();
 
   const topDroppable = useDroppable({
     id: `${element.id}-top`,
@@ -50,15 +55,19 @@ export default function DesignerElementWrapper({
     removeElement(element.id);
   };
 
-  const handleEdit = () => {
-    setActiveElement(element.id);
-  };
-
   return (
     <div
+      onClick={(e) => {
+        e.stopPropagation();
+        setActiveElement(element);
+        setActiveElementId(element.id);
+      }}
       onMouseEnter={() => setIsHoveredOn(true)}
       onMouseLeave={() => setIsHoveredOn(false)}
-      className="relative flex flex-col text-foreground hover:cursor-pointer rounded-md"
+      className={cn(
+        "relative flex flex-col text-foreground hover:cursor-pointer rounded-md my-2",
+        activeElementId === element.id && "border-gray-200 border"
+      )}
     >
       <div
         ref={topDroppable.setNodeRef}
@@ -76,11 +85,11 @@ export default function DesignerElementWrapper({
       ></div>
       {isHoveredOn && (
         <>
-          <div className="absolute right-6 justify-center p-1 z-10">
-            <EditIcon onClick={handleEdit} />
-          </div>
+          {/* <div className="absolute -right-5 -top-6 justify-center p-1 z-10">
+            <EditIcon className="w-4 h-4" onClick={handleEdit} />
+          </div> */}
           <div className="absolute right-0 justify-center p-1 z-10">
-            <Trash2Icon onClick={handleDelete} />
+            <Trash2Icon className="w-4 h-4" onClick={handleDelete} />
           </div>
         </>
       )}
@@ -90,7 +99,7 @@ export default function DesignerElementWrapper({
         {...designerDraggable.attributes}
         className={cn(
           "cursor-grab flex p-2 rounded-md",
-          isHoveredOn && "bg-gray-300 opacity-80"
+          isHoveredOn && "border-gray-400 border opacity-80"
         )}
       >
         <DesignerComponent elementInstance={element} />

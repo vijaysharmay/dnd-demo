@@ -18,23 +18,19 @@ export const HContainerComponentElement: ComponentElement = {
         showInProperties: true,
         options: null,
       },
-      width: {
-        propertyValue: `300px`,
-        showInProperties: true,
-        options: null,
-      },
       height: {
-        propertyValue: `300px`,
+        propertyValue: "100",
         showInProperties: true,
         options: null,
       },
       columns: {
-        propertyValue: `3`,
+        propertyValue: "1",
         showInProperties: true,
-        options: null,
+        options: ["1", "2", "3"],
       },
     },
     events: {},
+    children: [],
   }),
   componentLibraryListItem: {
     icon: <Columns3Icon />,

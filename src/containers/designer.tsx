@@ -4,15 +4,18 @@ import useElementStore from "@/store";
 import { ComponentElementInstance, ComponentElementType } from "@/types";
 import { DragEndEvent, useDndMonitor, useDroppable } from "@dnd-kit/core";
 import { v4 as uuidv4 } from "uuid";
+
 import DesignerElementWrapper from "./designer-element-wrapper";
 
 export default function Designer() {
   const {
     elements,
     addElement,
+    addElementToParent,
     getElementIndexById,
     moveElementV,
     setActiveElement,
+    setActiveElementId,
   } = useElementStore();
   const droppable = useDroppable({
     id: "designer",
@@ -31,6 +34,7 @@ export default function Designer() {
         active.data?.current?.isDesignerElementDraggable;
       const hoveredElementId = over.data?.current?.id as string;
       const hoveredElementIndex = getElementIndexById(hoveredElementId);
+      const isHContainerDroppable = over.data?.current?.isHContainerDroppable;
 
       if (isLibraryListItem && hoveredElementIndex !== undefined) {
         const elementType = active.data?.current?.type;
@@ -40,7 +44,7 @@ export default function Designer() {
           elementType as ComponentElementType
         ].create(uuidv4());
 
-        if (hoveredElementIndex > -1) {
+        if (hoveredElementIndex > -1 && (isTop || isBottom)) {
           if (isTop) {
             addElement(hoveredElementIndex, newElement);
           }
@@ -49,10 +53,16 @@ export default function Designer() {
             addElement(hoveredElementIndex + 1, newElement);
           }
         } else {
-          addElement(0, newElement);
+          if (isHContainerDroppable) {
+            const hContainerId = over.data?.current?.id;
+            addElementToParent(hContainerId, 0, newElement);
+          } else {
+            addElement(0, newElement);
+          }
         }
 
-        setActiveElement(newElement.id);
+        setActiveElement(newElement);
+        setActiveElementId(newElement.id);
       }
 
       if (isDesignerElementDraggable && hoveredElementIndex !== undefined) {

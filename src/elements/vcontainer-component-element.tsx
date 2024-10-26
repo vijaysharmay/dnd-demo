@@ -33,6 +33,7 @@ export const VContainerComponentElement: ComponentElement = {
       },
     },
     events: {},
+    children: [],
   }),
   componentLibraryListItem: {
     icon: <Columns3Icon />,

@@ -119,6 +119,7 @@ export type ComponentElementInstance = {
   type: ComponentElementType;
   attributes: Record<string, AttributePropertyConfig>;
   events: Record<string, () => void>;
+  children: ComponentElementInstance[];
 };
 
 export type ComponentElement = {

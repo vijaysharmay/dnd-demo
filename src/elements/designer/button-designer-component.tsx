@@ -9,7 +9,7 @@ export const ButtonDesignerComponent: React.FC<{
   const { buttonId, buttonText } = attributes;
   const { onClickHandler } = events;
   return (
-    <div>
+    <div className="place-content-center text-center w-full">
       <Button
         id={buttonId.propertyValue}
         onClick={onClickHandler as MouseEventHandler<HTMLButtonElement>}

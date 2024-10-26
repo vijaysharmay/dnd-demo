@@ -10,14 +10,13 @@ import {
 } from "@/components/ui/select";
 import useElementStore from "@/store";
 import { AttributePropertyConfig } from "@/types";
+import { dropRight } from "lodash";
 import { useState } from "react";
 
 export default function Properties() {
-  const { activeElementId, getElementById, updateElement } = useElementStore();
+  const { activeElement, updateElement } = useElementStore();
   const [inputFocusKey, setInputFocusKey] = useState("");
-  if (!activeElementId) return;
-  const activeElement = getElementById(activeElementId);
-  if (!activeElement) return;
+  if (activeElement === null) return;
   const { attributes } = activeElement;
 
   const ElementProperty = ({
@@ -29,12 +28,6 @@ export default function Properties() {
     propertyValue: string;
     propertyOptions: string[] | null;
   }) => {
-    const handlePropertyOptionChange = (key: string, value: string) => {
-      const { attributes } = activeElement;
-      const updatedAttributes = { [key]: value, ...attributes };
-      const updatedElement = { ...activeElement, updatedAttributes };
-      updateElement(activeElement.id, updatedElement);
-    };
     const handlePropertyChange = (key: string, value: string) => {
       setInputFocusKey(key);
       const { attributes } = activeElement;
@@ -51,6 +44,16 @@ export default function Properties() {
         ...activeElement,
         attributes: updatedAttributes,
       };
+
+      const childCount = updatedElement.children.length;
+
+      if (key === "columns" && childCount > parseInt(value)) {
+        updatedElement.children = dropRight(
+          updatedElement.children,
+          childCount - parseInt(value)
+        );
+      }
+
       updateElement(activeElement.id, updatedElement);
     };
 
@@ -62,9 +65,7 @@ export default function Properties() {
         {propertyOptions ? (
           <Select
             value={propertyValue}
-            onValueChange={(value) =>
-              handlePropertyOptionChange(property, value)
-            }
+            onValueChange={(value) => handlePropertyChange(property, value)}
           >
             <SelectTrigger>
               <SelectValue />
