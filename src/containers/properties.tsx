@@ -1,37 +1,34 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import useElementStore from "@/store";
-import { AttributePropertyConfig } from "@/types";
-import { dropRight } from "lodash";
+import { AttributePropertyConfig, ComponentElementInstance } from "@/types";
+import { drop, dropRight } from "lodash";
 import { useState } from "react";
 
-export default function Properties() {
-  const { activeElement, updateElement } = useElementStore();
+const ElementProperty = ({
+  property,
+  propertyValue,
+  propertyOptions,
+}: {
+  property: string;
+  propertyValue: string;
+  propertyOptions: string[] | null;
+}) => {
+  const {
+    activeElement,
+    updateElement,
+    addElement,
+    getElementIndexById,
+    setActiveElement,
+  } = useElementStore();
   const [inputFocusKey, setInputFocusKey] = useState("");
-  if (activeElement === null) return;
-  const { attributes } = activeElement;
-
-  const ElementProperty = ({
-    property,
-    propertyValue,
-    propertyOptions,
-  }: {
-    property: string;
-    propertyValue: string;
-    propertyOptions: string[] | null;
-  }) => {
-    const handlePropertyChange = (key: string, value: string) => {
+  const handlePropertyChange = (key: string, value: string) => {
+    if (activeElement) {
       setInputFocusKey(key);
-      const { attributes } = activeElement;
+      const { attributes } = activeElement as ComponentElementInstance;
       const attributePropertyObj = attributes[key];
+
       const updatedAttributeProperties = {
         ...attributePropertyObj,
         propertyValue: value,
@@ -40,59 +37,74 @@ export default function Properties() {
         ...attributes,
         [key]: updatedAttributeProperties,
       };
-      const updatedElement = {
+      const updatedElement: ComponentElementInstance = {
         ...activeElement,
         attributes: updatedAttributes,
       };
 
-      const childCount = updatedElement.children.length;
+      if (updatedElement.children) {
+        const childCount = updatedElement.children.length;
 
-      if (key === "columns" && childCount > parseInt(value)) {
-        updatedElement.children = dropRight(
-          updatedElement.children,
-          childCount - parseInt(value)
-        );
+        if (key === "columns" && childCount > parseInt(value)) {
+          const updatedElementIndex = getElementIndexById(activeElement.id);
+
+          drop(updatedElement.children, parseInt(value)).forEach((child) => {
+            addElement(updatedElementIndex + 1, child);
+          });
+
+          updatedElement.children = dropRight(
+            updatedElement.children,
+            childCount - parseInt(value)
+          );
+        }
       }
 
       updateElement(activeElement.id, updatedElement);
-    };
-
-    return (
-      <div className="flex w-full max-w-sm items-center space-x-2">
-        <div className="w-36">
-          <Label className="text-xs">{property}:</Label>
-        </div>
-        {propertyOptions ? (
-          <Select
-            value={propertyValue}
-            onValueChange={(value) => handlePropertyChange(property, value)}
-          >
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                {propertyOptions.map((option) => (
-                  <SelectItem key={option} value={option}>
-                    {option}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-        ) : (
-          <Input
-            key={property}
-            className="h-7"
-            type="text"
-            value={propertyValue}
-            autoFocus={inputFocusKey === property}
-            onChange={(e) => handlePropertyChange(property, e.target.value)}
-          />
-        )}
-      </div>
-    );
+      setActiveElement(updatedElement);
+    }
   };
+
+  return (
+    <div className="flex w-full max-w-sm items-center space-x-2">
+      <div className="w-36">
+        <Label className="text-xs">{property}:</Label>
+      </div>
+      {propertyOptions ? (
+        <Select
+          value={propertyValue}
+          onValueChange={(value) => handlePropertyChange(property, value)}
+        >
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              {propertyOptions.map((option) => (
+                <SelectItem key={option} value={option}>
+                  {option}
+                </SelectItem>
+              ))}
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+      ) : (
+        <Input
+          key={property}
+          className="h-7"
+          type="text"
+          value={propertyValue}
+          autoFocus={inputFocusKey === property}
+          onChange={(e) => handlePropertyChange(property, e.target.value)}
+        />
+      )}
+    </div>
+  );
+};
+
+export default function Properties() {
+  const { activeElement } = useElementStore();
+  if (activeElement === null) return;
+  const { attributes } = activeElement as ComponentElementInstance;
 
   return (
     <>

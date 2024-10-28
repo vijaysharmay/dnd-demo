@@ -7,10 +7,10 @@ interface ElementState {
   elements: ComponentElementInstance[];
   activeElementId: string | null;
   activeElement: ComponentElementInstance | null;
-  getElementById: (elementId: string) => ComponentElementInstance | undefined;
-  getElementIndexById: (elementId: string) => number | undefined;
-  setActiveElement: (element: ComponentElementInstance) => void;
-  setActiveElementId: (elementId: string) => void;
+  getElementById: (elementId: string) => ComponentElementInstance | null;
+  getElementIndexById: (elementId: string) => number;
+  setActiveElement: (element: ComponentElementInstance | null) => void;
+  setActiveElementId: (elementId: string | null) => void;
   addElement: (index: number, element: ComponentElementInstance) => void;
   addElementToParent: (
     elementId: string,
@@ -34,7 +34,7 @@ const useElementStore = create<ElementState>()(
           const element = elements.find(
             (x: ComponentElementInstance) => x.id === elementId
           );
-          return element;
+          return element ?? null;
         },
         getElementIndexById: (elementId: string) => {
           const elements = get().elements;
@@ -43,10 +43,10 @@ const useElementStore = create<ElementState>()(
           );
           return elementIndex;
         },
-        setActiveElement: (element: ComponentElementInstance) => {
+        setActiveElement: (element: ComponentElementInstance | null) => {
           set({ activeElement: element });
         },
-        setActiveElementId: (elementId: string) => {
+        setActiveElementId: (elementId: string | null) => {
           set({ activeElementId: elementId });
         },
         addElement: (index: number, element: ComponentElementInstance) => {

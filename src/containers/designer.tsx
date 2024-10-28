@@ -55,7 +55,8 @@ export default function Designer() {
         } else {
           if (isHContainerDroppable) {
             const hContainerId = over.data?.current?.id;
-            addElementToParent(hContainerId, 0, newElement);
+            const index = over.data?.current?.index;
+            addElementToParent(hContainerId, index, newElement);
           } else {
             addElement(0, newElement);
           }

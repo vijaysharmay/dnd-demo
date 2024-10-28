@@ -52,6 +52,7 @@ const HContainerDroppable = ({
     id: `hcontainer-droppable-${index}`,
     data: {
       id: elementId,
+      index,
       type: "hcontainerDroppable",
       isHContainerDroppable: true,
     },
@@ -63,7 +64,9 @@ const HContainerDroppable = ({
         "w-full bg-white rounded-md border-gray-500 border border-dashed",
         dropRegion.isOver && "bg-gray-400"
       )}
-    ></div>
+    >
+      {index}
+    </div>
   );
 };
 

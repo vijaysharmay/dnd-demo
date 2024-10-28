@@ -51,16 +51,27 @@ export default function DesignerElementWrapper({
 
   const DesignerComponent = libraryElements[element.type].designerComponent;
 
+  const getDesignerElementDeleteId = () =>
+    `designerElementDelete-${element.id}`;
+
   const handleDelete = () => {
     removeElement(element.id);
+    setActiveElement(null);
+    setActiveElementId(null);
   };
 
   return (
     <div
       onClick={(e) => {
         e.stopPropagation();
-        setActiveElement(element);
-        setActiveElementId(element.id);
+
+        if (
+          (e.target as HTMLDivElement).getAttribute("data-id") !==
+          getDesignerElementDeleteId()
+        ) {
+          setActiveElement(element);
+          setActiveElementId(element.id);
+        }
       }}
       onMouseEnter={() => setIsHoveredOn(true)}
       onMouseLeave={() => setIsHoveredOn(false)}
@@ -89,7 +100,11 @@ export default function DesignerElementWrapper({
             <EditIcon className="w-4 h-4" onClick={handleEdit} />
           </div> */}
           <div className="absolute right-0 justify-center p-1 z-10">
-            <Trash2Icon className="w-4 h-4" onClick={handleDelete} />
+            <Trash2Icon
+              data-id={getDesignerElementDeleteId()}
+              className="w-4 h-4"
+              onClick={handleDelete}
+            />
           </div>
         </>
       )}
