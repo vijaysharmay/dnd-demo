@@ -1,9 +1,16 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import useElementStore from "@/store";
 import { AttributePropertyConfig, ComponentElementInstance } from "@/types";
-import { drop, dropRight } from "lodash";
+import { drop, dropRight, fill } from "lodash";
 import { useState } from "react";
 
 const ElementProperty = ({
@@ -45,17 +52,32 @@ const ElementProperty = ({
       if (updatedElement.children) {
         const childCount = updatedElement.children.length;
 
-        if (key === "columns" && childCount > parseInt(value)) {
-          const updatedElementIndex = getElementIndexById(activeElement.id);
+        if (key === "columns") {
+          if (childCount > parseInt(value)) {
+            const updatedElementIndex = getElementIndexById(activeElement.id);
 
-          drop(updatedElement.children, parseInt(value)).forEach((child) => {
-            addElement(updatedElementIndex + 1, child);
-          });
+            drop(updatedElement.children, parseInt(value)).forEach((child) => {
+              if (child) {
+                addElement(
+                  updatedElementIndex + 1,
+                  child as ComponentElementInstance
+                );
+              }
+            });
 
-          updatedElement.children = dropRight(
-            updatedElement.children,
-            childCount - parseInt(value)
-          );
+            const childCountDiff = childCount - parseInt(value);
+            updatedElement.children = dropRight(
+              updatedElement.children,
+              childCountDiff
+            );
+          } else {
+            const childCountDiff = parseInt(value) - childCount;
+
+            updatedElement.children = [
+              ...updatedElement.children,
+              ...fill(Array(childCountDiff), undefined),
+            ];
+          }
         }
       }
 

@@ -32,6 +32,7 @@ export const ButtonComponentElement: ComponentElement = {
       onClickHandler: () => {},
     },
     children: [],
+    parentId: null,
   }),
   componentLibraryListItem: {
     icon: <ButtonIcon />,

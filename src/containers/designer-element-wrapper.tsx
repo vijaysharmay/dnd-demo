@@ -55,7 +55,7 @@ export default function DesignerElementWrapper({
     `designerElementDelete-${element.id}`;
 
   const handleDelete = () => {
-    removeElement(element.id);
+    removeElement(element.id, element.parentId);
     setActiveElement(null);
     setActiveElementId(null);
   };

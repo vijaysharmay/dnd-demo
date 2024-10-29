@@ -40,6 +40,7 @@ export const InputComponentElement: ComponentElement = {
     },
     events: {},
     children: [],
+    parentId: null,
   }),
   componentLibraryListItem: {
     icon: <InputIcon />,

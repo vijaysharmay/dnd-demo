@@ -8,3 +8,7 @@ export function cn(...inputs: ClassValue[]) {
 export function randInt() {
   return Math.floor(Math.random() * 1000) + 1;
 }
+
+export function createDummyData(schema) {
+  return {};
+}

@@ -17,7 +17,7 @@ interface ElementState {
     index: number,
     element: ComponentElementInstance
   ) => void;
-  removeElement: (elementId: string) => void;
+  removeElement: (elementId: string, parentId: string | null) => void;
   updateElement: (elementId: string, element: ComponentElementInstance) => void;
   moveElementV: (elementId: string, fromIndex: number, toIndex: number) => void;
 }
@@ -65,17 +65,28 @@ const useElementStore = create<ElementState>()(
           );
           if (parentElementIndex !== -1) {
             const parentElement = elements[parentElementIndex];
-            if (parentElement.children) {
-              parentElement.children.splice(index, 0, element);
-            } else {
-              parentElement.children = [element];
-            }
+            // needs a revisit
+            parentElement.children.splice(index, 1, element);
             elements.splice(parentElementIndex, 1, parentElement);
             set({ elements });
           }
         },
-        removeElement: (elementId: string) => {
+        removeElement: (elementId: string, parentId: string | null) => {
           const elements = get().elements;
+
+          if (parentId !== null) {
+            const parentElement = get().getElementById(parentId);
+            if (parentElement !== null) {
+              const elementIndex = parentElement.children.findIndex(
+                (x: ComponentElementInstance | null) => x && x.id === elementId
+              );
+              if (elementIndex !== -1) {
+                parentElement.children.splice(elementIndex, 1, null);
+                get().updateElement(parentId, parentElement);
+              }
+            }
+          }
+
           const elementIndex = elements.findIndex(
             (x: ComponentElementInstance) => x.id === elementId
           );

@@ -56,6 +56,7 @@ export default function Designer() {
           if (isHContainerDroppable) {
             const hContainerId = over.data?.current?.id;
             const index = over.data?.current?.index;
+            newElement.parentId = hContainerId;
             addElementToParent(hContainerId, index, newElement);
           } else {
             addElement(0, newElement);
@@ -127,7 +128,12 @@ export default function Designer() {
             {elements.length > 0 &&
               elements.map((element: ComponentElementInstance) => {
                 return (
-                  <DesignerElementWrapper key={element.id} element={element} />
+                  element && (
+                    <DesignerElementWrapper
+                      key={element.id}
+                      element={element}
+                    />
+                  )
                 );
               })}
           </div>

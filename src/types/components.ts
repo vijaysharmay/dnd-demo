@@ -46,7 +46,7 @@ export const Toggle = "Toggle";
 export const ToggleGroup = "ToggleGroup";
 export const Tooltip = "Tooltip";
 export const HContainer = "HContainer";
-export const VContainer = "VContainer";
+export const DTable = "DTable";
 
 // export type ComponentElementType =
 //   | typeof Accordion
@@ -101,7 +101,7 @@ export type ComponentElementType =
   | typeof Input
   | typeof Button
   | typeof HContainer
-  | typeof VContainer;
+  | typeof DTable;
 
 export type ComponentLibraryListItem = {
   icon: React.ReactElement;
@@ -119,7 +119,8 @@ export type ComponentElementInstance = {
   type: ComponentElementType;
   attributes: Record<string, AttributePropertyConfig>;
   events: Record<string, () => void>;
-  children: ComponentElementInstance[];
+  children: (ComponentElementInstance | null)[];
+  parentId: string | null;
 };
 
 export type ComponentElement = {

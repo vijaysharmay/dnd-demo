@@ -31,6 +31,7 @@ export const HContainerComponentElement: ComponentElement = {
     },
     events: {},
     children: [],
+    parentId: null,
   }),
   componentLibraryListItem: {
     icon: <Columns3Icon />,

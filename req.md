@@ -8,7 +8,6 @@ Requirements
 - [ ] Resizable Containers / Components
 - [ ] Properties should not always be editable i.e need to edit one attribute at a time
 - [ ] Nested Droppable / Draggable
-  - [ ] Column & Row increase/decrease logic
   - [ ] Handle drag and drop for elements already present on screen
 - [ ] Code Refactoring
   - [ ] Use Immer

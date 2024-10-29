@@ -28,7 +28,7 @@ export const HContainerDesignerComponent: React.FC<{
         colsClassMapper[columns.propertyValue],
         "gap-2 auto-cols-max grid-flow-col p-2 w-full"
       )}
-      style={{ height: `${height.propertyValue}px` }}
+      style={{ minHeight: `${height.propertyValue}px` }}
     >
       {colsArray.map((v, i) => {
         if (v) {
