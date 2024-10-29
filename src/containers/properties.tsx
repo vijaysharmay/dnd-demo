@@ -8,7 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import useElementStore from "@/store";
+import useElementStore from "@/store/element-store";
 import { AttributePropertyConfig, ComponentElementInstance } from "@/types";
 import { drop, dropRight, fill } from "lodash";
 import { useState } from "react";

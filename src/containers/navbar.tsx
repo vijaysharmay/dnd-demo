@@ -1,5 +1,7 @@
 import { Button } from "@/components/ui/button";
+
 import { Link } from "wouter";
+import SchemaManager from "./schema-manager";
 
 export default function Navbar() {
   return (
@@ -11,10 +13,8 @@ export default function Navbar() {
           </Button>
         </div>
       </Link>
-      <div className=" grow">
-        <Button className="bg-black font-sans text-md text-white cursor-pointer">
-          Data & Schema Manager
-        </Button>
+      <div className="grow">
+        <SchemaManager />
       </div>
       <Link asChild href="/preview">
         <Button className="bg-black font-sans text-md text-white cursor-pointer align-right">

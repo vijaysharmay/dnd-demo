@@ -40,14 +40,14 @@ function LibraryListDraggableItem({ element }: { element: ComponentElement }) {
       ref={draggable.setNodeRef}
       variant={"outline"}
       className={cn(
-        "flex-row cursor-grab text-md h-full bg-gray-100",
+        "flex-col cursor-grab gap-1 h-full bg-gray-100",
         draggable.isDragging && "ring-2 ring-slate-200"
       )}
       {...draggable.listeners}
       {...draggable.attributes}
     >
       <div>{icon}</div>
-      <p className="sm:text-xs">{label}</p>
+      <p className="text-xs">{label}</p>
     </Button>
   );
 }

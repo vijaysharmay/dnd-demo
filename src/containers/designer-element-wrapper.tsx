@@ -1,6 +1,6 @@
 import { libraryElements } from "@/elements";
 import { cn } from "@/lib/utils";
-import useElementStore from "@/store";
+import useElementStore from "@/store/element-store";
 import { ComponentElementInstance } from "@/types";
 import { useDraggable, useDroppable } from "@dnd-kit/core";
 import { Trash2Icon } from "lucide-react";

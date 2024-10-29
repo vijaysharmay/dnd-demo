@@ -1,6 +1,6 @@
 import { libraryElements } from "@/elements";
 import { cn } from "@/lib/utils";
-import useElementStore from "@/store";
+import useElementStore from "@/store/element-store";
 import { ComponentElementInstance, ComponentElementType } from "@/types";
 import { DragEndEvent, useDndMonitor, useDroppable } from "@dnd-kit/core";
 import { v4 as uuidv4 } from "uuid";

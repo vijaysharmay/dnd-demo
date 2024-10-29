@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
 
-import { ComponentElementInstance } from "./types";
+import { ComponentElementInstance } from "../types";
 
 interface ElementState {
   elements: ComponentElementInstance[];
