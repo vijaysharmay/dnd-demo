@@ -1,22 +1,16 @@
-import {
-  Dialog,
-  DialogHeader,
-  DialogTrigger,
-  DialogContent,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { editor } from "monaco-editor";
-import { Editor as SchemaEditor, Monaco } from "@monaco-editor/react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { useRef, useState } from "react";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
-import Ajv from "ajv";
 import useSchemaStore from "@/store/schema-store";
 import { ConcordSchema } from "@/types/schema";
+import { Monaco, Editor as SchemaEditor } from "@monaco-editor/react";
+import Ajv from "ajv";
+import { JSONSchemaFaker, Schema } from "json-schema-faker";
+import { editor } from "monaco-editor";
+import { useRef, useState } from "react";
 
 export default function SchemaManager() {
   const options: editor.IStandaloneEditorConstructionOptions = {
@@ -73,7 +67,9 @@ export default function SchemaManager() {
     const schemaObject: ConcordSchema = {
       name: schemaName,
       schema: schemaValue as string,
-      sampleData: "",
+      sampleData: JSONSchemaFaker.generate(
+        JSON.parse(schemaValue as string) as Schema
+      ),
     };
     upsertSchema(schemaName, schemaObject);
     setActiveTab("showSchemas");
@@ -121,7 +117,10 @@ export default function SchemaManager() {
             {Object.keys(schemas).length > 0 ? (
               <>
                 {Object.keys(schemas).map((schemaKey: string) => (
-                  <div className="flex flex-row items-center gap-4 my-2 ml-2">
+                  <div
+                    key={schemaKey}
+                    className="flex flex-row items-center gap-4 my-2 ml-2"
+                  >
                     <div className="text-lg grow">{schemaKey}</div>
                     <Button
                       className="h-6"

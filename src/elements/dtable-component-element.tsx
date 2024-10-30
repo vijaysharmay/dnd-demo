@@ -16,7 +16,7 @@ export const DTableComponentElement: ComponentElement = {
         showInProperties: true,
         options: null,
       },
-      schema: {
+      data: {
         propertyValue: "",
         showInProperties: true,
         options: null,

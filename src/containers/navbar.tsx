@@ -5,7 +5,7 @@ import SchemaManager from "./schema-manager";
 
 export default function Navbar() {
   return (
-    <div className="p-2 bg-blue-500 font-bold flex gap-x-2">
+    <div className="p-2 bg-blue-500 flex gap-x-2">
       <Link asChild href="/">
         <div className="grow">
           <Button className="bg-black font-sans text-md text-white cursor-pointer">
@@ -13,7 +13,7 @@ export default function Navbar() {
           </Button>
         </div>
       </Link>
-      <div className="grow">
+      <div className="grow font-sans">
         <SchemaManager />
       </div>
       <Link asChild href="/preview">
