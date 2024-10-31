@@ -1,6 +1,6 @@
+import { randInt } from "@/lib/utils";
 import { ComponentElement, Input as InputType } from "@/types";
-import { InputPropsZSchema } from "@/types/properties";
-import { generateMock } from "@anatine/zod-mock";
+import { faker } from "@faker-js/faker";
 import { InputIcon } from "@radix-ui/react-icons";
 import { InputDesignerComponent, InputDragOverlayComponent } from "./designer";
 import { InputPropertiesComponent } from "./properties";
@@ -11,7 +11,13 @@ export const InputComponentElement: ComponentElement = {
   create: (id: string) => ({
     id,
     type: InputType,
-    props: generateMock(InputPropsZSchema),
+    props: {
+      inputId: `input-${randInt()}`,
+      inputLabel: faker.string.alpha({ length: { min: 5, max: 10 } }),
+      placeHolder: faker.string.alpha({ length: { min: 5, max: 10 } }),
+      helperText: faker.string.alpha({ length: { min: 5, max: 10 } }),
+      inputType: "text",
+    },
     children: [],
     parentId: null,
   }),

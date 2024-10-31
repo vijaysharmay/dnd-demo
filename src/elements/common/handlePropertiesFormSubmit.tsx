@@ -1,6 +1,10 @@
 import useElementStore from "@/store/element-store";
 import { ComponentElementInstance, HContainer } from "@/types";
-import { HContainerPropsSchema, PropsSchema } from "@/types/properties";
+import {
+  colsIntRec,
+  HContainerPropsSchema,
+  PropsSchema,
+} from "@/types/properties";
 import { drop, dropRight, fill } from "lodash";
 
 export const handlePropertiesFormSubmit = (
@@ -19,29 +23,29 @@ export const handlePropertiesFormSubmit = (
     const childCount = updatedElement.children.length;
 
     if (activeElement.type === HContainer) {
-      const noOfColumns = (activeElementProps as HContainerPropsSchema)
-        .hContainerColumns;
-      if (childCount > parseInt(noOfColumns)) {
+      const noOfColumns =
+        colsIntRec[
+          (activeElementProps as HContainerPropsSchema).hContainerColumns
+        ];
+      if (childCount > noOfColumns) {
         const updatedElementIndex = getElementIndexById(activeElement.id);
 
-        drop(updatedElement.children, parseInt(noOfColumns)).forEach(
-          (child) => {
-            if (child) {
-              addElement(
-                updatedElementIndex + 1,
-                child as ComponentElementInstance
-              );
-            }
+        drop(updatedElement.children, noOfColumns).forEach((child) => {
+          if (child) {
+            addElement(
+              updatedElementIndex + 1,
+              child as ComponentElementInstance
+            );
           }
-        );
+        });
 
-        const childCountDiff = childCount - parseInt(noOfColumns);
+        const childCountDiff = childCount - noOfColumns;
         updatedElement.children = dropRight(
           updatedElement.children,
           childCountDiff
         );
       } else {
-        const childCountDiff = parseInt(noOfColumns) - childCount;
+        const childCountDiff = noOfColumns - childCount;
 
         updatedElement.children = [
           ...updatedElement.children,

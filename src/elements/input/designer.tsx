@@ -1,25 +1,25 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ComponentElementInstance } from "@/types";
+import { InputPropsSchema } from "@/types/properties";
 
 export const InputDesignerComponent: React.FC<{
   elementInstance: ComponentElementInstance;
 }> = ({ elementInstance }) => {
-  const { attributes } = elementInstance;
-  const { inputId, inputType, label, helperText, placeHolder } = attributes;
+  const { props } = elementInstance;
+  const { inputId, inputType, inputLabel, helperText, placeHolder } =
+    props as InputPropsSchema;
 
   return (
     <div className="w-full">
-      <Label htmlFor={inputId.propertyValue}>{label.propertyValue}</Label>
+      <Label htmlFor={inputId}>{inputLabel}</Label>
       <Input
-        type={inputType.propertyValue}
-        id={inputId.propertyValue}
-        placeholder={placeHolder.propertyValue}
+        type={inputType}
+        id={inputId}
+        placeholder={placeHolder}
         readOnly={true}
       />
-      <p className="text-muted-foreground text-xs">
-        {helperText.propertyValue}
-      </p>
+      <p className="text-muted-foreground text-xs">{helperText}</p>
     </div>
   );
 };

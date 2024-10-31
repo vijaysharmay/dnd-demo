@@ -9,6 +9,20 @@ export const ButtonVariants = [
 ] as const;
 
 export const EventVariants = ["Do Nothing", "Redirect To Route"] as const;
+export const InputVariants = ["text", "password"] as const;
+export const HContainerColumnVariants = [
+  "One",
+  "Two",
+  "Three",
+  "Four",
+] as const;
+
+export const colsIntRec: Record<string, number> = {
+  One: 1,
+  Two: 2,
+  Three: 3,
+  Four: 4,
+};
 
 export const ButtonPropsZSchema = z.object({
   buttonId: z
@@ -25,8 +39,11 @@ export const HContainerPropsZSchema = z.object({
     .string({ required_error: "Required hContainerId" })
     .min(11)
     .startsWith("hContainer-", "ID must start with the prefix `hContainer-`"),
-  hContainerHeight: z.string().min(50),
-  hContainerColumns: z.enum(["1", "2", "3"]),
+  hContainerHeightInPx: z
+    .string()
+    .max(5)
+    .endsWith("px", "Please enter a value in px, for example: 100px"),
+  hContainerColumns: z.enum(HContainerColumnVariants),
 });
 
 export const InputPropsZSchema = z.object({
@@ -34,8 +51,8 @@ export const InputPropsZSchema = z.object({
     .string({ required_error: "Required inputId" })
     .min(8)
     .startsWith("input-", "ID must start with the prefix `input-`"),
-  inputType: z.enum(["text", "password"]),
-  label: z.string().min(1),
+  inputType: z.enum(InputVariants),
+  inputLabel: z.string().min(1),
   helperText: z.string().min(1),
   placeHolder: z.string().min(1),
 });
@@ -49,4 +66,8 @@ export type PropsSchema =
   | HContainerPropsSchema
   | InputPropsSchema;
 
-export type VariantsSchema = typeof ButtonVariants | typeof EventVariants;
+export type VariantsSchema =
+  | typeof ButtonVariants
+  | typeof EventVariants
+  | typeof HContainerColumnVariants
+  | typeof InputVariants;

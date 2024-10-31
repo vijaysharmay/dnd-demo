@@ -1,6 +1,5 @@
+import { randInt } from "@/lib/utils";
 import { ComponentElement, HContainer } from "@/types";
-import { InputPropsZSchema } from "@/types/properties";
-import { generateMock } from "@anatine/zod-mock";
 import { Columns3Icon } from "lucide-react";
 import {
   HContainerDesignerComponent,
@@ -14,7 +13,11 @@ export const HContainerComponentElement: ComponentElement = {
   create: (id: string) => ({
     id,
     type: HContainer,
-    props: generateMock(InputPropsZSchema),
+    props: {
+      hContainerId: `hContainer-${randInt()}`,
+      hContainerHeightInPx: "100px",
+      hContainerColumns: "One",
+    },
     children: [],
     parentId: null,
   }),

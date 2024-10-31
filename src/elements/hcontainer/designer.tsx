@@ -2,33 +2,36 @@ import { Button } from "@/components/ui/button";
 import DesignerElementWrapper from "@/containers/designer-element-wrapper";
 import { cn } from "@/lib/utils";
 import { ComponentElementInstance } from "@/types";
+import { colsIntRec, HContainerPropsSchema } from "@/types/properties";
 import { useDroppable } from "@dnd-kit/core";
 import { concat } from "lodash";
 
 export const HContainerDesignerComponent: React.FC<{
   elementInstance: ComponentElementInstance;
 }> = ({ elementInstance }) => {
-  const { id, attributes, children } = elementInstance;
-  const { hContainerId, height, columns } = attributes;
-  const lDiff = parseInt(columns.propertyValue) - children.length;
+  const { id, props, children } = elementInstance;
+  const { hContainerId, hContainerHeightInPx, hContainerColumns } =
+    props as HContainerPropsSchema;
+
+  const colsClassMapper: Record<string, string> = {
+    One: "grid-cols-1",
+    Two: "grid-cols-2",
+    Three: "grid-cols-3",
+    Four: "grid-cols-4",
+  };
+  const lDiff = colsIntRec[hContainerColumns] - children.length;
   const colsArray =
     lDiff > 0 ? concat(children, new Array(lDiff).fill(undefined)) : children;
 
-  const colsClassMapper: Record<string, string> = {
-    1: "grid-cols-1",
-    2: "grid-cols-2",
-    3: "grid-cols-3",
-  };
-
   return (
     <div
-      id={hContainerId.propertyValue}
+      id={hContainerId}
       className={cn(
         "grid",
-        colsClassMapper[columns.propertyValue],
+        colsClassMapper[hContainerColumns],
         "gap-2 auto-cols-max grid-flow-col p-2 w-full"
       )}
-      style={{ minHeight: `${height.propertyValue}px` }}
+      style={{ minHeight: `${hContainerHeightInPx}` }}
     >
       {colsArray.map((v, i) => {
         if (v) {
@@ -64,9 +67,7 @@ const HContainerDroppable = ({
         "w-full bg-white rounded-md border-gray-500 border border-dashed",
         dropRegion.isOver && "bg-gray-400"
       )}
-    >
-      {index}
-    </div>
+    ></div>
   );
 };
 
