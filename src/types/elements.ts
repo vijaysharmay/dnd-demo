@@ -1,3 +1,9 @@
+import {
+  ButtonPropsSchema,
+  HContainerPropsSchema,
+  InputPropsSchema,
+} from "./properties";
+
 export const Accordion = "Accordion";
 export const Alert = "Alert";
 export const AlertDialog = "AlertDialog";
@@ -100,8 +106,8 @@ export const DTable = "DTable";
 export type ComponentElementType =
   | typeof Input
   | typeof Button
-  | typeof HContainer
-  | typeof DTable;
+  | typeof HContainer;
+// | typeof DTable;
 
 export type ComponentLibraryListItem = {
   icon: React.ReactElement;
@@ -117,8 +123,7 @@ export type AttributePropertyConfig = {
 export type ComponentElementInstance = {
   id: string;
   type: ComponentElementType;
-  attributes: Record<string, AttributePropertyConfig>;
-  events: Record<string, () => void>;
+  props: ButtonPropsSchema | InputPropsSchema | HContainerPropsSchema;
   children: (ComponentElementInstance | null)[];
   parentId: string | null;
 };
@@ -129,8 +134,8 @@ export type ComponentElement = {
   componentLibraryListItem: ComponentLibraryListItem;
   designerComponent: React.FC<{ elementInstance: ComponentElementInstance }>;
   dragOverlayComponent: React.FC;
-  renderComponent: React.FC;
-  propertiesComponent: React.FC;
+  renderComponent: React.FC<{ elementInstance: ComponentElementInstance }>;
+  propertiesComponent: React.FC<{ elementInstance: ComponentElementInstance }>;
 };
 
 export type ComponentElements = {

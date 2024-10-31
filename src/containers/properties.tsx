@@ -8,8 +8,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { libraryElements } from "@/elements";
 import useElementStore from "@/store/element-store";
-import { AttributePropertyConfig, ComponentElementInstance } from "@/types";
+import { ComponentElementInstance } from "@/types";
 import { drop, dropRight, fill } from "lodash";
 import { useState } from "react";
 
@@ -126,42 +127,12 @@ const ElementProperty = ({
 export default function Properties() {
   const { activeElement } = useElementStore();
   if (activeElement === null) return;
-  const { attributes } = activeElement as ComponentElementInstance;
+  const { type } = activeElement as ComponentElementInstance;
+  const PropertiesComponent = libraryElements[type].propertiesComponent;
 
   return (
     <>
-      {activeElement && (
-        <div className="p-2 flex flex-wrap gap-2">
-          <div className="text-center w-full font-semibold text-muted-foreground">
-            Properties
-          </div>
-
-          <div className="text-sm w-full text-zince-50 underline">
-            Attributes
-          </div>
-
-          {Object.keys(attributes).map((key: string) => {
-            const { propertyValue, showInProperties, options } = attributes[
-              key
-            ] as AttributePropertyConfig;
-
-            return (
-              showInProperties && (
-                <ElementProperty
-                  key={key}
-                  property={key}
-                  propertyValue={propertyValue}
-                  propertyOptions={options}
-                />
-              )
-            );
-          })}
-
-          <div className="text-sm w-full text-zince-50 underline pt-4">
-            Events
-          </div>
-        </div>
-      )}
+      {activeElement && <PropertiesComponent elementInstance={activeElement} />}
     </>
   );
 }

@@ -1,20 +1,22 @@
 import { Button } from "@/components/ui/button";
 import { ComponentElementInstance } from "@/types";
-import { MouseEventHandler } from "react";
+import { ButtonPropsSchema } from "@/types/properties";
+import { EventMapper } from "../common/event-mapper";
 
 export const ButtonDesignerComponent: React.FC<{
   elementInstance: ComponentElementInstance;
 }> = ({ elementInstance }) => {
-  const { attributes, events } = elementInstance;
-  const { buttonId, buttonText } = attributes;
-  const { onClickHandler } = events;
+  const { props } = elementInstance;
+  const { buttonId, buttonText, buttonVariant, onClickHandler } =
+    props as ButtonPropsSchema;
   return (
     <div className="place-content-center text-center w-full h-fit">
       <Button
-        id={buttonId.propertyValue}
-        onClick={onClickHandler as MouseEventHandler<HTMLButtonElement>}
+        variant={buttonVariant}
+        id={buttonId}
+        onClick={EventMapper[onClickHandler]}
       >
-        {buttonText.propertyValue}
+        {buttonText}
       </Button>
     </div>
   );

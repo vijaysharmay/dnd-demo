@@ -2,8 +2,12 @@ import { randInt } from "@/lib/utils";
 import { ComponentElement, DTable } from "@/types";
 import { Table } from "lucide-react";
 
-import { DTableDragOverlayComponent } from "./designer/dtable-designer-component";
-import { DTableDesignerComponent } from "./designer/dtable-designer-component";
+import {
+  DTableDesignerComponent,
+  DTableDragOverlayComponent,
+} from "./designer";
+import { DTablePropertiesComponent } from "./properties";
+import { DTableRenderComponent } from "./render";
 
 export const DTableComponentElement: ComponentElement = {
   type: DTable,
@@ -32,6 +36,6 @@ export const DTableComponentElement: ComponentElement = {
   },
   designerComponent: DTableDesignerComponent,
   dragOverlayComponent: DTableDragOverlayComponent,
-  propertiesComponent: () => <div>ButtonComponentElement</div>,
-  renderComponent: () => <div>ButtonComponentElement</div>,
+  propertiesComponent: DTablePropertiesComponent,
+  renderComponent: DTableRenderComponent,
 };
