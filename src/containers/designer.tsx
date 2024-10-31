@@ -5,6 +5,7 @@ import { ComponentElementInstance, ComponentElementType } from "@/types";
 import { DragEndEvent, useDndMonitor, useDroppable } from "@dnd-kit/core";
 import { v4 as uuidv4 } from "uuid";
 
+import { isNull } from "lodash";
 import DesignerElementWrapper from "./designer-element-wrapper";
 
 export default function Designer() {
@@ -12,9 +13,11 @@ export default function Designer() {
     elements,
     addElement,
     addElementToParent,
+    getElementById,
     getElementIndexById,
     moveElementV,
     setActiveElement,
+    removeElement,
     setActiveElementId,
   } = useElementStore();
   const droppable = useDroppable({
@@ -72,6 +75,18 @@ export default function Designer() {
         const fromIndex = getElementIndexById(movedElementId);
         const isTop = over.data?.current?.isTopHalfDroppable;
         const isBottom = over.data?.current?.isBottomHalfDroppable;
+
+        if (isHContainerDroppable) {
+          const hContainerId = over.data?.current?.id;
+          const index = over.data?.current?.index;
+          const activatedElementId = active.data?.current?.id;
+          const activatedElement = getElementById(activatedElementId);
+          if (!isNull(activatedElement)) {
+            activatedElement.parentId = hContainerId;
+            addElementToParent(hContainerId, index, activatedElement);
+            removeElement(activatedElementId, null);
+          }
+        }
 
         // YUCK *vomits all over the place* !!!
         // if (fromIndex !== undefined) {

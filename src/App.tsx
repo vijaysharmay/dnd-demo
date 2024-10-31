@@ -15,6 +15,7 @@ import Designer from "./containers/designer";
 import DragOverlayWrapper from "./containers/drag-overlay-wrapper";
 import Navbar from "./containers/navbar";
 import Properties from "./containers/properties";
+import Preview from "./containers/preview";
 
 export default function App() {
   return (
@@ -65,8 +66,4 @@ function Home() {
       </PanelGroup>
     </>
   );
-}
-
-function Preview() {
-  return <div>Preview</div>;
 }

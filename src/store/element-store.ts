@@ -13,7 +13,7 @@ interface ElementState {
   setActiveElementId: (elementId: string | null) => void;
   addElement: (index: number, element: ComponentElementInstance) => void;
   addElementToParent: (
-    elementId: string,
+    parentElementId: string,
     index: number,
     element: ComponentElementInstance
   ) => void;
@@ -55,13 +55,13 @@ const useElementStore = create<ElementState>()(
           set({ elements });
         },
         addElementToParent: (
-          elementId: string,
+          parentElementId: string,
           index: number,
           element: ComponentElementInstance
         ) => {
           const elements = get().elements;
           const parentElementIndex = elements.findIndex(
-            (x: ComponentElementInstance) => x.id === elementId
+            (x: ComponentElementInstance) => x.id === parentElementId
           );
           if (parentElementIndex !== -1) {
             const parentElement = elements[parentElementIndex];

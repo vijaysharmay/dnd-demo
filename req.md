@@ -6,14 +6,12 @@ Requirements
 - [ ] Integrating OpenAPI Specification Support For Backend Driven UI Development
 - [ ] Flow / Action Orchestration Engine
 - [ ] Resizable Containers / Components
-- [ ] Properties should not always be editable i.e need to edit one attribute at a time
-- [ ] Nested Droppable / Draggable
-  - [ ] Handle drag and drop for elements already present on screen
 - [ ] Code Refactoring
   - [ ] Use Immer
   - [ ] Separate OnDragEnd, OnDragEnter etc into separate files
   - [ ] Properties Component Rethink
   - [ ] Evaluate Daybrush Selecto
+- [ ] Ability to nest HContainer within VContainer (and vice versa) and prevent drop at a depth
 
 Scope
 =====
