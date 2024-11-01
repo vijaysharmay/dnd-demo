@@ -12,6 +12,9 @@ Requirements
   - [ ] Properties Component Rethink
   - [ ] Evaluate Daybrush Selecto
 - [ ] Ability to nest HContainer within VContainer (and vice versa) and prevent drop at a depth
+- [ ] ability to group elements to a form elements
+- [ ] should be able to move objects in/out from hcontainer/vcontainer
+- [ ] 
 
 Scope
 =====

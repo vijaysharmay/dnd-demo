@@ -1,14 +1,21 @@
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import useSchemaStore from "@/store/schema-store";
 import { ConcordSchema } from "@/types/schema";
 import { Monaco, Editor as SchemaEditor } from "@monaco-editor/react";
 import Ajv from "ajv";
-import { JSONSchemaFaker, Schema } from "json-schema-faker";
 import { editor } from "monaco-editor";
 import { useRef, useState } from "react";
 
@@ -19,11 +26,24 @@ export default function SchemaManager() {
     // lineNumbers: "off",
   };
   const ajv = new Ajv();
+  ajv.addVocabulary([
+    // OpenAPI root elements
+    "components",
+    "externalDocs",
+    "info",
+    "openapi",
+    "paths",
+    "security",
+    "servers",
+    // OpenAPI Request/Response (relative) root element
+    "content",
+  ]);
 
   const [schemaValue, setSchemaValue] = useState<string | undefined>("");
   const [schemaName, setSchemaName] = useState<string>("");
   const [isSchemaValid, setIsSchemaValid] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<string>("showSchemas");
+  const [activeSchemaType, setActiveSchemaType] = useState<string>("openAPI");
   const [errorMsg, setErrorMsg] = useState<string>("");
 
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
@@ -31,7 +51,7 @@ export default function SchemaManager() {
 
   const { schemas, upsertSchema, removeSchema } = useSchemaStore();
 
-  const handleEditorChange = (
+  const handleEditorChange = async (
     value: string | undefined,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _event: editor.IModelContentChangedEvent
@@ -67,9 +87,9 @@ export default function SchemaManager() {
     const schemaObject: ConcordSchema = {
       name: schemaName,
       schema: schemaValue as string,
-      sampleData: JSONSchemaFaker.generate(
-        JSON.parse(schemaValue as string) as Schema
-      ),
+      // sampleData: JSONSchemaFaker.generate(
+      //   JSON.parse(schemaValue as string) as Schema
+      // ),
     };
     upsertSchema(schemaName, schemaObject);
     setActiveTab("showSchemas");
@@ -158,9 +178,35 @@ export default function SchemaManager() {
                 )}
               />
             </div>
-            <div className="min-h-[250px] p-4 bg-gray-100">
+            <div className="grid grid-cols-8 items-center gap-2 mb-4">
+              <Label htmlFor="name" className="text-center col-span-1">
+                Schema Type
+              </Label>
+              <RadioGroup
+                defaultValue={activeSchemaType}
+                className="col-span-2 grid-flow-col"
+              >
+                <div className="items-center space-x-2">
+                  <RadioGroupItem
+                    value="openAPI"
+                    id="r1"
+                    onClick={() => setActiveSchemaType("openAPI")}
+                  />
+                  <Label htmlFor="r1">Open API</Label>
+                </div>
+                <div className="items-center space-x-2">
+                  <RadioGroupItem
+                    value="jsonSchema"
+                    id="r2"
+                    onClick={() => setActiveSchemaType("jsonSchema")}
+                  />
+                  <Label htmlFor="r2">JSON Schema</Label>
+                </div>
+              </RadioGroup>
+            </div>
+            <div className="min-h-[300px] p-4 bg-gray-100">
               <SchemaEditor
-                height="250px"
+                height="300px"
                 defaultLanguage="json"
                 defaultValue={schemaValue}
                 theme="dark"
