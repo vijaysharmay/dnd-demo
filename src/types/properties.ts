@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ConcordSchema } from "./schema";
 
 export const ButtonVariants = [
   "default",
@@ -66,6 +67,8 @@ export const DTablePropsZSchema = z.object({
   responseSchemaMapping: z.string(),
 });
 
+export type SchemaVariants = Record<string, ConcordSchema>;
+
 export type ButtonPropsSchema = z.infer<typeof ButtonPropsZSchema>;
 export type HContainerPropsSchema = z.infer<typeof HContainerPropsZSchema>;
 export type InputPropsSchema = z.infer<typeof InputPropsZSchema>;
@@ -81,4 +84,5 @@ export type VariantsSchema =
   | typeof ButtonVariants
   | typeof EventVariants
   | typeof HContainerColumnVariants
+  | string[]
   | typeof InputVariants;

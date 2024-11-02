@@ -16,6 +16,7 @@ import useSchemaStore from "@/store/schema-store";
 import { ConcordSchema } from "@/types/schema";
 import { Monaco, Editor as SchemaEditor } from "@monaco-editor/react";
 import Ajv from "ajv";
+import { JSONSchemaFaker, Schema } from "json-schema-faker";
 import { editor } from "monaco-editor";
 import { useRef, useState } from "react";
 
@@ -87,9 +88,9 @@ export default function SchemaManager() {
     const schemaObject: ConcordSchema = {
       name: schemaName,
       schema: schemaValue as string,
-      // sampleData: JSONSchemaFaker.generate(
-      //   JSON.parse(schemaValue as string) as Schema
-      // ),
+      sampleData: JSONSchemaFaker.generate(
+        JSON.parse(schemaValue as string) as Schema
+      ),
     };
     upsertSchema(schemaName, schemaObject);
     setActiveTab("showSchemas");

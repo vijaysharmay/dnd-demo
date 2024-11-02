@@ -18,7 +18,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { PropsSchema, VariantsSchema } from "@/types/properties";
+import { PropsSchema, VariantsSchema, SchemaVariants } from "@/types/properties";
 import { Info } from "lucide-react";
 import { ControllerRenderProps } from "react-hook-form";
 
@@ -71,6 +71,7 @@ export const SelectFormField = ({
   variants,
   field,
 }: SelectFormFieldProps) => {
+
   return (
     <FormItem>
       <FormLabel>

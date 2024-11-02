@@ -4,9 +4,6 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
@@ -21,11 +18,7 @@ import {
 import useSchemaStore from "@/store/schema-store";
 import { ComponentElementInstance } from "@/types";
 import { DTablePropsSchema } from "@/types/properties";
-import {
-  CaretSortIcon,
-  ChevronDownIcon,
-  DotsHorizontalIcon,
-} from "@radix-ui/react-icons";
+import { CaretSortIcon, ChevronDownIcon } from "@radix-ui/react-icons";
 import {
   ColumnFiltersState,
   flexRender,
@@ -37,7 +30,6 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
-import { JSONSchemaFaker } from "json-schema-faker";
 import { useState } from "react";
 
 export const DTableDesignerComponent: React.FC<{
@@ -46,8 +38,7 @@ export const DTableDesignerComponent: React.FC<{
   const { props } = elementInstance;
   const { schemas } = useSchemaStore();
   const { responseSchemaMapping } = props as DTablePropsSchema;
-  const dTableSchema = JSON.parse(schemas[responseSchemaMapping].schema);
-  const data = JSONSchemaFaker.generate(dTableSchema);
+  const data = schemas[responseSchemaMapping].sampleData;
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -77,70 +68,35 @@ export const DTableDesignerComponent: React.FC<{
       enableHiding: false,
     },
     {
-      accessorKey: "status",
-      header: "Status",
+      accessorKey: "completed",
+      header: "Completed",
       cell: ({ row }) => (
-        <div className="capitalize">{row.getValue("status")}</div>
+        <div className="capitalize">{row.getValue("completed")}</div>
       ),
     },
     {
-      accessorKey: "email",
+      accessorKey: "title",
       header: ({ column }) => {
         return (
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            Email
+            Title
             <CaretSortIcon className="ml-2 h-4 w-4" />
           </Button>
         );
       },
       cell: ({ row }) => (
-        <div className="lowercase">{row.getValue("email")}</div>
+        <div className="lowercase">{row.getValue("title")}</div>
       ),
     },
     {
-      accessorKey: "amount",
+      accessorKey: "userId",
       header: () => <div className="text-right">Amount</div>,
       cell: ({ row }) => {
-        const amount = parseFloat(row.getValue("amount"));
-
-        // Format the amount as a dollar amount
-        const formatted = new Intl.NumberFormat("en-US", {
-          style: "currency",
-          currency: "USD",
-        }).format(amount);
-
-        return <div className="text-right font-medium">{formatted}</div>;
-      },
-    },
-    {
-      id: "actions",
-      enableHiding: false,
-      cell: ({ row }) => {
-        const payment = row.original;
-
         return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <DotsHorizontalIcon className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem
-                onClick={() => navigator.clipboard.writeText(payment.id)}
-              >
-                Copy payment ID
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>View customer</DropdownMenuItem>
-              <DropdownMenuItem>View payment details</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <div className="text-right font-medium">{row.getValue("userId")}</div>
         );
       },
     },
@@ -149,6 +105,8 @@ export const DTableDesignerComponent: React.FC<{
   const table = useReactTable({
     data,
     columns,
+    autoResetPageIndex: false,
+    autoResetExpanded: false,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
@@ -170,9 +128,9 @@ export const DTableDesignerComponent: React.FC<{
       <div className="flex items-center py-4">
         <Input
           placeholder="Filter emails..."
-          value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
+          value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("email")?.setFilterValue(event.target.value)
+            table.getColumn("title")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />
