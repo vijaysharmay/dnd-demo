@@ -1,0 +1,28 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Department {
+  id             String    @id @default(uuid())
+  departmentName String    @map("department_name")
+  Employee       Employee? @relation(fields: [employeeId], references: [id])
+  employeeId     String?
+
+  @@map("departments")
+}
+
+model Employee {
+  id           String       @id @default(uuid())
+  fullName     String       @map("full_name")
+  employeeId   String       @map("employee_id")
+  salaryInRs   Int          @map("salary_in_rs")
+  departmentId String       @map("department_id")
+  Department   Department[]
+
+  @@map("employees")
+}

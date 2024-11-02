@@ -1,7 +1,8 @@
+import { ComponentElementInstance } from "@/types";
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
 
-import { ComponentElementInstance } from "../types";
+import { isNull } from "lodash";
 
 interface ElementState {
   elements: ComponentElementInstance[];
@@ -16,6 +17,10 @@ interface ElementState {
     parentElementId: string,
     index: number,
     element: ComponentElementInstance
+  ) => void;
+  updateElementInParent: (
+    parentElementId: string,
+    updatedElement: ComponentElementInstance
   ) => void;
   removeElement: (elementId: string, parentId: string | null) => void;
   updateElement: (elementId: string, element: ComponentElementInstance) => void;
@@ -67,6 +72,33 @@ const useElementStore = create<ElementState>()(
             const parentElement = elements[parentElementIndex];
             // needs a revisit
             parentElement.children.splice(index, 1, element);
+            elements.splice(parentElementIndex, 1, parentElement);
+            set({ elements });
+          }
+        },
+        updateElementInParent: (
+          parentElementId: string,
+          updatedElement: ComponentElementInstance
+        ) => {
+          const elements = get().elements;
+          const parentElementIndex = elements.findIndex(
+            (x: ComponentElementInstance) => x.id === parentElementId
+          );
+          if (parentElementIndex !== -1) {
+            const parentElement = elements[parentElementIndex];
+            const updatedElementIndex = parentElement.children.findIndex(
+              (child: ComponentElementInstance | null) => {
+                if (isNull(child)) return -1;
+                return child.id === updatedElement.id;
+              }
+            );
+            if (updatedElementIndex !== -1) {
+              parentElement.children.splice(
+                updatedElementIndex,
+                1,
+                updatedElement
+              );
+            }
             elements.splice(parentElementIndex, 1, parentElement);
             set({ elements });
           }
