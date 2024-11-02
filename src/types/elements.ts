@@ -1,8 +1,4 @@
-import {
-  ButtonPropsSchema,
-  HContainerPropsSchema,
-  InputPropsSchema,
-} from "./properties";
+import { PropsSchema } from "./properties";
 
 export const Accordion = "Accordion";
 export const Alert = "Alert";
@@ -106,8 +102,8 @@ export const DTable = "DTable";
 export type ComponentElementType =
   | typeof Input
   | typeof Button
-  | typeof HContainer;
-// | typeof DTable;
+  | typeof HContainer
+  | typeof DTable;
 
 export type ComponentLibraryListItem = {
   icon: React.ReactElement;
@@ -123,7 +119,7 @@ export type AttributePropertyConfig = {
 export type ComponentElementInstance = {
   id: string;
   type: ComponentElementType;
-  props: ButtonPropsSchema | InputPropsSchema | HContainerPropsSchema;
+  props: PropsSchema;
   children: (ComponentElementInstance | null)[];
   parentId: string | null;
 };

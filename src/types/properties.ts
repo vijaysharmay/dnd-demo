@@ -57,13 +57,24 @@ export const InputPropsZSchema = z.object({
   placeHolder: z.string().min(1),
 });
 
+export const DTablePropsZSchema = z.object({
+  dTableId: z
+    .string({ required_error: "Required dTableId" })
+    .min(9)
+    .startsWith("input-", "ID must start with the prefix `dTableId-`"),
+  dataUrl: z.string().url(),
+  responseSchemaMapping: z.string(),
+});
+
 export type ButtonPropsSchema = z.infer<typeof ButtonPropsZSchema>;
 export type HContainerPropsSchema = z.infer<typeof HContainerPropsZSchema>;
 export type InputPropsSchema = z.infer<typeof InputPropsZSchema>;
+export type DTablePropsSchema = z.infer<typeof DTablePropsZSchema>;
 
 export type PropsSchema =
   | ButtonPropsSchema
   | HContainerPropsSchema
+  | DTablePropsSchema
   | InputPropsSchema;
 
 export type VariantsSchema =

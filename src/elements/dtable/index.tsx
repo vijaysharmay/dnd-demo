@@ -14,19 +14,11 @@ export const DTableComponentElement: ComponentElement = {
   create: (id: string) => ({
     id,
     type: DTable,
-    attributes: {
-      DTableId: {
-        propertyValue: `dTable-${randInt()}`,
-        showInProperties: true,
-        options: null,
-      },
-      data: {
-        propertyValue: "",
-        showInProperties: true,
-        options: null,
-      },
+    props: {
+      dTableId: `dTable-${randInt()}`,
+      dataUrl: "https://jsonplaceholder.typicode.com/posts",
+      responseSchemaMapping: "JSONPlaceholderPosts"
     },
-    events: {},
     children: [],
     parentId: null,
   }),
