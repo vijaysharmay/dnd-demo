@@ -1,0 +1,126 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                     String              @id @default(uuid()) @map("id")
+  fullName               String              @map("full_name")
+  username               String              @unique @map("username")
+  passwd                 Int                 @map("passwd")
+  ownerOfWorkspace       Workspace[]         @relation(name: "ownerOfWorkspace")
+  ownerOfProject         Project[]           @relation(name: "ownerOfProject")
+  ownerOfPage            Page[]              @relation(name: "ownerOfPage")
+  partOf                 UsersInWorkspaces[] @relation(name: "partOf")
+  addedUsersInWorkspaces UsersInWorkspaces[] @relation(name: "addedBy")
+
+  @@map("users")
+}
+
+model Workspace {
+  id       String              @id @default(uuid()) @map("id")
+  name     String              @map("name")
+  owner    User                @relation(fields: [ownerId], references: [id], name: "ownerOfWorkspace")
+  ownerId  String              @unique
+  route    String              @unique @map("workspace_route")
+  members  UsersInWorkspaces[]
+  projects Project[]           @relation(name: "partOfWorkspace")
+
+  @@map("workspaces")
+}
+
+model UsersInWorkspaces {
+  user        User      @relation(fields: [userId], references: [id], name: "partOf", map: "user_workspace_fk")
+  userId      String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  workspaceId String
+  addedAt     DateTime  @default(now())
+  addedBy     User      @relation(fields: [userId], references: [id], name: "addedBy", map: "added_by_fk")
+  addedById   String    @unique
+
+  @@id([userId, workspaceId])
+  @@map("users_in_workspaces")
+}
+
+model Project {
+  id             String    @id @default(uuid()) @map("id")
+  name           String    @map("name")
+  projectOwner   User      @relation(fields: [projectOwnerId], references: [id], name: "ownerOfProject")
+  projectOwnerId String    @unique
+  workspace      Workspace @relation(fields: [workspaceId], references: [id], name: "partOfWorkspace")
+  workspaceId    String    @unique
+  route          String    @unique @map("route")
+  pages          Page[]    @relation(name: "partOfProject")
+
+  @@map("projects")
+}
+
+model Page {
+  id          String  @id @default(uuid()) @map("id")
+  name        String  @map("name")
+  pageOwner   User    @relation(fields: [pageOwnerId], references: [id], name: "ownerOfPage")
+  pageOwnerId String  @unique
+  project     Project @relation(fields: [projectId], references: [id], name: "partOfProject")
+  projectId   String  @unique
+  route       String  @unique @map("route")
+  blocks      Block[] @relation(name: "partOfPage")
+
+  @@map("pages")
+}
+
+model Block {
+  id           String  @id @default(uuid()) @map("id")
+  blockId      String  @unique @map("block_id")
+  blockType    String  @map("block_type") //should be enum
+  defaultProps Json    @map("default_props")
+  props        Json?   @map("props")
+  page         Page    @relation(fields: [pageId], references: [id], name: "partOfPage")
+  pageId       String  @unique
+  route        String  @unique @map("route")
+  flow         Flow?   @relation(fields: [flowId], references: [id], name: "hasFlow")
+  flowId       String? @unique
+
+  @@map("blocks")
+}
+
+model Flow {
+  id           String           @id @default(uuid()) @map("id")
+  name         String           @map("name")
+  triggerEvent String           @map("trigger_event") // should be enum
+  actions      ActionsInFlows[] @relation(name: "partOfFlow")
+  ofBlock      Block?           @relation(name: "hasFlow")
+
+  @@map("flows")
+}
+
+model Action {
+  id           String           @id @default(uuid()) @map("id")
+  actionId     String           @unique @map("action_id")
+  actionType   String           @map("action_type") // should be enum
+  defaultProps Json             @map("default_props")
+  props        Json?            @map("props")
+  route        String           @unique @map("route")
+  flows        ActionsInFlows[] @relation(name: "partOfAction")
+
+  @@map("actions")
+}
+
+model ActionsInFlows {
+  flow     Flow   @relation(fields: [flowId], references: [id], name: "partOfFlow", map: "flow_workspace_fk")
+  flowId   String
+  action   Action @relation(fields: [actionId], references: [id], name: "partOfAction")
+  actionId String
+
+  @@id([flowId, actionId])
+  @@map("actions_in_flows")
+}

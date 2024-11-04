@@ -18,3 +18,35 @@ Requirements
 
 Scope
 =====
+
+TS Bugs
+=======
+
+[06:24:42.452] src/elements/button/properties.tsx(43,17)
+[06:24:42.452] src/elements/button/properties.tsx(55,17)
+[06:24:42.453] src/elements/button/properties.tsx(67,17)
+[06:24:42.453] src/elements/button/properties.tsx(80,17)
+[06:24:42.453] src/elements/common/event-mapper.ts(5,25)
+[06:24:42.453] src/elements/common/form-fields.tsx(21,39)
+[06:24:42.454] src/elements/dtable/designer.tsx(54,18)
+[06:24:42.454] src/elements/dtable/designer.tsx(68,16)
+[06:24:42.454] src/elements/dtable/designer.tsx(75,18)
+[06:24:42.454] src/elements/dtable/designer.tsx(85,16)
+[06:24:42.455] src/elements/dtable/properties.tsx(40,17)
+[06:24:42.455] src/elements/dtable/properties.tsx(52,17)
+[06:24:42.456] src/elements/dtable/properties.tsx(64,17)
+[06:24:42.456] src/elements/dtable/properties.tsx(77,17)
+[06:24:42.457] src/elements/dtable/render.tsx(69,18)
+[06:24:42.457] src/elements/dtable/render.tsx(83,16)
+[06:24:42.457] src/elements/dtable/render.tsx(90,18)
+[06:24:42.457] src/elements/dtable/render.tsx(100,16)
+[06:24:42.457] src/elements/hcontainer/properties.tsx(42,17)
+[06:24:42.457] src/elements/hcontainer/properties.tsx(54,17)
+[06:24:42.458] src/elements/hcontainer/properties.tsx(66,17)
+[06:24:42.458] src/elements/input/properties.tsx(42,17)
+[06:24:42.458] src/elements/input/properties.tsx(54,17)
+[06:24:42.458] src/elements/input/properties.tsx(66,17)
+[06:24:42.458] src/elements/input/properties.tsx(79,17)
+[06:24:42.459] src/elements/input/properties.tsx(91,17)
+[06:24:42.459] src/lib/utils.ts(12,33)
+[06:24:42.460] src/lib/utils.ts(12,33)
