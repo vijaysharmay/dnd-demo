@@ -6,7 +6,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Table,
   TableBody,
@@ -30,6 +30,7 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
+import { capitalize } from "lodash";
 import { useState } from "react";
 
 export const DTableDesignerComponent: React.FC<{
@@ -37,12 +38,36 @@ export const DTableDesignerComponent: React.FC<{
 }> = ({ elementInstance }) => {
   const { props } = elementInstance;
   const { schemas } = useSchemaStore();
-  const { responseSchemaMapping } = props as DTablePropsSchema;
+  const { dTableHeightInPx, responseSchemaMapping } =
+    props as DTablePropsSchema;
   const data = schemas[responseSchemaMapping].sampleData;
+  const dataSchema = JSON.parse(schemas[responseSchemaMapping].schema);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
+
+  const schemaProperties = dataSchema.items.properties;
+  const tableColumns = Object.keys(schemaProperties).map((prop: string) => {
+    return {
+      accessorKey: prop,
+      header: ({ column }) => {
+        const propType = schemaProperties[prop].type;
+        return propType === "string" ? (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            {capitalize(prop)}
+            <CaretSortIcon className="ml-2 h-4 w-4" />
+          </Button>
+        ) : (
+          capitalize(prop)
+        );
+      },
+      cell: ({ row }) => <div className="lowercase">{row.getValue(prop)}</div>,
+    };
+  });
 
   const columns = [
     {
@@ -67,39 +92,7 @@ export const DTableDesignerComponent: React.FC<{
       enableSorting: false,
       enableHiding: false,
     },
-    {
-      accessorKey: "completed",
-      header: "Completed",
-      cell: ({ row }) => (
-        <div className="capitalize">{row.getValue("completed")}</div>
-      ),
-    },
-    {
-      accessorKey: "title",
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Title
-            <CaretSortIcon className="ml-2 h-4 w-4" />
-          </Button>
-        );
-      },
-      cell: ({ row }) => (
-        <div className="lowercase">{row.getValue("title")}</div>
-      ),
-    },
-    {
-      accessorKey: "userId",
-      header: () => <div className="text-right">Amount</div>,
-      cell: ({ row }) => {
-        return (
-          <div className="text-right font-medium">{row.getValue("userId")}</div>
-        );
-      },
-    },
+    ...tableColumns,
   ];
 
   const table = useReactTable({
@@ -126,14 +119,14 @@ export const DTableDesignerComponent: React.FC<{
   return (
     <div className="w-full">
       <div className="flex items-center py-4">
-        <Input
+        {/* <Input
           placeholder="Filter emails..."
           value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
             table.getColumn("title")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
-        />
+        /> */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">
@@ -162,54 +155,59 @@ export const DTableDesignerComponent: React.FC<{
         </DropdownMenu>
       </div>
       <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
+        <ScrollArea
+          className="overflow-auto"
+          style={{ maxHeight: dTableHeightInPx }}
+        >
+          <Table>
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => {
+                    return (
+                      <TableHead key={header.id}>
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                      </TableHead>
+                    );
+                  })}
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && "selected"}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={columns.length}
+                    className="h-24 text-center"
+                  >
+                    No results.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </ScrollArea>
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="flex-1 text-sm text-muted-foreground">

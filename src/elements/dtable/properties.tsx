@@ -1,13 +1,13 @@
-import PropertiesElementWrapper from "@/containers/properties-element.wrapper";
-import { ComponentElementInstance } from "@/types";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { SubmitHandler, useForm } from "react-hook-form";
-
 import { Button } from "@/components/ui/button";
 import { Form, FormField } from "@/components/ui/form";
+import PropertiesElementWrapper from "@/containers/properties-element.wrapper";
 import useSchemaStore from "@/store/schema-store";
+import { ComponentElementInstance } from "@/types";
 import { DTablePropsSchema, DTablePropsZSchema } from "@/types/properties";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { isEmpty } from "lodash";
+import { SubmitHandler, useForm } from "react-hook-form";
+
 import { InputFormField, SelectFormField } from "../common/form-fields";
 import { handlePropertiesFormSubmit } from "../common/handlePropertiesFormSubmit";
 
@@ -63,6 +63,18 @@ export const DTablePropertiesComponent: React.FC<{
                 tooltip="Schema of the expected response from the data URL"
                 field={field}
                 variants={Object.keys(schemas)}
+              />
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="dTableHeightInPx"
+            render={({ field }) => (
+              <InputFormField
+                name="Height (in px)"
+                tooltip="Height of the horizontal container, in pixels"
+                field={field}
               />
             )}
           />

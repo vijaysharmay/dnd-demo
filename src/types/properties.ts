@@ -1,4 +1,5 @@
 import { z } from "zod";
+
 import { ConcordSchema } from "./schema";
 
 export const ButtonVariants = [
@@ -61,10 +62,14 @@ export const InputPropsZSchema = z.object({
 export const DTablePropsZSchema = z.object({
   dTableId: z
     .string({ required_error: "Required dTableId" })
-    .min(9)
-    .startsWith("input-", "ID must start with the prefix `dTableId-`"),
+    .min(10)
+    .startsWith("dTable-", "ID must start with the prefix `dTable-`"),
   dataUrl: z.string().url(),
   responseSchemaMapping: z.string(),
+  dTableHeightInPx: z
+    .string()
+    .max(5)
+    .endsWith("px", "Please enter a value in px, for example: 100px"),
 });
 
 export type SchemaVariants = Record<string, ConcordSchema>;

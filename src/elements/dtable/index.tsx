@@ -17,7 +17,8 @@ export const DTableComponentElement: ComponentElement = {
     props: {
       dTableId: `dTable-${randInt()}`,
       dataUrl: "https://jsonplaceholder.typicode.com/posts",
-      responseSchemaMapping: "JSONPlaceholderPosts"
+      responseSchemaMapping: "JSONPlaceholderPosts",
+      dTableHeightInPx: "200px",
     },
     children: [],
     parentId: null,

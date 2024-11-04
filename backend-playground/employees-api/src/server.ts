@@ -1,4 +1,6 @@
+import cors from "@fastify/cors";
 import Fastify from "fastify";
+
 import departmentRoutes from "./modules/department/department.route";
 import { departmentSchemas } from "./modules/department/department.schema";
 import employeeRoutes from "./modules/employee/employee.route";
@@ -6,6 +8,10 @@ import { employeeSchemas } from "./modules/employee/employee.schema";
 
 function buildServer() {
   const server = Fastify();
+  server.register(cors, {
+    origin: "*",
+    methods: ["GET"],
+  });
 
   server.get("/healthcheck", async function () {
     return { status: "OK" };
