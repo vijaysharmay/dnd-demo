@@ -1,0 +1,23 @@
+meta {
+  name: Create Workspace
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:3000/workspace
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Sample1",
+    "ownerId": "{{currentUserId}}",
+    "route": "sample1"
+  }
+}
+
+tests {
+  bru.setEnvVar("currentUserId",res.getBody().id)
+}

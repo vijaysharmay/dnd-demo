@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "dnd-demo",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}

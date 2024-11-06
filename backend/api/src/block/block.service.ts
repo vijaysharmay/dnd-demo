@@ -1,9 +1,12 @@
 import { Injectable } from '@nestjs/common';
+import { PrismaService } from 'src/prisma.service';
+
 import { CreateBlockDto } from './dto/create-block.dto';
 import { UpdateBlockDto } from './dto/update-block.dto';
 
 @Injectable()
 export class BlockService {
+  constructor(private prisma: PrismaService) {}
   create(createBlockDto: CreateBlockDto) {
     return 'This action adds a new block';
   }

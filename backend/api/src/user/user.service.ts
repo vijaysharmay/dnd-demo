@@ -1,26 +1,84 @@
 import { Injectable } from '@nestjs/common';
+import { PrismaService } from 'src/prisma.service';
+
+import { v4 } from 'uuid';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UserService {
+  constructor(private prisma: PrismaService) {}
   create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+    const { fullName, email, passwd, role } = createUserDto;
+    return this.prisma.user.create({
+      data: {
+        id: v4(),
+        fullName,
+        email,
+        passwd,
+        role,
+      },
+      select: {
+        id: true,
+        fullName: true,
+        email: true,
+        role: true,
+      },
+    });
   }
 
   findAll() {
-    return `This action returns all user`;
+    return this.prisma.user.findMany({
+      select: {
+        id: true,
+        fullName: true,
+        email: true,
+        role: true,
+      },
+    });
   }
 
-  findOne(id: string) {
-    return `This action returns a #${id} user`;
+  findOne(userId: string) {
+    return this.prisma.user.findFirst({
+      where: {
+        id: userId,
+      },
+      select: {
+        id: true,
+        fullName: true,
+        email: true,
+        role: true,
+      },
+    });
   }
 
-  update(id: string, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  update(userId: string, updateUserDto: UpdateUserDto) {
+    const { fullName, email, passwd, role } = updateUserDto;
+    return this.prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        fullName,
+        passwd,
+        email,
+        role,
+      },
+      select: {
+        id: true,
+        fullName: true,
+        email: true,
+        role: true,
+      },
+    });
   }
 
-  remove(id: string) {
-    return `This action removes a #${id} user`;
+  async remove(userId: string) {
+    await this.prisma.user.delete({
+      where: {
+        id: userId,
+      },
+    });
+    return;
   }
 }

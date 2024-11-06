@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { APP_PIPE, RouterModule } from '@nestjs/core';
+import { ZodValidationPipe } from 'nestjs-zod';
 
 import { ActionModule } from './action/action.module';
 import { AppController } from './app.controller';
@@ -10,7 +11,6 @@ import { PageModule } from './page/page.module';
 import { ProjectModule } from './project/project.module';
 import { UserModule } from './user/user.module';
 import { WorkspaceModule } from './workspace/workspace.module';
-import { ZodValidationPipe } from 'nestjs-zod';
 
 @Module({
   imports: [

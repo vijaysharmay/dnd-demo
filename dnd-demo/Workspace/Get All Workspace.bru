@@ -1,0 +1,15 @@
+meta {
+  name: Get All Workspace
+  type: http
+  seq: 4
+}
+
+get {
+  url: http://localhost:3000/workspace
+  body: json
+  auth: none
+}
+
+tests {
+  bru.setEnvVar("currentUserId",res.getBody().id)
+}

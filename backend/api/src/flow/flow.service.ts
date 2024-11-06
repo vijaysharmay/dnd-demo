@@ -1,9 +1,12 @@
 import { Injectable } from '@nestjs/common';
+import { PrismaService } from 'src/prisma.service';
+
 import { CreateFlowDto } from './dto/create-flow.dto';
 import { UpdateFlowDto } from './dto/update-flow.dto';
 
 @Injectable()
 export class FlowService {
+  constructor(private prisma: PrismaService) {}
   create(createFlowDto: CreateFlowDto) {
     return 'This action adds a new flow';
   }

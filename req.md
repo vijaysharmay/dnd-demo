@@ -19,6 +19,18 @@ Requirements
 Scope
 =====
 
+a workspace has multiple users with different roles. a user with the right role can create a project.
+each project is associated with a route and contain pages with sub routes.
+
+each page has blocks and each block's event listeners can be modelled as a flow.
+a flow is comprised of actions (which are reusable across concord)
+
+- openapi integration
+- events
+- 
+
+
+
 TS Bugs
 =======
 

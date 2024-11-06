@@ -13,47 +13,41 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum UserRole {
+  ADMIN
+  DESIGNER
+  DEVELOPER
+  OWNER
+}
+
 model User {
-  id                     String              @id @default(uuid()) @map("id")
-  fullName               String              @map("full_name")
-  username               String              @unique @map("username")
-  passwd                 Int                 @map("passwd")
-  ownerOfWorkspace       Workspace[]         @relation(name: "ownerOfWorkspace")
-  ownerOfProject         Project[]           @relation(name: "ownerOfProject")
-  ownerOfPage            Page[]              @relation(name: "ownerOfPage")
-  partOf                 UsersInWorkspaces[] @relation(name: "partOf")
-  addedUsersInWorkspaces UsersInWorkspaces[] @relation(name: "addedBy")
+  id               String      @id @map("id")
+  fullName         String      @map("full_name")
+  email            String      @unique @map("email")
+  passwd           String      @map("passwd")
+  role             UserRole    @map("user_role")
+  ownerOfWorkspace Workspace[] @relation(name: "ownerOfWorkspace")
+  ownerOfProject   Project[]   @relation(name: "ownerOfProject")
+  ownerOfPage      Page[]      @relation(name: "ownerOfPage")
+  workspaces       Workspace[]
 
   @@map("users")
 }
 
 model Workspace {
-  id       String              @id @default(uuid()) @map("id")
-  name     String              @map("name")
-  owner    User                @relation(fields: [ownerId], references: [id], name: "ownerOfWorkspace")
-  ownerId  String              @unique
-  route    String              @unique @map("workspace_route")
-  members  UsersInWorkspaces[]
-  projects Project[]           @relation(name: "partOfWorkspace")
+  id       String    @id @map("id")
+  name     String    @map("name")
+  owner    User      @relation(fields: [ownerId], references: [id], name: "ownerOfWorkspace")
+  ownerId  String    @unique
+  route    String    @unique @map("workspace_route")
+  members  User[]
+  projects Project[] @relation(name: "partOfWorkspace")
 
   @@map("workspaces")
 }
 
-model UsersInWorkspaces {
-  user        User      @relation(fields: [userId], references: [id], name: "partOf", map: "user_workspace_fk")
-  userId      String
-  workspace   Workspace @relation(fields: [workspaceId], references: [id])
-  workspaceId String
-  addedAt     DateTime  @default(now())
-  addedBy     User      @relation(fields: [userId], references: [id], name: "addedBy", map: "added_by_fk")
-  addedById   String    @unique
-
-  @@id([userId, workspaceId])
-  @@map("users_in_workspaces")
-}
-
 model Project {
-  id             String    @id @default(uuid()) @map("id")
+  id             String    @id @map("id")
   name           String    @map("name")
   projectOwner   User      @relation(fields: [projectOwnerId], references: [id], name: "ownerOfProject")
   projectOwnerId String    @unique
@@ -66,7 +60,7 @@ model Project {
 }
 
 model Page {
-  id          String  @id @default(uuid()) @map("id")
+  id          String  @id @map("id")
   name        String  @map("name")
   pageOwner   User    @relation(fields: [pageOwnerId], references: [id], name: "ownerOfPage")
   pageOwnerId String  @unique
@@ -79,7 +73,7 @@ model Page {
 }
 
 model Block {
-  id           String  @id @default(uuid()) @map("id")
+  id           String  @id @map("id")
   blockId      String  @unique @map("block_id")
   blockType    String  @map("block_type") //should be enum
   defaultProps Json    @map("default_props")
@@ -94,7 +88,7 @@ model Block {
 }
 
 model Flow {
-  id           String           @id @default(uuid()) @map("id")
+  id           String           @id @map("id")
   name         String           @map("name")
   triggerEvent String           @map("trigger_event") // should be enum
   actions      ActionsInFlows[] @relation(name: "partOfFlow")
@@ -104,7 +98,7 @@ model Flow {
 }
 
 model Action {
-  id           String           @id @default(uuid()) @map("id")
+  id           String           @id @map("id")
   actionId     String           @unique @map("action_id")
   actionType   String           @map("action_type") // should be enum
   defaultProps Json             @map("default_props")
