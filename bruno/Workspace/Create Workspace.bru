@@ -12,12 +12,12 @@ post {
 
 body:json {
   {
-    "name": "Sample1",
+    "name": "Sample",
     "ownerId": "{{currentUserId}}",
-    "route": "sample1"
+    "route": "sample"
   }
 }
 
 tests {
-  bru.setEnvVar("currentUserId",res.getBody().id)
+  bru.setEnvVar("currentWorkspaceId",res.getBody().id)
 }

@@ -1,68 +1,54 @@
 import { Injectable } from '@nestjs/common';
+import { isUndefined } from 'lodash';
 import { PrismaService } from 'src/prisma.service';
 import { v4 } from 'uuid';
 
-import { isNull } from 'lodash';
 import { CreateWorkspaceDto } from './dto/create-workspace.dto';
 import { UpdateWorkspaceDto } from './dto/update-workspace.dto';
 
 @Injectable()
 export class WorkspaceService {
   constructor(private prisma: PrismaService) {}
-  create(createWorkspaceDto: CreateWorkspaceDto) {
+  async create(createWorkspaceDto: CreateWorkspaceDto) {
+    const { name, ownerId, route } = createWorkspaceDto;
     const workspaceId = v4();
-    return this.prisma.workspace.create({
+    const { id } = await this.prisma.workspace.create({
       data: {
         id: workspaceId,
-        name: createWorkspaceDto.name,
+        name,
         owner: {
           connect: {
-            id: createWorkspaceDto.ownerId,
+            id: ownerId,
           },
         },
-        route: createWorkspaceDto.route,
-        members: {
-          connect: {
-            id: createWorkspaceDto.ownerId,
-          },
-        },
+        route,
       },
       select: {
         id: true,
-        name: true,
-        route: true,
-        members: {
-          select: {
-            id: true,
-            fullName: true,
-            email: true,
-            role: true,
-          },
-        },
       },
     });
+
+    await this.prisma.userWorkspaceRole.create({
+      data: {
+        userId: ownerId,
+        workspaceId: id,
+        role: 'ADMIN',
+      },
+    });
+
+    return this.findOne(id);
   }
 
   findAll() {
     return this.prisma.workspace.findMany({
-      select: {
-        id: true,
-        name: true,
-        owner: {
-          select: {
-            id: true,
-            fullName: true,
-            email: true,
-            role: true,
-          },
-        },
-        route: true,
+      include: {
         members: {
-          select: {
-            id: true,
-            fullName: true,
-            email: true,
-            role: true,
+          include: {
+            user: {
+              omit: {
+                passwd: true,
+              },
+            },
           },
         },
       },
@@ -74,24 +60,14 @@ export class WorkspaceService {
       where: {
         id: workspaceId,
       },
-      select: {
-        id: true,
-        name: true,
-        owner: {
-          select: {
-            id: true,
-            fullName: true,
-            email: true,
-            role: true,
-          },
-        },
-        route: true,
+      include: {
         members: {
-          select: {
-            id: true,
-            fullName: true,
-            email: true,
-            role: true,
+          include: {
+            user: {
+              omit: {
+                passwd: true,
+              },
+            },
           },
         },
       },
@@ -102,19 +78,22 @@ export class WorkspaceService {
     const { members, ownerId, ...updateWorkspaceDtoWithOutMembers } =
       updateWorkspaceDto;
     const updateMembersExpr =
-      members.length > 0
+      !isUndefined(members) && members.length > 0
         ? {
             members: {
-              connect: members.map((id: string) => {
+              set: members.map((member) => {
                 return {
-                  id,
+                  userId_workspaceId: {
+                    userId: member.memberId,
+                    workspaceId,
+                  },
+                  role: member.role,
                 };
               }),
             },
           }
         : {};
-
-    const updateOwnerExpr = isNull(ownerId)
+    const updateOwnerExpr = isUndefined(ownerId)
       ? {}
       : {
           owner: {
@@ -132,27 +111,26 @@ export class WorkspaceService {
       where: {
         id: workspaceId,
       },
-      select: {
-        id: true,
-        name: true,
-        route: true,
+      include: {
         members: {
-          select: {
-            id: true,
-            fullName: true,
-            email: true,
-            role: true,
+          include: {
+            user: {
+              omit: {
+                passwd: true,
+              },
+            },
           },
         },
       },
     });
   }
 
-  remove(workspaceId: string) {
-    return this.prisma.user.delete({
+  async remove(workspaceId: string) {
+    await this.prisma.workspace.delete({
       where: {
         id: workspaceId,
       },
     });
+    return;
   }
 }

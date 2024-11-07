@@ -9,31 +9,24 @@ import { UpdateUserDto } from './dto/update-user.dto';
 export class UserService {
   constructor(private prisma: PrismaService) {}
   create(createUserDto: CreateUserDto) {
-    const { fullName, email, passwd, role } = createUserDto;
+    const { fullName, email, passwd } = createUserDto;
     return this.prisma.user.create({
       data: {
         id: v4(),
         fullName,
         email,
         passwd,
-        role,
       },
-      select: {
-        id: true,
-        fullName: true,
-        email: true,
-        role: true,
+      omit: {
+        passwd: true,
       },
     });
   }
 
   findAll() {
     return this.prisma.user.findMany({
-      select: {
-        id: true,
-        fullName: true,
-        email: true,
-        role: true,
+      omit: {
+        passwd: true,
       },
     });
   }
@@ -43,17 +36,14 @@ export class UserService {
       where: {
         id: userId,
       },
-      select: {
-        id: true,
-        fullName: true,
-        email: true,
-        role: true,
+      omit: {
+        passwd: true,
       },
     });
   }
 
   update(userId: string, updateUserDto: UpdateUserDto) {
-    const { fullName, email, passwd, role } = updateUserDto;
+    const { fullName, email, passwd } = updateUserDto;
     return this.prisma.user.update({
       where: {
         id: userId,
@@ -62,13 +52,9 @@ export class UserService {
         fullName,
         passwd,
         email,
-        role,
       },
-      select: {
-        id: true,
-        fullName: true,
-        email: true,
-        role: true,
+      omit: {
+        passwd: true,
       },
     });
   }

@@ -5,7 +5,8 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["omitApi"]
 }
 
 datasource db {
@@ -21,29 +22,39 @@ enum UserRole {
 }
 
 model User {
-  id               String      @id @map("id")
-  fullName         String      @map("full_name")
-  email            String      @unique @map("email")
-  passwd           String      @map("passwd")
-  role             UserRole    @map("user_role")
-  ownerOfWorkspace Workspace[] @relation(name: "ownerOfWorkspace")
-  ownerOfProject   Project[]   @relation(name: "ownerOfProject")
-  ownerOfPage      Page[]      @relation(name: "ownerOfPage")
-  workspaces       Workspace[]
+  id               String              @id @map("id")
+  fullName         String              @map("full_name")
+  email            String              @unique @map("email")
+  passwd           String
+  ownerOfWorkspace Workspace[]         @relation(name: "ownerOfWorkspace")
+  ownerOfProject   Project[]           @relation(name: "ownerOfProject")
+  ownerOfPage      Page[]              @relation(name: "ownerOfPage")
+  workspaces       UserWorkspaceRole[] @relation(name: "userOfWorkspace")
 
   @@map("users")
 }
 
 model Workspace {
-  id       String    @id @map("id")
-  name     String    @map("name")
-  owner    User      @relation(fields: [ownerId], references: [id], name: "ownerOfWorkspace")
-  ownerId  String    @unique
-  route    String    @unique @map("workspace_route")
-  members  User[]
-  projects Project[] @relation(name: "partOfWorkspace")
+  id       String              @id @map("id")
+  name     String              @unique @map("workspace_name")
+  owner    User                @relation(fields: [ownerId], references: [id], name: "ownerOfWorkspace")
+  ownerId  String              @unique
+  route    String              @unique @map("workspace_route")
+  members  UserWorkspaceRole[] @relation(name: "workspaceForUser")
+  projects Project[]           @relation(name: "partOfWorkspace")
 
   @@map("workspaces")
+}
+
+model UserWorkspaceRole {
+  user        User      @relation(fields: [userId], references: [id], name: "userOfWorkspace", map: "user_of_workspace_fkey")
+  userId      String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], name: "workspaceForUser", map: "workspace_for_user_fkey")
+  workspaceId String
+  role        UserRole
+
+  @@id([userId, workspaceId])
+  @@map("role_for_user_in_workspace")
 }
 
 model Project {

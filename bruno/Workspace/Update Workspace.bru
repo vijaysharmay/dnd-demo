@@ -1,0 +1,30 @@
+meta {
+  name: Update Workspace
+  type: http
+  seq: 2
+}
+
+patch {
+  url: http://localhost:3000/workspace/{{currentWorkspaceId}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "members": [
+      {
+        "memberId": "df6a9803-eada-40b6-bf62-cdf950a4c83d",
+        "role": "DESIGNER"
+      },
+      {
+        "memberId": "0608b906-24e9-4211-b7a3-ce472be28aeb",
+        "role": "ADMIN"
+      }
+    ]
+  }
+}
+
+vars:post-response {
+  : 
+}

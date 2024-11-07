@@ -1,0 +1,15 @@
+meta {
+  name: Delete Workspace
+  type: http
+  seq: 3
+}
+
+delete {
+  url: http://localhost:3000/workspace/{{currentWorkspaceId}}
+  body: json
+  auth: none
+}
+
+tests {
+  bru.setEnvVar("currentWorkspaceId", "")
+}
