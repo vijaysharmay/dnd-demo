@@ -1,0 +1,29 @@
+meta {
+  name: Add Child To Block
+  type: http
+  seq: 6
+}
+
+put {
+  url: http://localhost:3000/workspace/{{currentWorkspaceId}}/project/{{currentProjectId}}/page/{{currentPageId}}/block/{{currentBlockId}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "blockId": "inapu1t-23424",
+    "blockType": "Input",
+    "props": {
+      "inputId": "input-as",
+      "inputLabel": "dummy",
+      "placeHolder": "dummy",
+      "helperText": "dummy",
+      "inputType": "text"
+    }
+  }
+}
+
+tests {
+  bru.setEnvVar("currentBlockId",res.getBody().id)
+}

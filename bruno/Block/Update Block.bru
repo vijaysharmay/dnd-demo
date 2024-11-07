@@ -1,0 +1,29 @@
+meta {
+  name: Update Block
+  type: http
+  seq: 2
+}
+
+patch {
+  url: http://localhost:3000/workspace/{{currentWorkspaceId}}/project/{{currentProjectId}}/page/{{currentPageId}}/block/{{currentBlockId}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "blockId": "input-2344",
+    "blockType": "Input",
+    "props": {
+      "inputId": "input-as",
+      "inputLabel": "dummy1",
+      "placeHolder": "dummy",
+      "helperText": "dummy",
+      "inputType": "text"
+    }
+  }
+}
+
+vars:post-response {
+  : 
+}

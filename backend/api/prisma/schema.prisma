@@ -43,6 +43,7 @@ model Workspace {
   members  UserWorkspaceRole[] @relation(name: "workspaceForUser")
   projects Project[]           @relation(name: "partOfWorkspace")
   pages    Page[]              @relation(name: "partOfWorkspacePage")
+  blocks   Block[]             @relation(name: "partOfWorkspacePageBlock")
 
   @@map("workspaces")
 }
@@ -67,6 +68,7 @@ model Project {
   workspaceId String    @unique
   route       String    @unique @map("route")
   pages       Page[]    @relation(name: "partOfProject")
+  blocks      Block[]   @relation(name: "partOfProjectPage")
 
   @@map("projects")
 }
@@ -88,48 +90,56 @@ model Page {
 }
 
 model Block {
-  id           String  @id @map("id")
-  blockId      String  @unique @map("block_id")
-  blockType    String  @map("block_type") //should be enum
-  defaultProps Json    @map("default_props")
-  props        Json?   @map("props")
-  page         Page    @relation(fields: [pageId], references: [id], name: "partOfPage")
-  pageId       String  @unique
-  route        String  @unique @map("route")
-  flow         Flow?   @relation(fields: [flowId], references: [id], name: "hasFlow")
-  flowId       String? @unique
+  id          String    @id @map("id")
+  blockId     String    @unique @map("block_id")
+  blockType   String    @map("block_type") //should be enum
+  props       Json      @map("props")
+  order       Int?      @default(0) @map("order") // only relevant for child blocks
+  children    Block[]   @relation("nestedBlocks")
+  parent      Block?    @relation("nestedBlocks", fields: [parentId], references: [id])
+  parentId    String?
+  page        Page      @relation(fields: [pageId], references: [id], name: "partOfPage")
+  pageId      String
+  project     Project   @relation(fields: [projectId], references: [id], name: "partOfProjectPage")
+  projectId   String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], name: "partOfWorkspacePageBlock")
+  workspaceId String
+  flow        Flow[]    @relation(name: "hasFlow")
 
   @@map("blocks")
 }
 
 model Flow {
-  id           String           @id @map("id")
-  name         String           @map("name")
-  triggerEvent String           @map("trigger_event") // should be enum
-  actions      ActionsInFlows[] @relation(name: "partOfFlow")
-  ofBlock      Block?           @relation(name: "hasFlow")
+  id           String   @id @map("id")
+  name         String   @map("name")
+  triggerEvent String   @map("trigger_event") // should be enum
+  ofBlock      Block    @relation(name: "hasFlow", fields: [blockId], references: [id])
+  blockId      String
+  actions      Action[]
+  // actions      ActionsInFlows[] @relation(name: "partOfFlow")
 
   @@map("flows")
 }
 
 model Action {
-  id           String           @id @map("id")
-  actionId     String           @unique @map("action_id")
-  actionType   String           @map("action_type") // should be enum
-  defaultProps Json             @map("default_props")
-  props        Json?            @map("props")
-  route        String           @unique @map("route")
-  flows        ActionsInFlows[] @relation(name: "partOfAction")
+  id           String @id @map("id")
+  actionId     String @unique @map("action_id")
+  actionType   String @map("action_type") // should be enum
+  defaultProps Json   @map("default_props")
+  props        Json?  @map("props")
+  route        String @unique @map("route")
+  flows        Flow[]
+  // flows        ActionsInFlows[] @relation(name: "partOfAction")
 
   @@map("actions")
 }
 
-model ActionsInFlows {
-  flow     Flow   @relation(fields: [flowId], references: [id], name: "partOfFlow", map: "flow_workspace_fk")
-  flowId   String
-  action   Action @relation(fields: [actionId], references: [id], name: "partOfAction")
-  actionId String
+// model ActionsInFlows {
+//   flow     Flow   @relation(fields: [flowId], references: [id], name: "partOfFlow", map: "flow_workspace_fk")
+//   flowId   String
+//   action   Action @relation(fields: [actionId], references: [id], name: "partOfAction")
+//   actionId String
 
-  @@id([flowId, actionId])
-  @@map("actions_in_flows")
-}
+//   @@id([flowId, actionId])
+//   @@map("actions_in_flows")
+// }

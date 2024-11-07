@@ -1,0 +1,11 @@
+meta {
+  name: Get All Blocks
+  type: http
+  seq: 4
+}
+
+get {
+  url: http://localhost:3000/workspace/{{currentWorkspaceId}}/project/{{currentProjectId}}/page/{{currentPageId}}/block
+  body: json
+  auth: none
+}

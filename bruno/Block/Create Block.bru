@@ -1,0 +1,29 @@
+meta {
+  name: Create Block
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:3000/workspace/{{currentWorkspaceId}}/project/{{currentProjectId}}/page/{{currentPageId}}/block
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "blockId": "input-2344",
+    "blockType": "Input",
+    "props": {
+      "inputId": "input-as",
+      "inputLabel": "dummy",
+      "placeHolder": "dummy",
+      "helperText": "dummy",
+      "inputType": "text"
+    }
+  }
+}
+
+tests {
+  bru.setEnvVar("currentBlockId",res.getBody().id)
+}
