@@ -11,6 +11,7 @@ import {
 import { CreateWorkspaceDto } from './dto/create-workspace.dto';
 import { UpdateWorkspaceDto } from './dto/update-workspace.dto';
 import { WorkspaceService } from './workspace.service';
+import { RemoveMembersDto } from './dto/remove-members.dto';
 
 @Controller()
 export class WorkspaceController {
@@ -37,6 +38,14 @@ export class WorkspaceController {
     @Body() updateWorkspaceDto: UpdateWorkspaceDto,
   ) {
     return this.workspaceService.update(workspaceId, updateWorkspaceDto);
+  }
+
+  @Patch(':workspaceId/member')
+  removeMembersFromWorkspace(
+    @Param('workspaceId') workspaceId: string,
+    @Body() removeMembersDto: RemoveMembersDto,
+  ) {
+    return this.workspaceService.removeMembersFromWorkspace(workspaceId, removeMembersDto);
   }
 
   @Delete(':workspaceId')

@@ -47,9 +47,9 @@ model Workspace {
 }
 
 model UserWorkspaceRole {
-  user        User      @relation(fields: [userId], references: [id], name: "userOfWorkspace", map: "user_of_workspace_fkey")
+  user        User      @relation(fields: [userId], references: [id], name: "userOfWorkspace", onDelete: Cascade, onUpdate: Cascade, map: "user_of_workspace_fkey")
   userId      String
-  workspace   Workspace @relation(fields: [workspaceId], references: [id], name: "workspaceForUser", map: "workspace_for_user_fkey")
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], name: "workspaceForUser", onDelete: Cascade, onUpdate: Cascade, map: "workspace_for_user_fkey")
   workspaceId String
   role        UserRole
 

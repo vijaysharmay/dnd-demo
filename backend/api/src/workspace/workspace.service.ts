@@ -4,6 +4,7 @@ import { PrismaService } from 'src/prisma.service';
 import { v4 } from 'uuid';
 
 import { CreateWorkspaceDto } from './dto/create-workspace.dto';
+import { RemoveMembersDto } from './dto/remove-members.dto';
 import { UpdateWorkspaceDto } from './dto/update-workspace.dto';
 
 @Injectable()
@@ -74,25 +75,35 @@ export class WorkspaceService {
     });
   }
 
-  update(workspaceId: string, updateWorkspaceDto: UpdateWorkspaceDto) {
+  async update(workspaceId: string, updateWorkspaceDto: UpdateWorkspaceDto) {
     const { members, ownerId, ...updateWorkspaceDtoWithOutMembers } =
       updateWorkspaceDto;
-    const updateMembersExpr =
-      !isUndefined(members) && members.length > 0
-        ? {
-            members: {
-              set: members.map((member) => {
-                return {
-                  userId_workspaceId: {
-                    userId: member.memberId,
-                    workspaceId,
-                  },
-                  role: member.role,
-                };
-              }),
+
+    if (!isUndefined(members) && members.length > 0) {
+      for (const member of members) {
+        try {
+          await this.prisma.userWorkspaceRole.upsert({
+            where: {
+              userId_workspaceId: { userId: member.memberId, workspaceId },
             },
-          }
-        : {};
+            update: {
+              role: member.role,
+            },
+            create: {
+              userId: member.memberId,
+              workspaceId,
+              role: member.role,
+            },
+          });
+        } catch (error) {
+          console.error(
+            `Failed to create or connect user role for member ${member.memberId}:`,
+            error,
+          );
+        }
+      }
+    }
+
     const updateOwnerExpr = isUndefined(ownerId)
       ? {}
       : {
@@ -102,10 +113,10 @@ export class WorkspaceService {
             },
           },
         };
+
     return this.prisma.workspace.update({
       data: {
         ...updateWorkspaceDtoWithOutMembers,
-        ...updateMembersExpr,
         ...updateOwnerExpr,
       },
       where: {
@@ -120,6 +131,17 @@ export class WorkspaceService {
               },
             },
           },
+        },
+      },
+    });
+  }
+
+  removeMembersFromWorkspace(workspaceId: string, members: RemoveMembersDto) {
+    return this.prisma.userWorkspaceRole.deleteMany({
+      where: {
+        workspaceId,
+        userId: {
+          in: members.members,
         },
       },
     });

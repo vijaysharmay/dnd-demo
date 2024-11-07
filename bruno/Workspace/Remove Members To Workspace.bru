@@ -1,0 +1,24 @@
+meta {
+  name: Remove Members To Workspace
+  type: http
+  seq: 5
+}
+
+patch {
+  url: http://localhost:3000/workspace/{{currentWorkspaceId}}/member
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "members": [
+      "437fe54c-7968-4e21-9d6e-8d9f4a6b62d4",
+      "5debc112-c7bb-48ab-9d4c-7ee4c28ed727"
+    ]
+  }
+}
+
+vars:post-response {
+  : 
+}
