@@ -1,29 +1,108 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
+import { v4 } from 'uuid';
 
 import { CreateProjectDto } from './dto/create-project.dto';
-import { UpdateProjectDto } from './dto/update-project.dto';
+import { UpdateProjectDto } from './dto/update-Project.dto';
 
 @Injectable()
 export class ProjectService {
   constructor(private prisma: PrismaService) {}
-  create(createProjectDto: CreateProjectDto) {
-    return 'This action adds a new project';
+  async create(workspaceId: string, createProjectDto: CreateProjectDto) {
+    const { name, ownerId, route } = createProjectDto;
+    const projectId = v4();
+    return this.prisma.project.create({
+      data: {
+        id: projectId,
+        name,
+        owner: {
+          connect: {
+            id: ownerId,
+          },
+        },
+        route,
+        workspace: {
+          connect: {
+            id: workspaceId,
+          },
+        },
+      },
+      select: {
+        id: true,
+      },
+    });
   }
 
-  findAll() {
-    return `This action returns all project`;
+  findAll(workspaceId: string) {
+    return this.prisma.project.findMany({
+      where: {
+        workspaceId,
+      },
+      include: {
+        owner: {
+          omit: {
+            passwd: true,
+          },
+        },
+      },
+      omit: {
+        ownerId: true,
+      },
+    });
   }
 
-  findOne(id: string) {
-    return `This action returns a #${id} project`;
+  findOne(workspaceId: string, projectId: string) {
+    return this.prisma.project.findFirst({
+      where: {
+        id: projectId,
+        workspaceId,
+      },
+      include: {
+        owner: {
+          omit: {
+            passwd: true,
+          },
+        },
+        pages: true,
+      },
+      omit: {
+        ownerId: true,
+      },
+    });
   }
 
-  update(id: string, updateProjectDto: UpdateProjectDto) {
-    return `This action updates a #${id} project`;
+  async update(
+    workspaceId: string,
+    projectId: string,
+    updateProjectDto: UpdateProjectDto,
+  ) {
+    return this.prisma.project.update({
+      data: updateProjectDto,
+      where: {
+        id: projectId,
+        workspaceId,
+      },
+      include: {
+        owner: {
+          omit: {
+            passwd: true,
+          },
+        },
+      },
+      omit: {
+        ownerId: true,
+        workspaceId: true,
+      },
+    });
   }
 
-  remove(id: string) {
-    return `This action removes a #${id} project`;
+  async remove(workspaceId: string, projectId: string) {
+    await this.prisma.project.delete({
+      where: {
+        id: projectId,
+        workspaceId,
+      },
+    });
+    return;
   }
 }

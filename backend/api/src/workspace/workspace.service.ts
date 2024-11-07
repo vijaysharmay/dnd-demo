@@ -43,15 +43,14 @@ export class WorkspaceService {
   findAll() {
     return this.prisma.workspace.findMany({
       include: {
-        members: {
-          include: {
-            user: {
-              omit: {
-                passwd: true,
-              },
-            },
+        owner: {
+          omit: {
+            passwd: true,
           },
         },
+      },
+      omit: {
+        ownerId: true,
       },
     });
   }
@@ -62,6 +61,11 @@ export class WorkspaceService {
         id: workspaceId,
       },
       include: {
+        owner: {
+          omit: {
+            passwd: true,
+          },
+        },
         members: {
           include: {
             user: {
@@ -70,7 +74,28 @@ export class WorkspaceService {
               },
             },
           },
+          omit: {
+            workspaceId: true,
+            userId: true,
+          },
         },
+
+        projects: {
+          omit: {
+            workspaceId: true,
+            ownerId: true,
+          },
+          include: {
+            owner: {
+              omit: {
+                passwd: true,
+              },
+            },
+          },
+        },
+      },
+      omit: {
+        ownerId: true,
       },
     });
   }

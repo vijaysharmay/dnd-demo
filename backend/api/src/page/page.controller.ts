@@ -17,30 +17,52 @@ export class PageController {
   constructor(private readonly pageService: PageService) {}
 
   @Post()
-  create(@Body() createPageDto: CreatePageDto) {
-    return this.pageService.create(createPageDto);
+  create(
+    @Param('workspaceId') workspaceId: string,
+    @Param('projectId') projectId: string,
+    @Body() createPageDto: CreatePageDto,
+  ) {
+    return this.pageService.create(workspaceId, projectId, createPageDto);
   }
 
   @Get()
-  findAll() {
-    return this.pageService.findAll();
+  findAll(
+    @Param('workspaceId') workspaceId: string,
+    @Param('projectId') projectId: string,
+  ) {
+    return this.pageService.findAll(workspaceId, projectId);
   }
 
   @Get(':pageId')
-  findOne(@Param('pageId') pageId: string) {
-    return this.pageService.findOne(pageId);
+  findOne(
+    @Param('workspaceId') workspaceId: string,
+    @Param('projectId') projectId: string,
+    @Param('pageId') pageId: string,
+  ) {
+    return this.pageService.findOne(workspaceId, projectId, pageId);
   }
 
   @Patch(':pageId')
   update(
+    @Param('workspaceId') workspaceId: string,
+    @Param('projectId') projectId: string,
     @Param('pageId') pageId: string,
     @Body() updatePageDto: UpdatePageDto,
   ) {
-    return this.pageService.update(pageId, updatePageDto);
+    return this.pageService.update(
+      workspaceId,
+      projectId,
+      pageId,
+      updatePageDto,
+    );
   }
 
   @Delete(':pageId')
-  remove(@Param('pageId') pageId: string) {
-    return this.pageService.remove(pageId);
+  remove(
+    @Param('workspaceId') workspaceId: string,
+    @Param('projectId') projectId: string,
+    @Param('pageId') pageId: string,
+  ) {
+    return this.pageService.remove(workspaceId, projectId, pageId);
   }
 }

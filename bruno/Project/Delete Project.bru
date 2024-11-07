@@ -1,0 +1,15 @@
+meta {
+  name: Delete Project
+  type: http
+  seq: 3
+}
+
+delete {
+  url: http://localhost:3000/workspace/{{currentWorkspaceId}}/project/{{currentProjectId}}
+  body: json
+  auth: none
+}
+
+tests {
+  bru.setEnvVar("currentProjectId", "")
+}

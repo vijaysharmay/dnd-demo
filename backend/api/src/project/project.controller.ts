@@ -17,30 +17,40 @@ export class ProjectController {
   constructor(private readonly projectService: ProjectService) {}
 
   @Post()
-  create(@Body() createProjectDto: CreateProjectDto) {
-    return this.projectService.create(createProjectDto);
+  create(
+    @Param('workspaceId') workspaceId: string,
+    @Body() createProjectDto: CreateProjectDto,
+  ) {
+    return this.projectService.create(workspaceId, createProjectDto);
   }
 
   @Get()
-  findAll() {
-    return this.projectService.findAll();
+  findAll(@Param('workspaceId') workspaceId: string) {
+    return this.projectService.findAll(workspaceId);
   }
 
   @Get(':projectId')
-  findOne(@Param('projectId') projectId: string) {
-    return this.projectService.findOne(projectId);
+  findOne(
+    @Param('workspaceId') workspaceId: string,
+    @Param('projectId') projectId: string,
+  ) {
+    return this.projectService.findOne(workspaceId, projectId);
   }
 
   @Patch(':projectId')
   update(
+    @Param('workspaceId') workspaceId: string,
     @Param('projectId') projectId: string,
     @Body() updateProjectDto: UpdateProjectDto,
   ) {
-    return this.projectService.update(projectId, updateProjectDto);
+    return this.projectService.update(workspaceId, projectId, updateProjectDto);
   }
 
   @Delete(':projectId')
-  remove(@Param('projectId') projectId: string) {
-    return this.projectService.remove(projectId);
+  remove(
+    @Param('workspaceId') workspaceId: string,
+    @Param('projectId') projectId: string,
+  ) {
+    return this.projectService.remove(workspaceId, projectId);
   }
 }

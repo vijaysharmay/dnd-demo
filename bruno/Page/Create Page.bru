@@ -1,0 +1,23 @@
+meta {
+  name: Create Page
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:3000/workspace/{{currentWorkspaceId}}/project/{{currentProjectId}}/page
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Sample Project",
+    "ownerId": "{{currentUserId}}",
+    "route": "p1"
+  }
+}
+
+tests {
+  bru.setEnvVar("currentPageId",res.getBody().id)
+}
