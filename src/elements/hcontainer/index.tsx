@@ -1,6 +1,7 @@
 import { randInt } from "@/lib/utils";
 import { ComponentElement, HContainer } from "@/types";
-import { Columns3Icon } from "lucide-react";
+import { LayoutTemplate } from "lucide-react";
+
 import {
   HContainerDesignerComponent,
   HContainerDragOverlayComponent,
@@ -22,7 +23,7 @@ export const HContainerComponentElement: ComponentElement = {
     parentId: null,
   }),
   componentLibraryListItem: {
-    icon: <Columns3Icon />,
+    icon: <LayoutTemplate />,
     label: HContainer,
   },
   designerComponent: HContainerDesignerComponent,

@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { ConcordSchema } from "./schema";
 
-export const ButtonVariants = [
+export const ButtonStyleVariants = [
   "default",
   "secondary",
   "destructive",
@@ -10,8 +10,10 @@ export const ButtonVariants = [
   "ghost",
 ] as const;
 
+export const ButtonTypeVariants = ["button", "submit", "reset"] as const;
+
 export const EventVariants = ["Do Nothing", "Redirect To Route"] as const;
-export const InputVariants = ["text", "password"] as const;
+export const InputVariants = ["text", "password", "number"] as const;
 export const HContainerColumnVariants = [
   "One",
   "Two",
@@ -32,7 +34,9 @@ export const ButtonPropsZSchema = z.object({
     .min(7)
     .startsWith("button-", "ID must start with the prefix `button-`"),
   buttonText: z.string().min(1),
-  buttonVariant: z.enum(ButtonVariants),
+  buttonType: z.enum(ButtonTypeVariants),
+  isFormElement: z.boolean().default(false),
+  buttonVariant: z.enum(ButtonStyleVariants),
   onClickHandler: z.enum(EventVariants),
 });
 
@@ -57,16 +61,30 @@ export const InputPropsZSchema = z.object({
   inputLabel: z.string().min(1),
   helperText: z.string().min(1),
   placeHolder: z.string().min(1),
+  isFormElement: z.boolean().default(false),
 });
 
 export const DTablePropsZSchema = z.object({
   dTableId: z
     .string({ required_error: "Required dTableId" })
-    .min(10)
+    .min(9)
     .startsWith("dTable-", "ID must start with the prefix `dTable-`"),
   dataUrl: z.string().url(),
   responseSchemaMapping: z.string(),
   dTableHeightInPx: z
+    .string()
+    .max(5)
+    .endsWith("px", "Please enter a value in px, for example: 100px"),
+});
+
+export const FormPropsZSchema = z.object({
+  formId: z
+    .string({ required_error: "Required formId" })
+    .min(8)
+    .startsWith("form-", "ID must start with the prefix `form-`"),
+  onSubmitUrl: z.string().url(),
+  responseSchemaMapping: z.string(),
+  formHeightInPx: z
     .string()
     .max(5)
     .endsWith("px", "Please enter a value in px, for example: 100px"),
@@ -78,15 +96,24 @@ export type ButtonPropsSchema = z.infer<typeof ButtonPropsZSchema>;
 export type HContainerPropsSchema = z.infer<typeof HContainerPropsZSchema>;
 export type InputPropsSchema = z.infer<typeof InputPropsZSchema>;
 export type DTablePropsSchema = z.infer<typeof DTablePropsZSchema>;
+export type FormPropsSchema = z.infer<typeof FormPropsZSchema>;
 
 export type PropsSchema =
   | ButtonPropsSchema
   | HContainerPropsSchema
   | DTablePropsSchema
+  | FormPropsSchema
   | InputPropsSchema;
 
+export type CustomPropsSchema = ButtonPropsSchema &
+  HContainerPropsSchema &
+  DTablePropsSchema &
+  FormPropsSchema &
+  InputPropsSchema;
+
 export type VariantsSchema =
-  | typeof ButtonVariants
+  | typeof ButtonStyleVariants
+  | typeof ButtonTypeVariants
   | typeof EventVariants
   | typeof HContainerColumnVariants
   | string[]

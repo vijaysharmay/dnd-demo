@@ -1,4 +1,4 @@
-import { PropsSchema } from "./properties";
+import { CustomPropsSchema, PropsSchema } from "./properties";
 
 export const Accordion = "Accordion";
 export const Alert = "Alert";
@@ -103,6 +103,7 @@ export type ComponentElementType =
   | typeof Input
   | typeof Button
   | typeof HContainer
+  | typeof Form
   | typeof DTable;
 
 export type ComponentLibraryListItem = {
@@ -125,7 +126,10 @@ export type ComponentElementInstance = {
 };
 
 export type ComponentElement = {
-  create: (id: string) => ComponentElementInstance;
+  create: (
+    id: string,
+    customProps?: CustomPropsSchema
+  ) => ComponentElementInstance;
   type: ComponentElementType;
   componentLibraryListItem: ComponentLibraryListItem;
   designerComponent: React.FC<{ elementInstance: ComponentElementInstance }>;

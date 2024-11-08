@@ -1,7 +1,9 @@
 import { libraryElements } from "@/elements";
+import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import useElementStore from "@/store/element-store";
-import { ComponentElementInstance } from "@/types";
+import { Button, ComponentElementInstance, Input } from "@/types";
+import { ButtonPropsSchema, InputPropsSchema } from "@/types/properties";
 import { useDraggable, useDroppable } from "@dnd-kit/core";
 import { Trash2Icon } from "lucide-react";
 import { useState } from "react";
@@ -12,6 +14,7 @@ export default function DesignerElementWrapper({
   element: ComponentElementInstance;
 }) {
   const [isHoveredOn, setIsHoveredOn] = useState(false);
+  const { toast } = useToast();
   const {
     removeElement,
     setActiveElementId,
@@ -55,6 +58,22 @@ export default function DesignerElementWrapper({
     `designerElementDelete-${element.id}`;
 
   const handleDelete = () => {
+    const isButton = element.type === Button;
+    const isInput = element.type === Input;
+    if (isButton || isInput) {
+      const props = isButton
+        ? (element.props as ButtonPropsSchema)
+        : (element.props as InputPropsSchema);
+      if (props.isFormElement) {
+        toast({
+          variant: "destructive",
+          title: "Operation Not Permitted",
+          description: "You cannot delete a data-driven form element",
+          duration: 2000,
+        });
+        return;
+      }
+    }
     removeElement(element.id, element.parentId);
     setActiveElement(null);
     setActiveElementId(null);

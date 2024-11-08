@@ -2,10 +2,7 @@ import { randInt } from "@/lib/utils";
 import { ComponentElement, DTable } from "@/types";
 import { Table } from "lucide-react";
 
-import {
-  DTableDesignerComponent,
-  DTableDragOverlayComponent,
-} from "./designer";
+import { DTableDesignerComponent, DTableDragOverlayComponent } from "./designer";
 import { DTablePropertiesComponent } from "./properties";
 import { DTableRenderComponent } from "./render";
 

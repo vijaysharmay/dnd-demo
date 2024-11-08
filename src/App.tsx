@@ -10,12 +10,13 @@ import { restrictToWindowEdges } from "@dnd-kit/modifiers";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { Route, Switch } from "wouter";
 
+import { Toaster } from "./components/ui/toaster";
 import { ComponentLibrary } from "./containers/component-library";
 import Designer from "./containers/designer";
 import DragOverlayWrapper from "./containers/drag-overlay-wrapper";
 import Navbar from "./containers/navbar";
-import Properties from "./containers/properties";
 import Preview from "./containers/preview";
+import Properties from "./containers/properties";
 
 export default function App() {
   return (
@@ -64,6 +65,7 @@ function Home() {
           <Properties />
         </Panel>
       </PanelGroup>
+      <Toaster />
     </>
   );
 }

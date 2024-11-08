@@ -1,13 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { Form, FormField } from "@/components/ui/form";
 import PropertiesElementWrapper from "@/containers/properties-element.wrapper";
+import useSchemaStore from "@/store/schema-store";
 import { ComponentElementInstance } from "@/types";
-import {
-  ButtonPropsSchema,
-  ButtonPropsZSchema,
-  ButtonStyleVariants,
-  EventVariants,
-} from "@/types/properties";
+import { FormPropsSchema, FormPropsZSchema } from "@/types/properties";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { isEmpty } from "lodash";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -15,15 +11,16 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { InputFormField, SelectFormField } from "../common/form-fields";
 import { handlePropertiesFormSubmit } from "../common/handlePropertiesFormSubmit";
 
-export const ButtonPropertiesComponent: React.FC<{
+export const FormPropertiesComponent: React.FC<{
   elementInstance: ComponentElementInstance;
 }> = ({ elementInstance }) => {
-  const form = useForm<ButtonPropsSchema>({
-    resolver: zodResolver(ButtonPropsZSchema),
-    values: elementInstance.props as ButtonPropsSchema,
+  const { schemas } = useSchemaStore();
+  const form = useForm<FormPropsSchema>({
+    resolver: zodResolver(FormPropsZSchema),
+    values: elementInstance.props as FormPropsSchema,
   });
 
-  const onSubmit: SubmitHandler<ButtonPropsSchema> = (data) =>
+  const onSubmit: SubmitHandler<FormPropsSchema> = (data) =>
     handlePropertiesFormSubmit(data, elementInstance);
 
   return (
@@ -35,10 +32,10 @@ export const ButtonPropertiesComponent: React.FC<{
         >
           <FormField
             control={form.control}
-            name="buttonId"
+            name="formId"
             render={({ field }) => (
               <InputFormField
-                name="Button ID"
+                name="Form ID"
                 tooltip="A unique identifier which is useful when crafting events"
                 field={field}
               />
@@ -47,11 +44,11 @@ export const ButtonPropertiesComponent: React.FC<{
 
           <FormField
             control={form.control}
-            name="buttonText"
+            name="onSubmitUrl"
             render={({ field }) => (
               <InputFormField
-                name="Button Text"
-                tooltip="Text inside the button"
+                name="On Submit URL"
+                tooltip="A POST API Endpoint for submitting the form"
                 field={field}
               />
             )}
@@ -59,26 +56,25 @@ export const ButtonPropertiesComponent: React.FC<{
 
           <FormField
             control={form.control}
-            name="buttonVariant"
+            name="responseSchemaMapping"
             render={({ field }) => (
               <SelectFormField
-                name="Button Variants"
-                tooltip="Variant of Button"
+                name="Response Schema"
+                tooltip="Schema of the expected request for the URL"
                 field={field}
-                variants={ButtonStyleVariants}
+                variants={Object.keys(schemas)}
               />
             )}
           />
 
           <FormField
             control={form.control}
-            name="onClickHandler"
+            name="formHeightInPx"
             render={({ field }) => (
-              <SelectFormField
-                name="On Click Workflow"
-                tooltip="Choose what to do when you click this button"
+              <InputFormField
+                name="Height (in px)"
+                tooltip="Height of the form container, in pixels"
                 field={field}
-                variants={EventVariants}
               />
             )}
           />
