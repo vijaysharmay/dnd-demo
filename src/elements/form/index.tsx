@@ -1,6 +1,7 @@
 import { randInt } from "@/lib/utils";
 import { ComponentElement, Form } from "@/types";
 import { CustomPropsSchema, InputPropsSchema } from "@/types/properties";
+import { Schema } from "json-schema-faker";
 import { capitalize, isNull, keys } from "lodash";
 import { NotepadText } from "lucide-react";
 import { v4 } from "uuid";
@@ -37,11 +38,10 @@ export const FormComponentElement: ComponentElement = {
 function initFormChildren(schemaName: string) {
   const schemaStore = localStorage["schemaStore"];
   if (isNull(schemaStore)) return [];
-  const schema = JSON.parse(
-    JSON.parse(schemaStore).state.schemas[schemaName].schema
-  );
+  const schema: Schema =
+    JSON.parse(schemaStore).state.schemas[schemaName].schema;
 
-  return keys(schema.items.properties).map((prop: string) => {
+  return keys(schema.properties).map((prop: string) => {
     const inputInstanceProps: InputPropsSchema = {
       inputId: `input-${randInt()}`,
       inputLabel: capitalize(prop),

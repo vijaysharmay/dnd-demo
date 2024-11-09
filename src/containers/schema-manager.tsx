@@ -40,7 +40,7 @@ export default function SchemaManager() {
     "content",
   ]);
 
-  const [schemaValue, setSchemaValue] = useState<string | undefined>("");
+  const [schemaValue, setSchemaValue] = useState<Schema | undefined>(undefined);
   const [schemaName, setSchemaName] = useState<string>("");
   const [isSchemaValid, setIsSchemaValid] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<string>("showSchemas");
@@ -61,14 +61,16 @@ export default function SchemaManager() {
       try {
         const parsedValue = JSON.parse(value);
         ajv.compile(parsedValue);
+        setErrorMsg("");
+        setIsSchemaValid(true);
+        setSchemaValue(parsedValue);
       } catch (e: unknown) {
         setErrorMsg((e as Error).message);
         setIsSchemaValid(false);
+        setSchemaValue(undefined);
         return;
       }
-      setErrorMsg("");
-      setIsSchemaValid(true);
-      setSchemaValue(value);
+      // why not parsedValue? need to think
     }
 
     if (value === "") {
@@ -87,10 +89,8 @@ export default function SchemaManager() {
   const handleSave = () => {
     const schemaObject: ConcordSchema = {
       name: schemaName,
-      schema: schemaValue as string,
-      sampleData: JSONSchemaFaker.generate(
-        JSON.parse(schemaValue as string) as Schema
-      ),
+      schema: schemaValue as Schema,
+      sampleData: JSONSchemaFaker.generate(schemaValue as Schema),
     };
     upsertSchema(schemaName, schemaObject);
     setActiveTab("showSchemas");
@@ -121,7 +121,7 @@ export default function SchemaManager() {
               value="showSchemas"
               onClick={() => {
                 setSchemaName("");
-                setSchemaValue("");
+                setSchemaValue(undefined);
                 setActiveTab("showSchemas");
               }}
             >
