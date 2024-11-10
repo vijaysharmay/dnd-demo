@@ -1,17 +1,15 @@
+import { Button } from "@/components/ui/button";
+import { Form, FormControl, FormField } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import PropertiesElementWrapper from "@/containers/properties-element.wrapper";
 import { ComponentElementInstance } from "@/types";
+import { InputPropsSchema, InputPropsZSchema, InputVariants } from "@/types/properties";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { isEmpty } from "lodash";
 import { SubmitHandler, useForm } from "react-hook-form";
 
-import { Button } from "@/components/ui/button";
-import { Form, FormField } from "@/components/ui/form";
-import {
-  InputPropsSchema,
-  InputPropsZSchema,
-  InputVariants,
-} from "@/types/properties";
-import { isEmpty } from "lodash";
-import { InputFormField, SelectFormField } from "../common/form-fields";
+import { FormFieldRender } from "../common/form-fields";
 import { handlePropertiesFormSubmit } from "../common/handlePropertiesFormSubmit";
 
 export const InputPropertiesComponent: React.FC<{
@@ -36,10 +34,10 @@ export const InputPropertiesComponent: React.FC<{
             control={form.control}
             name="inputId"
             render={({ field }) => (
-              <InputFormField
+              <FormFieldRender
                 name="Input ID"
                 tooltip="A unique identifier which is useful when crafting events"
-                field={field}
+                children={<Input type="text" {...field} />}
               />
             )}
           />
@@ -48,10 +46,10 @@ export const InputPropertiesComponent: React.FC<{
             control={form.control}
             name="inputLabel"
             render={({ field }) => (
-              <InputFormField
+              <FormFieldRender
                 name="Input Label"
                 tooltip="Label for the Input Element"
-                field={field}
+                children={<Input type="text" {...field} />}
               />
             )}
           />
@@ -60,11 +58,30 @@ export const InputPropertiesComponent: React.FC<{
             control={form.control}
             name="inputType"
             render={({ field }) => (
-              <SelectFormField
+              <FormFieldRender
                 name="Input Type"
                 tooltip="Type of Input"
-                field={field}
-                variants={InputVariants}
+                children={
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a variant" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {InputVariants.map((variant: string) => {
+                        return (
+                          <SelectItem key={variant} value={variant}>
+                            {variant}
+                          </SelectItem>
+                        );
+                      })}
+                    </SelectContent>
+                  </Select>
+                }
               />
             )}
           />
@@ -73,10 +90,10 @@ export const InputPropertiesComponent: React.FC<{
             control={form.control}
             name="helperText"
             render={({ field }) => (
-              <InputFormField
+              <FormFieldRender
                 name="Helper Text"
                 tooltip="Helper Text For Input Element"
-                field={field}
+                children={<Input type="text" {...field} />}
               />
             )}
           />
@@ -85,10 +102,10 @@ export const InputPropertiesComponent: React.FC<{
             control={form.control}
             name="placeHolder"
             render={({ field }) => (
-              <InputFormField
+              <FormFieldRender
                 name="Placeholder"
                 tooltip="Placeholder For Input Element"
-                field={field}
+                children={<Input type="text" {...field} />}
               />
             )}
           />

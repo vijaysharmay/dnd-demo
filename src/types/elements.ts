@@ -111,12 +111,6 @@ export type ComponentLibraryListItem = {
   label: string;
 };
 
-export type AttributePropertyConfig = {
-  propertyValue: string;
-  options: string[] | null;
-  showInProperties: boolean;
-};
-
 export type ComponentElementInstance = {
   id: string;
   type: ComponentElementType;

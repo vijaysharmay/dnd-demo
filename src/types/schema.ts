@@ -1,4 +1,4 @@
-import { Schema } from "json-schema-faker";
+import { JSONSchema7 } from "json-schema";
 
 export type ConcordJsonObject = { [key: string]: ConcordJsonValue };
 
@@ -12,6 +12,6 @@ export type ConcordJsonValue =
 
 export interface ConcordSchema {
   name: string;
-  schema: Schema;
+  schema: JSONSchema7;
   sampleData: ConcordJsonValue[];
 }

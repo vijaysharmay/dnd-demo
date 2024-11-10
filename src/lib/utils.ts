@@ -1,4 +1,4 @@
-import { clsx, type ClassValue } from "clsx";
+import { ClassValue, clsx } from "clsx";
 import { JSONSchema7, JSONSchema7TypeName } from "json-schema";
 import { includes, keys } from "lodash";
 import { twMerge } from "tailwind-merge";
@@ -12,17 +12,13 @@ export function randInt() {
   return Math.floor(Math.random() * 1000) + 1;
 }
 
-export function createZodSchema(schema: JSONSchema7) {
-  return z.object({});
-}
-
 export function convertJSONSchemaToZod(schema: JSONSchema7): ZodTypeAny {
   const { required, properties } = schema;
 
   const zSchemaTypeMappings: Record<string, ZodTypeAny> = {
-    number: z.number().positive(),
-    string: z.string().min(1),
-    boolean: z.boolean(),
+    number: z.coerce.number().positive(),
+    string: z.string(),
+    boolean: z.enum(["true", "false"]).transform((value) => value === "true"),
   };
 
   const schemaObj: Record<string, ZodTypeAny> = {};
@@ -38,5 +34,35 @@ export function convertJSONSchemaToZod(schema: JSONSchema7): ZodTypeAny {
     });
   }
 
-  return z.object(schemaObj);
+  return z.object(schemaObj).required();
+}
+
+export function createEmptyObjectFromSchema(schema: JSONSchema7) {
+  const result: { [x: string]: string | number | boolean | object | null } = {};
+  if (schema.properties) {
+    const { properties } = schema;
+    Object.entries(properties).forEach(([key, property]) => {
+      const propSchema = property as JSONSchema7;
+      switch (propSchema.type as JSONSchema7TypeName) {
+        case "string":
+          result[key] = "";
+          break;
+        case "number":
+          result[key] = 0;
+          break;
+        case "boolean":
+          result[key] = false;
+          break;
+        case "object":
+          result[key] = createEmptyObjectFromSchema(propSchema); // Recursive call for nested objects
+          break;
+        case "array":
+          result[key] = [];
+          break;
+        default:
+          result[key] = null; // Fallback for unsupported types
+      }
+    });
+  }
+  return result;
 }

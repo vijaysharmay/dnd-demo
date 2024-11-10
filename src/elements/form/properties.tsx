@@ -1,5 +1,7 @@
 import { Button } from "@/components/ui/button";
-import { Form, FormField } from "@/components/ui/form";
+import { Form, FormControl, FormField } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import PropertiesElementWrapper from "@/containers/properties-element.wrapper";
 import useSchemaStore from "@/store/schema-store";
 import { ComponentElementInstance } from "@/types";
@@ -8,7 +10,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { isEmpty } from "lodash";
 import { SubmitHandler, useForm } from "react-hook-form";
 
-import { InputFormField, SelectFormField } from "../common/form-fields";
+import { FormFieldRender } from "../common/form-fields";
 import { handlePropertiesFormSubmit } from "../common/handlePropertiesFormSubmit";
 
 export const FormPropertiesComponent: React.FC<{
@@ -34,10 +36,10 @@ export const FormPropertiesComponent: React.FC<{
             control={form.control}
             name="formId"
             render={({ field }) => (
-              <InputFormField
+              <FormFieldRender
                 name="Form ID"
                 tooltip="A unique identifier which is useful when crafting events"
-                field={field}
+                children={<Input type="text" {...field} />}
               />
             )}
           />
@@ -46,10 +48,10 @@ export const FormPropertiesComponent: React.FC<{
             control={form.control}
             name="onSubmitUrl"
             render={({ field }) => (
-              <InputFormField
+              <FormFieldRender
                 name="On Submit URL"
                 tooltip="A POST API Endpoint for submitting the form"
-                field={field}
+                children={<Input type="text" {...field} />}
               />
             )}
           />
@@ -58,11 +60,30 @@ export const FormPropertiesComponent: React.FC<{
             control={form.control}
             name="responseSchemaMapping"
             render={({ field }) => (
-              <SelectFormField
+              <FormFieldRender
                 name="Response Schema"
                 tooltip="Schema of the expected request for the URL"
-                field={field}
-                variants={Object.keys(schemas)}
+                children={
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a variant" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {Object.keys(schemas).map((variant: string) => {
+                        return (
+                          <SelectItem key={variant} value={variant}>
+                            {variant}
+                          </SelectItem>
+                        );
+                      })}
+                    </SelectContent>
+                  </Select>
+                }
               />
             )}
           />
@@ -71,10 +92,10 @@ export const FormPropertiesComponent: React.FC<{
             control={form.control}
             name="formHeightInPx"
             render={({ field }) => (
-              <InputFormField
+              <FormFieldRender
                 name="Height (in px)"
                 tooltip="Height of the form container, in pixels"
-                field={field}
+                children={<Input type="text" {...field} />}
               />
             )}
           />

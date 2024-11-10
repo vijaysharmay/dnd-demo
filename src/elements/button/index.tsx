@@ -4,10 +4,7 @@ import { ButtonPropsSchema } from "@/types/properties";
 import { faker } from "@faker-js/faker";
 import { ButtonIcon } from "@radix-ui/react-icons";
 
-import {
-  ButtonDesignerComponent,
-  ButtonDragOverlayComponent,
-} from "./designer";
+import { ButtonDesignerComponent, ButtonDragOverlayComponent } from "./designer";
 import { ButtonPropertiesComponent } from "./properties";
 import { ButtonRenderComponent } from "./render";
 

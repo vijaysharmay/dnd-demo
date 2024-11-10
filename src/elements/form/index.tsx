@@ -1,7 +1,7 @@
 import { randInt } from "@/lib/utils";
-import { ComponentElement, Form } from "@/types";
+import { ComponentElement, ComponentElementInstance, Form } from "@/types";
 import { CustomPropsSchema, InputPropsSchema } from "@/types/properties";
-import { Schema } from "json-schema-faker";
+import { JSONSchema4TypeName, JSONSchema7, JSONSchema7Definition } from "json-schema";
 import { capitalize, isNull, keys } from "lodash";
 import { NotepadText } from "lucide-react";
 import { v4 } from "uuid";
@@ -35,24 +35,40 @@ export const FormComponentElement: ComponentElement = {
   renderComponent: FormRenderComponent,
 };
 
-function initFormChildren(schemaName: string) {
+function initFormChildren(
+  schemaName: string
+): (ComponentElementInstance | null)[] {
   const schemaStore = localStorage["schemaStore"];
   if (isNull(schemaStore)) return [];
-  const schema: Schema =
+  const schema: JSONSchema7 =
     JSON.parse(schemaStore).state.schemas[schemaName].schema;
 
-  return keys(schema.properties).map((prop: string) => {
-    const inputInstanceProps: InputPropsSchema = {
-      inputId: `input-${randInt()}`,
-      inputLabel: capitalize(prop),
-      placeHolder: capitalize(prop),
-      helperText: capitalize(prop),
-      inputType: "text",
-      isFormElement: true,
-    };
-    return libraryElements.Input.create(
-      v4(),
-      inputInstanceProps as CustomPropsSchema
-    );
+  if (isNull(schema.properties)) return [];
+
+  const children: (ComponentElementInstance | null)[] = keys(
+    schema.properties
+  ).map((prop: string) => {
+    if (schema.properties) {
+      const propObj: JSONSchema7Definition = schema.properties[prop];
+      const inputInstanceProps: InputPropsSchema = {
+        inputId: `input-${randInt()}`,
+        inputLabel: capitalize(prop),
+        placeHolder: capitalize(prop),
+        helperText: capitalize(prop),
+        inputType: "text",
+        isFormElement: true,
+        schemaPropertyMapping: {
+          name: prop,
+          type: (propObj as JSONSchema7).type as JSONSchema4TypeName,
+        },
+      };
+      return libraryElements.Input.create(
+        v4(),
+        inputInstanceProps as CustomPropsSchema
+      );
+    } else {
+      return null;
+    }
   });
+  return children;
 }

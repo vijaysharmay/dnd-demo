@@ -1,12 +1,5 @@
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -16,7 +9,9 @@ import useSchemaStore from "@/store/schema-store";
 import { ConcordSchema } from "@/types/schema";
 import { Monaco, Editor as SchemaEditor } from "@monaco-editor/react";
 import Ajv from "ajv";
+import { JSONSchema7 } from "json-schema";
 import { JSONSchemaFaker, Schema } from "json-schema-faker";
+import { isNull } from "lodash";
 import { editor } from "monaco-editor";
 import { useRef, useState } from "react";
 
@@ -40,7 +35,9 @@ export default function SchemaManager() {
     "content",
   ]);
 
-  const [schemaValue, setSchemaValue] = useState<Schema | undefined>(undefined);
+  const [schemaValue, setSchemaValue] = useState<JSONSchema7 | undefined>(
+    undefined
+  );
   const [schemaName, setSchemaName] = useState<string>("");
   const [isSchemaValid, setIsSchemaValid] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<string>("showSchemas");
@@ -89,7 +86,7 @@ export default function SchemaManager() {
   const handleSave = () => {
     const schemaObject: ConcordSchema = {
       name: schemaName,
-      schema: schemaValue as Schema,
+      schema: schemaValue as JSONSchema7,
       sampleData: JSONSchemaFaker.generate(schemaValue as Schema),
     };
     upsertSchema(schemaName, schemaObject);
@@ -209,7 +206,7 @@ export default function SchemaManager() {
               <SchemaEditor
                 height="300px"
                 defaultLanguage="json"
-                defaultValue={schemaValue}
+                defaultValue={JSON.stringify(schemaValue)}
                 theme="dark"
                 options={options}
                 onChange={handleEditorChange}
@@ -224,7 +221,7 @@ export default function SchemaManager() {
                 !isSchemaValid ||
                 schemaName === "" ||
                 errorMsg !== "" ||
-                schemaValue === ""
+                isNull(schemaValue)
               }
               onClick={handleSave}
             >

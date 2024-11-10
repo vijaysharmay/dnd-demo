@@ -62,6 +62,12 @@ export const InputPropsZSchema = z.object({
   helperText: z.string().min(1),
   placeHolder: z.string().min(1),
   isFormElement: z.boolean().default(false),
+  schemaPropertyMapping: z.optional(
+    z.object({
+      name: z.string(),
+      type: z.string(),
+    })
+  ),
 });
 
 export const DTablePropsZSchema = z.object({

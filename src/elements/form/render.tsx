@@ -1,14 +1,17 @@
 import { Button } from "@/components/ui/button";
-import { Form, FormField } from "@/components/ui/form";
-import { convertJSONSchemaToZod } from "@/lib/utils";
+import { Form, FormControl, FormField } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { convertJSONSchemaToZod, createEmptyObjectFromSchema } from "@/lib/utils";
 import useSchemaStore from "@/store/schema-store";
 import { ComponentElementInstance } from "@/types";
 import { FormPropsSchema, InputPropsSchema } from "@/types/properties";
 import { zodResolver } from "@hookform/resolvers/zod";
+
 import type { JSONSchema7 } from "json-schema";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
-import { InputFormField } from "../common/form-fields";
+import { FormFieldRender } from "../common/form-fields";
 
 export const FormRenderComponent: React.FC<{
   elementInstance: ComponentElementInstance;
@@ -23,11 +26,11 @@ export const FormRenderComponent: React.FC<{
   type FormSchema = z.infer<typeof zDataSchema>;
   const form = useForm<FormSchema>({
     resolver: zodResolver(zDataSchema),
-    values: {},
+    defaultValues: createEmptyObjectFromSchema(dataSchema),
   });
 
   const onSubmit: SubmitHandler<FormSchema> = (data) => {
-    console.log(data);
+    console.log(onSubmitUrl, data);
   };
 
   return (
@@ -45,12 +48,36 @@ export const FormRenderComponent: React.FC<{
                   <FormField
                     key={props.inputId}
                     control={form.control}
-                    name={props.inputLabel}
+                    name={props.schemaPropertyMapping?.name as string}
                     render={({ field }) => (
-                      <InputFormField
+                      <FormFieldRender
                         name={props.inputLabel}
                         tooltip={props.helperText}
-                        field={field}
+                        children={
+                          props.schemaPropertyMapping?.type === "boolean" ? (
+                            <Select
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                            >
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select an option" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {["true", "false"].map((variant: string) => {
+                                  return (
+                                    <SelectItem key={variant} value={variant}>
+                                      {variant}
+                                    </SelectItem>
+                                  );
+                                })}
+                              </SelectContent>
+                            </Select>
+                          ) : (
+                            <Input {...field} />
+                          )
+                        }
                       />
                     )}
                   />

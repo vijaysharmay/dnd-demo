@@ -1,18 +1,15 @@
 import { Button } from "@/components/ui/button";
-import { Form, FormField } from "@/components/ui/form";
+import { Form, FormControl, FormField } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import PropertiesElementWrapper from "@/containers/properties-element.wrapper";
 import { ComponentElementInstance } from "@/types";
-import {
-  ButtonPropsSchema,
-  ButtonPropsZSchema,
-  ButtonStyleVariants,
-  EventVariants,
-} from "@/types/properties";
+import { ButtonPropsSchema, ButtonPropsZSchema, ButtonStyleVariants, EventVariants } from "@/types/properties";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { isEmpty } from "lodash";
 import { SubmitHandler, useForm } from "react-hook-form";
 
-import { InputFormField, SelectFormField } from "../common/form-fields";
+import { FormFieldRender } from "../common/form-fields";
 import { handlePropertiesFormSubmit } from "../common/handlePropertiesFormSubmit";
 
 export const ButtonPropertiesComponent: React.FC<{
@@ -37,10 +34,10 @@ export const ButtonPropertiesComponent: React.FC<{
             control={form.control}
             name="buttonId"
             render={({ field }) => (
-              <InputFormField
+              <FormFieldRender
                 name="Button ID"
                 tooltip="A unique identifier which is useful when crafting events"
-                field={field}
+                children={<Input type="text" {...field} />}
               />
             )}
           />
@@ -49,10 +46,10 @@ export const ButtonPropertiesComponent: React.FC<{
             control={form.control}
             name="buttonText"
             render={({ field }) => (
-              <InputFormField
+              <FormFieldRender
                 name="Button Text"
                 tooltip="Text inside the button"
-                field={field}
+                children={<Input type="text" {...field} />}
               />
             )}
           />
@@ -61,11 +58,30 @@ export const ButtonPropertiesComponent: React.FC<{
             control={form.control}
             name="buttonVariant"
             render={({ field }) => (
-              <SelectFormField
+              <FormFieldRender
                 name="Button Variants"
                 tooltip="Variant of Button"
-                field={field}
-                variants={ButtonStyleVariants}
+                children={
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a variant" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {ButtonStyleVariants.map((variant: string) => {
+                        return (
+                          <SelectItem key={variant} value={variant}>
+                            {variant}
+                          </SelectItem>
+                        );
+                      })}
+                    </SelectContent>
+                  </Select>
+                }
               />
             )}
           />
@@ -74,11 +90,30 @@ export const ButtonPropertiesComponent: React.FC<{
             control={form.control}
             name="onClickHandler"
             render={({ field }) => (
-              <SelectFormField
+              <FormFieldRender
                 name="On Click Workflow"
                 tooltip="Choose what to do when you click this button"
-                field={field}
-                variants={EventVariants}
+                children={
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a variant" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {EventVariants.map((variant: string) => {
+                        return (
+                          <SelectItem key={variant} value={variant}>
+                            {variant}
+                          </SelectItem>
+                        );
+                      })}
+                    </SelectContent>
+                  </Select>
+                }
               />
             )}
           />
