@@ -1,35 +1,13 @@
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import useSchemaStore from "@/store/schema-store";
 import { ComponentElementInstance } from "@/types";
 import { DTablePropsSchema } from "@/types/properties";
 import { CaretSortIcon, ChevronDownIcon } from "@radix-ui/react-icons";
-import {
-  ColumnFiltersState,
-  flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  SortingState,
-  useReactTable,
-  VisibilityState,
-} from "@tanstack/react-table";
+import { ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
 import { capitalize } from "lodash";
 import { useState } from "react";
 
@@ -41,7 +19,7 @@ export const DTableDesignerComponent: React.FC<{
   const { dTableHeightInPx, responseSchemaMapping } =
     props as DTablePropsSchema;
   const data = schemas[responseSchemaMapping].sampleData;
-  const dataSchema = JSON.parse(schemas[responseSchemaMapping].schema);
+  const dataSchema = schemas[responseSchemaMapping].schema;
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});

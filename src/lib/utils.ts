@@ -1,7 +1,16 @@
+import { libraryElements } from "@/elements";
+import { ComponentElementInstance } from "@/types";
+import { CustomPropsSchema, InputPropsSchema } from "@/types/properties";
 import { ClassValue, clsx } from "clsx";
-import { JSONSchema7, JSONSchema7TypeName } from "json-schema";
-import { includes, keys } from "lodash";
+import {
+  JSONSchema4TypeName,
+  JSONSchema7,
+  JSONSchema7Definition,
+  JSONSchema7TypeName,
+} from "json-schema";
+import { capitalize, includes, isNull, keys } from "lodash";
 import { twMerge } from "tailwind-merge";
+import { v4 } from "uuid";
 import { z, ZodTypeAny } from "zod";
 
 export function cn(...inputs: ClassValue[]) {
@@ -65,4 +74,42 @@ export function createEmptyObjectFromSchema(schema: JSONSchema7) {
     });
   }
   return result;
+}
+
+export function initFormChildren(
+  schemaName: string
+): (ComponentElementInstance | null)[] {
+  const schemaStore = localStorage["schemaStore"];
+  if (isNull(schemaStore)) return [];
+  const schema: JSONSchema7 =
+    JSON.parse(schemaStore).state.schemas[schemaName].schema;
+
+  if (isNull(schema.properties)) return [];
+
+  const children: (ComponentElementInstance | null)[] = keys(
+    schema.properties
+  ).map((prop: string) => {
+    if (schema.properties) {
+      const propObj: JSONSchema7Definition = schema.properties[prop];
+      const inputInstanceProps: InputPropsSchema = {
+        inputId: `input-${randInt()}`,
+        inputLabel: capitalize(prop),
+        placeHolder: capitalize(prop),
+        helperText: capitalize(prop),
+        inputType: "text",
+        isFormElement: true,
+        schemaPropertyMapping: {
+          name: prop,
+          type: (propObj as JSONSchema7).type as JSONSchema4TypeName,
+        },
+      };
+      return libraryElements.Input.create(
+        v4(),
+        inputInstanceProps as CustomPropsSchema
+      );
+    } else {
+      return null;
+    }
+  });
+  return children;
 }

@@ -1,7 +1,9 @@
+import { initFormChildren } from "@/lib/utils";
 import useElementStore from "@/store/element-store";
-import { ComponentElementInstance, HContainer } from "@/types";
+import { ComponentElementInstance, Form, HContainer } from "@/types";
 import {
   colsIntRec,
+  FormPropsSchema,
   HContainerPropsSchema,
   PropsSchema,
 } from "@/types/properties";
@@ -21,8 +23,18 @@ export const handlePropertiesFormSubmit = (
 
   const hasParent: boolean = !isNull(activeElement.parentId);
 
+  const updatedChildren =
+    activeElement.type === Form
+      ? {
+          children: initFormChildren(
+            (activeElementProps as FormPropsSchema).responseSchemaMapping
+          ),
+        }
+      : { children: activeElement.children };
+
   const updatedElement: ComponentElementInstance = {
     ...activeElement,
+    ...updatedChildren,
     props: activeElementProps,
   };
 

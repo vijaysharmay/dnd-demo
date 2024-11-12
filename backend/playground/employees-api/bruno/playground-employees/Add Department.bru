@@ -1,0 +1,21 @@
+meta {
+  name: Add Department
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://localhost:3000/api/departments
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "departmentName": "sample"
+  }
+}
+
+tests {
+  bru.setEnvVar("getCurrentDepartmentId", res.getBody().id)
+}
