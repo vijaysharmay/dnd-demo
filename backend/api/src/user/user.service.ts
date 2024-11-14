@@ -1,24 +1,30 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
-
 import { v4 } from 'uuid';
-import { CreateUserDto } from './dto/create-user.dto';
+
+import { CreateUserDto } from '../auth/dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+
+import { pbkdf2Sync, randomBytes } from 'crypto';
 
 @Injectable()
 export class UserService {
   constructor(private prisma: PrismaService) {}
   create(createUserDto: CreateUserDto) {
     const { fullName, email, passwd } = createUserDto;
+    const salt = randomBytes(16).toString('hex');
+    const hash = pbkdf2Sync(passwd, salt, 1000, 64, 'sha512').toString('hex');
+
     return this.prisma.user.create({
       data: {
         id: v4(),
         fullName,
         email,
-        passwd,
+        passwd: hash,
+        salt,
       },
       omit: {
-        passwd: true,
+        salt: true,
       },
     });
   }
@@ -27,6 +33,15 @@ export class UserService {
     return this.prisma.user.findMany({
       omit: {
         passwd: true,
+        salt: true,
+      },
+    });
+  }
+
+  findOneByEmail(email: string) {
+    return this.prisma.user.findFirst({
+      where: {
+        email,
       },
     });
   }
@@ -38,6 +53,7 @@ export class UserService {
       },
       omit: {
         passwd: true,
+        salt: true,
       },
     });
   }
@@ -55,6 +71,7 @@ export class UserService {
       },
       omit: {
         passwd: true,
+        salt: true,
       },
     });
   }

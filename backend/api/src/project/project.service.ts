@@ -42,6 +42,7 @@ export class ProjectService {
         owner: {
           omit: {
             passwd: true,
+            salt: true,
           },
         },
       },
@@ -61,6 +62,7 @@ export class ProjectService {
         owner: {
           omit: {
             passwd: true,
+            salt: true,
           },
         },
         pages: true,
@@ -86,6 +88,7 @@ export class ProjectService {
         owner: {
           omit: {
             passwd: true,
+            salt: true,
           },
         },
       },

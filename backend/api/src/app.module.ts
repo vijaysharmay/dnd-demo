@@ -1,16 +1,18 @@
 import { Module } from '@nestjs/common';
-import { APP_PIPE, RouterModule } from '@nestjs/core';
+import { APP_GUARD, APP_PIPE, RouterModule } from '@nestjs/core';
 import { ZodValidationPipe } from 'nestjs-zod';
 
 import { ActionModule } from './action/action.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { AuthModule } from './auth/auth.module';
 import { BlockModule } from './block/block.module';
 import { FlowModule } from './flow/flow.module';
 import { PageModule } from './page/page.module';
 import { ProjectModule } from './project/project.module';
 import { UserModule } from './user/user.module';
 import { WorkspaceModule } from './workspace/workspace.module';
+import { AuthGuard } from './auth/auth.guard';
 
 @Module({
   imports: [
@@ -61,6 +63,7 @@ import { WorkspaceModule } from './workspace/workspace.module';
     ]),
     ActionModule,
     UserModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [
@@ -68,6 +71,10 @@ import { WorkspaceModule } from './workspace/workspace.module';
     {
       provide: APP_PIPE,
       useClass: ZodValidationPipe,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
     },
   ],
 })

@@ -46,6 +46,7 @@ export class WorkspaceService {
         owner: {
           omit: {
             passwd: true,
+            salt: true,
           },
         },
       },
@@ -64,6 +65,7 @@ export class WorkspaceService {
         owner: {
           omit: {
             passwd: true,
+            salt: true,
           },
         },
         members: {
@@ -71,6 +73,7 @@ export class WorkspaceService {
             user: {
               omit: {
                 passwd: true,
+                salt: true,
               },
             },
           },
@@ -89,6 +92,7 @@ export class WorkspaceService {
             owner: {
               omit: {
                 passwd: true,
+                salt: true,
               },
             },
           },
@@ -153,6 +157,7 @@ export class WorkspaceService {
             user: {
               omit: {
                 passwd: true,
+                salt: true,
               },
             },
           },

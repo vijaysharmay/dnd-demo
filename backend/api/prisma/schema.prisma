@@ -26,6 +26,7 @@ model User {
   fullName         String              @map("full_name")
   email            String              @unique @map("email")
   passwd           String
+  salt             String
   ownerOfWorkspace Workspace[]         @relation(name: "ownerOfWorkspace")
   ownerOfProject   Project[]           @relation(name: "ownerOfProject")
   ownerOfPage      Page[]              @relation(name: "ownerOfPage")

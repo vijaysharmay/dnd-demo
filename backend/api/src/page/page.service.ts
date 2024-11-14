@@ -58,6 +58,7 @@ export class PageService {
             owner: {
               omit: {
                 passwd: true,
+                salt: true,
               },
             },
           },
@@ -70,6 +71,7 @@ export class PageService {
             owner: {
               omit: {
                 passwd: true,
+                salt: true,
               },
             },
           },
@@ -77,6 +79,7 @@ export class PageService {
         owner: {
           omit: {
             passwd: true,
+            salt: true,
           },
         },
       },
@@ -106,6 +109,7 @@ export class PageService {
             owner: {
               omit: {
                 passwd: true,
+                salt: true,
               },
             },
           },
@@ -118,6 +122,7 @@ export class PageService {
             owner: {
               omit: {
                 passwd: true,
+                salt: true,
               },
             },
           },
@@ -125,6 +130,7 @@ export class PageService {
         owner: {
           omit: {
             passwd: true,
+            salt: true,
           },
         },
       },
@@ -159,6 +165,7 @@ export class PageService {
             owner: {
               omit: {
                 passwd: true,
+                salt: true,
               },
             },
           },
@@ -171,6 +178,7 @@ export class PageService {
             owner: {
               omit: {
                 passwd: true,
+                salt: true,
               },
             },
           },
@@ -178,6 +186,7 @@ export class PageService {
         owner: {
           omit: {
             passwd: true,
+            salt: true,
           },
         },
       },
