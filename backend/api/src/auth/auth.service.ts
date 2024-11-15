@@ -3,6 +3,8 @@ import { JwtService } from '@nestjs/jwt';
 import { pbkdf2Sync, timingSafeEqual } from 'crypto';
 import { isNull } from 'lodash';
 import { UserService } from 'src/user/user.service';
+
+import { DIGEST, ITERATIONS, KEYLEN } from './constants';
 import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
@@ -23,9 +25,29 @@ export class AuthService {
     }
 
     const { id, email, passwd, salt } = user;
-    const encryptedHash = pbkdf2Sync(passwd, salt, 10000, 512, 'sha512');
 
-    if (timingSafeEqual(loginPasswd, encryptedHash)) {
+    // Hash the login password with the same parameters
+    const encryptedHash = pbkdf2Sync(
+      loginPasswd,
+      salt,
+      ITERATIONS,
+      KEYLEN,
+      DIGEST,
+    );
+
+    // Convert both to Buffer and ensure they have the same length
+    const storedPasswdBuffer = Buffer.from(passwd, 'hex');
+    const loginHashBuffer = Buffer.from(encryptedHash);
+
+    // Ensure both buffers are the same length
+    if (storedPasswdBuffer.length !== loginHashBuffer.length) {
+      throw new UnauthorizedException(
+        'incorrect password - buffer length mismatch',
+      );
+    }
+
+    // Compare securely using timingSafeEqual
+    if (timingSafeEqual(storedPasswdBuffer, loginHashBuffer)) {
       return {
         accessToken: await this.jwtService.signAsync({ sub: id, email: email }),
       };
@@ -35,11 +57,10 @@ export class AuthService {
   }
 
   async signup(createUserDto: CreateUserDto) {
-    const { id, email, passwd } = await this.userService.create(createUserDto);
-    const accessToken = await this.login(email, passwd);
+    const { email } = await this.userService.create(createUserDto);
+    const accessToken = await this.login(email, createUserDto.passwd);
     return {
-      id,
-      ...accessToken,
+      accessToken,
     };
   }
 }

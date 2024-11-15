@@ -1,6 +1,5 @@
 import { Route, Switch } from "wouter";
 
-import Navbar from "./containers/navbar";
 import Preview from "./containers/preview";
 import Auth from "./pages/auth";
 import Page from "./pages/page";
@@ -10,7 +9,6 @@ import Workspace from "./pages/workspace";
 export default function App() {
   return (
     <>
-      <Navbar />
       <Switch>
         <Route path="/" component={Auth}></Route>
         <Route path="/workspace/:workspaceId" nest={true}>

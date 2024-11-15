@@ -23,6 +23,7 @@ export class WorkspaceService {
           },
         },
         route,
+        isUserWorkspace: false,
       },
       select: {
         id: true,

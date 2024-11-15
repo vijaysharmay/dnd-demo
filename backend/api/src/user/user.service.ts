@@ -6,6 +6,7 @@ import { CreateUserDto } from '../auth/dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 import { pbkdf2Sync, randomBytes } from 'crypto';
+import { DIGEST, ITERATIONS, KEYLEN } from 'src/auth/constants';
 
 @Injectable()
 export class UserService {
@@ -13,17 +14,36 @@ export class UserService {
   create(createUserDto: CreateUserDto) {
     const { fullName, email, passwd } = createUserDto;
     const salt = randomBytes(16).toString('hex');
-    const hash = pbkdf2Sync(passwd, salt, 1000, 64, 'sha512').toString('hex');
+    const hash = pbkdf2Sync(passwd, salt, ITERATIONS, KEYLEN, DIGEST).toString(
+      'hex',
+    );
+
+    const userId = v4();
+    const workspaceId = v4();
 
     return this.prisma.user.create({
       data: {
-        id: v4(),
+        id: userId,
         fullName,
         email,
         passwd: hash,
         salt,
+        userWorkSpace: {
+          connectOrCreate: {
+            where: {
+              id: workspaceId,
+            },
+            create: {
+              id: workspaceId,
+              name: `${fullName}'s Workspace`,
+              isUserWorkspace: true,
+              ownerId: userId,
+            },
+          },
+        },
       },
       omit: {
+        passwd: true,
         salt: true,
       },
     });

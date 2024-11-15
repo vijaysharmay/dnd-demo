@@ -1,3 +1,9 @@
+import Navbar from "@/containers/navbar";
+
 export default function Workspace() {
-  return <div>index</div>;
+  return (
+    <>
+      <Navbar />
+    </>
+  );
 }
