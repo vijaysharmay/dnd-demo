@@ -4,13 +4,22 @@ import { v4 } from 'uuid';
 
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-Project.dto';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class ProjectService {
-  constructor(private prisma: PrismaService) {}
-  async create(workspaceId: string, createProjectDto: CreateProjectDto) {
-    const { name, ownerId, route } = createProjectDto;
+  constructor(
+    private prisma: PrismaService,
+    private jwtService: JwtService,
+  ) {}
+  async create(
+    accessToken: string,
+    workspaceId: string,
+    createProjectDto: CreateProjectDto,
+  ) {
+    const { name, route } = createProjectDto;
     const projectId = v4();
+    const { sub: ownerId } = this.jwtService.decode(accessToken);
     return this.prisma.project.create({
       data: {
         id: projectId,

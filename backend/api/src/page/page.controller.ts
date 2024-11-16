@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Headers
 } from '@nestjs/common';
 
 import { CreatePageDto } from './dto/create-page.dto';
@@ -21,8 +22,12 @@ export class PageController {
     @Param('workspaceId') workspaceId: string,
     @Param('projectId') projectId: string,
     @Body() createPageDto: CreatePageDto,
+    @Headers('Authorization') authorizationHeader?: string,
   ) {
-    return this.pageService.create(workspaceId, projectId, createPageDto);
+    if (!authorizationHeader)
+      throw new Error('Couldnt find access token in header');
+    const accessToken = authorizationHeader.split(' ')[1];
+    return this.pageService.create(accessToken, workspaceId, projectId, createPageDto);
   }
 
   @Get()

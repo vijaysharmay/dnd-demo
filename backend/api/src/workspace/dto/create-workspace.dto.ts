@@ -9,7 +9,7 @@ const memberRoleZSchema = z.object({
 
 const workspaceWithOutMembersAndProjectsSchema = z.object({
   name: z.string().max(100),
-  ownerId: z.string(),
+  ownerId: z.optional(z.string()),
   route: z.string(),
   members: z.optional(z.array(memberRoleZSchema)),
 });

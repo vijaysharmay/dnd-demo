@@ -4,7 +4,7 @@ import {
   File,
   Folder,
   Forward,
-  MoreHorizontal,
+  Plus,
   Settings,
   Trash2,
 } from "lucide-react";
@@ -14,23 +14,23 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import {
   SidebarGroup,
   SidebarGroupLabel,
   SidebarMenu,
-  SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarMenuSub,
-  useSidebar,
 } from "@/components/ui/sidebar";
+
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu";
+
 import { Skeleton } from "@/components/ui/skeleton";
 import { convertToTree } from "@/lib/utils";
 import useWorkspaceStore from "@/store/workspace-store";
@@ -68,6 +68,7 @@ export function ConcordSidebarNavigator() {
 
 type NavTreeNode = {
   name: string;
+  type: string;
   children?: NavTreeNode[];
 };
 
@@ -75,11 +76,13 @@ function NavTree({ item }: { item: NavTreeNode }) {
   if (!item.children) {
     return (
       <SidebarMenuItem className="cursor-pointer hover:bg-sidebar-accent rounded">
-        <SidebarMenuButton className="min-w-full">
+        <SidebarMenuButton className="">
           <File />
-          {item.name}
+          <NodeOptions nodeType={item.type}>
+            <>{item.name}</>
+          </NodeOptions>
         </SidebarMenuButton>
-        <DropdownContainer />
+        {/* <DropdownContainer /> */}
       </SidebarMenuItem>
     );
   }
@@ -87,55 +90,73 @@ function NavTree({ item }: { item: NavTreeNode }) {
   return (
     <SidebarMenuItem>
       <Collapsible className="group/collapsible [&[data-state=open]>button>svg:first-child]:rotate-90">
-        <CollapsibleTrigger asChild>
-          <SidebarMenuButton>
+        <SidebarMenuButton>
+          <CollapsibleTrigger asChild>
             <ChevronRight className="transition-transform" />
-            <Folder />
-            {item.name}
-          </SidebarMenuButton>
-        </CollapsibleTrigger>
+          </CollapsibleTrigger>
+          <Folder />
+          <NodeOptions nodeType={item.type}>
+            <>{item.name}</>
+          </NodeOptions>
+        </SidebarMenuButton>
         <CollapsibleContent>
-          <SidebarMenuSub className="w-full pr-4">
+          <SidebarMenuSub className="mr-0">
             {item.children?.map((node: NavTreeNode) => (
               <NavTree key={node.name} item={node} />
             ))}
           </SidebarMenuSub>
-          <DropdownContainer />
         </CollapsibleContent>
       </Collapsible>
+      {/* <DropdownContainer /> */}
     </SidebarMenuItem>
   );
 }
 
-function DropdownContainer() {
-  const { isMobile } = useSidebar();
+function NodeOptions({
+  nodeType,
+  children,
+}: {
+  nodeType: string;
+  children: React.ReactElement;
+}) {
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <SidebarMenuAction>
-          <MoreHorizontal />
-          <span className="sr-only">More</span>
-        </SidebarMenuAction>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent
-        className="w-48 rounded-lg"
-        side={isMobile ? "bottom" : "right"}
-        align={isMobile ? "end" : "start"}
-      >
-        <DropdownMenuItem>
-          <Forward className="text-muted-foreground" />
-          <span>Share</span>
-        </DropdownMenuItem>
-        <DropdownMenuItem>
-          <Settings className="text-muted-foreground" />
-          <span>Settings</span>
-        </DropdownMenuItem>
+    <ContextMenu>
+      <ContextMenuTrigger>{children}</ContextMenuTrigger>
+      <ContextMenuContent>
+        {nodeType === "project" && (
+          <>
+            <NodeOptionsItem
+              name="Add Page"
+              icon={<Plus className="size-4" />}
+            />
+            <DropdownMenuSeparator />
+          </>
+        )}
+        <NodeOptionsItem name="Share" icon={<Forward className="size-4" />} />
+        <NodeOptionsItem
+          name="Settings"
+          icon={<Settings className="size-4" />}
+        />
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          <Trash2 className="text-muted-foreground" />
-          <span>Delete</span>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+        <NodeOptionsItem name="Delete" icon={<Trash2 className="size-4" />} />
+      </ContextMenuContent>
+    </ContextMenu>
+  );
+}
+
+function NodeOptionsItem({
+  name,
+  icon,
+}: {
+  name: string;
+  icon: React.ReactElement;
+}) {
+  return (
+    <ContextMenuItem className="gap-2 p-2">
+      <div className="flex size-6 items-center justify-center rounded-md border bg-background text-muted-foreground">
+        {icon}
+      </div>
+      <div className="font-medium text-muted-foreground">{name}</div>
+    </ContextMenuItem>
   );
 }

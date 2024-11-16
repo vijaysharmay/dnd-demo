@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Headers,
   Param,
   Patch,
   Post,
@@ -20,8 +21,16 @@ export class ProjectController {
   create(
     @Param('workspaceId') workspaceId: string,
     @Body() createProjectDto: CreateProjectDto,
+    @Headers('Authorization') authorizationHeader?: string,
   ) {
-    return this.projectService.create(workspaceId, createProjectDto);
+    if (!authorizationHeader)
+      throw new Error('Couldnt find access token in header');
+    const accessToken = authorizationHeader.split(' ')[1];
+    return this.projectService.create(
+      accessToken,
+      workspaceId,
+      createProjectDto,
+    );
   }
 
   @Get()

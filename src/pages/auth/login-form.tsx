@@ -95,7 +95,7 @@ export function LoginForm() {
                       type="password"
                       placeholder="Enter your password"
                       className={cn(
-                        form.formState.errors["password"] && "bg-red-50"
+                        form.formState.errors["passwd"] && "bg-red-50"
                       )}
                       {...field}
                     />

@@ -3,15 +3,20 @@ import { isUndefined } from 'lodash';
 import { PrismaService } from 'src/prisma.service';
 import { v4 } from 'uuid';
 
+import { JwtService } from '@nestjs/jwt';
 import { CreateWorkspaceDto } from './dto/create-workspace.dto';
 import { RemoveMembersDto } from './dto/remove-members.dto';
 import { UpdateWorkspaceDto } from './dto/update-workspace.dto';
 
 @Injectable()
 export class WorkspaceService {
-  constructor(private prisma: PrismaService) {}
-  async create(createWorkspaceDto: CreateWorkspaceDto) {
-    const { name, ownerId, route } = createWorkspaceDto;
+  constructor(
+    private prisma: PrismaService,
+    private jwtService: JwtService,
+  ) {}
+  async create(accessToken: string, createWorkspaceDto: CreateWorkspaceDto) {
+    const { name, route } = createWorkspaceDto;
+    const { sub: ownerId } = this.jwtService.decode(accessToken);
     const workspaceId = v4();
     const { id } = await this.prisma.workspace.create({
       data: {

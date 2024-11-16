@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Headers,
   Param,
   Patch,
   Post,
@@ -18,8 +19,14 @@ export class WorkspaceController {
   constructor(private readonly workspaceService: WorkspaceService) {}
 
   @Post()
-  create(@Body() createWorkspaceDto: CreateWorkspaceDto) {
-    return this.workspaceService.create(createWorkspaceDto);
+  create(
+    @Body() createWorkspaceDto: CreateWorkspaceDto,
+    @Headers('Authorization') authorizationHeader?: string,
+  ) {
+    if (!authorizationHeader)
+      throw new Error('Couldnt find access token in header');
+    const accessToken = authorizationHeader.split(' ')[1];
+    return this.workspaceService.create(accessToken, createWorkspaceDto);
   }
 
   @Get()

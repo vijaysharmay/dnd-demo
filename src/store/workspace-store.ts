@@ -7,7 +7,7 @@ type WorkspaceState = {
   workspaces: WorkspaceSchema[];
   setWorkspaces: (workspaces: WorkspaceSchema[]) => void;
   currentWorkspace: WorkspaceSchema | undefined;
-  setCurrentWorkspace: (workspace: WorkspaceSchema) => void;
+  setCurrentWorkspace: (workspace: WorkspaceSchema | undefined) => void;
 };
 
 export const useWorkspaceStore = create<WorkspaceState>((set) => ({

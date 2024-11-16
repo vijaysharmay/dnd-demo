@@ -115,7 +115,7 @@ export function initFormChildren(
   return children;
 }
 
-interface Tree {
+export interface Tree {
   name: string;
   type: string;
   children?: Tree[];

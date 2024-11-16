@@ -4,16 +4,22 @@ import { v4 } from 'uuid';
 
 import { CreatePageDto } from './dto/create-page.dto';
 import { UpdatePageDto } from './dto/update-page.dto';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class PageService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private jwtService: JwtService,
+  ) {}
   async create(
+    accessToken: string,
     workspaceId: string,
     projectId: string,
     createPageDto: CreatePageDto,
   ) {
-    const { name, ownerId, route } = createPageDto;
+    const { sub: ownerId } = this.jwtService.decode(accessToken);
+    const { name, route } = createPageDto;
     const PageId = v4();
     return this.prisma.page.create({
       data: {
