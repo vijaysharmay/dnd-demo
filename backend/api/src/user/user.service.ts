@@ -1,17 +1,16 @@
 import { Injectable } from '@nestjs/common';
+import { pbkdf2Sync, randomBytes } from 'crypto';
+import { DIGEST, ITERATIONS, KEYLEN } from 'src/auth/constants';
 import { PrismaService } from 'src/prisma.service';
 import { v4 } from 'uuid';
 
 import { CreateUserDto } from '../auth/dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
-import { pbkdf2Sync, randomBytes } from 'crypto';
-import { DIGEST, ITERATIONS, KEYLEN } from 'src/auth/constants';
-
 @Injectable()
 export class UserService {
   constructor(private prisma: PrismaService) {}
-  create(createUserDto: CreateUserDto) {
+  async create(createUserDto: CreateUserDto) {
     const { fullName, email, passwd } = createUserDto;
     const salt = randomBytes(16).toString('hex');
     const hash = pbkdf2Sync(passwd, salt, ITERATIONS, KEYLEN, DIGEST).toString(
@@ -21,27 +20,33 @@ export class UserService {
     const userId = v4();
     const workspaceId = v4();
 
-    return this.prisma.user.create({
+    const user = await this.prisma.user.create({
       data: {
         id: userId,
         fullName,
         email,
         passwd: hash,
         salt,
-        userWorkSpace: {
-          connectOrCreate: {
-            where: {
-              id: workspaceId,
-            },
-            create: {
-              id: workspaceId,
-              name: `${fullName}'s Workspace`,
-              isUserWorkspace: true,
-              ownerId: userId,
-            },
-          },
-        },
       },
+      omit: {
+        passwd: true,
+        salt: true,
+      },
+    });
+
+    const workspace = await this.prisma.workspace.create({
+      data: {
+        id: workspaceId,
+        name: `${fullName}'s Workspace`,
+        isUserWorkspace: true,
+        owner: { connect: { id: user.id } },
+        defaultWorkspaceUserId: { connect: { id: user.id } },
+      },
+    });
+
+    return await this.prisma.user.update({
+      where: { id: user.id },
+      data: { userWorkSpaceId: workspace.id },
       omit: {
         passwd: true,
         salt: true,

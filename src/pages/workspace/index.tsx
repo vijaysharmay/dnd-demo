@@ -1,4 +1,4 @@
-import Navbar from "@/containers/navbar";
+import Navbar from "@/containers/app-container";
 
 export default function Workspace() {
   return (

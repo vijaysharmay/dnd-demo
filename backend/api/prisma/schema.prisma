@@ -31,8 +31,8 @@ model User {
   ownerOfProject   Project[]           @relation(name: "ownerOfProject")
   ownerOfPage      Page[]              @relation(name: "ownerOfPage")
   workspaces       UserWorkspaceRole[] @relation(name: "userOfWorkspace")
-  userWorkSpace    Workspace           @relation(fields: [userWorkSpaceId], references: [id], name: "userWorkspace")
-  userWorkSpaceId  String              @unique @map("user_workspace_id")
+  userWorkSpace    Workspace?          @relation(fields: [userWorkSpaceId], references: [id], name: "userWorkspace")
+  userWorkSpaceId  String?             @unique @map("user_workspace_id")
 
   @@map("users")
 }
