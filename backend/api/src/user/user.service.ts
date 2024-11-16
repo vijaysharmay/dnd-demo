@@ -4,12 +4,21 @@ import { DIGEST, ITERATIONS, KEYLEN } from 'src/auth/constants';
 import { PrismaService } from 'src/prisma.service';
 import { v4 } from 'uuid';
 
+import { forEach } from 'lodash';
 import { CreateUserDto } from '../auth/dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UserService {
   constructor(private prisma: PrismaService) {}
+
+  bulkCreate(createBulkUserDto: CreateUserDto[]) {
+    forEach(createBulkUserDto, async (user) => {
+      await this.create(user);
+    });
+    return true;
+  }
+
   async create(createUserDto: CreateUserDto) {
     const { fullName, email, passwd } = createUserDto;
     const salt = randomBytes(16).toString('hex');
@@ -44,9 +53,31 @@ export class UserService {
       },
     });
 
+    const updatedWorkspace = await this.prisma.workspace.update({
+      where: {
+        id: workspace.id,
+      },
+      data: {
+        members: {
+          connectOrCreate: {
+            where: {
+              userId_workspaceId: {
+                userId: user.id,
+                workspaceId: workspace.id,
+              },
+            },
+            create: {
+              role: 'ADMIN',
+              userId: user.id,
+            },
+          },
+        },
+      },
+    });
+
     return await this.prisma.user.update({
       where: { id: user.id },
-      data: { userWorkSpaceId: workspace.id },
+      data: { userWorkspaceId: updatedWorkspace.id },
       omit: {
         passwd: true,
         salt: true,
@@ -76,9 +107,110 @@ export class UserService {
       where: {
         id: userId,
       },
+      include: {
+        workspaces: {
+          include: {
+            workspace: {
+              include: {
+                owner: {
+                  omit: {
+                    passwd: true,
+                    salt: true,
+                    userWorkspaceId: true,
+                  },
+                },
+                projects: {
+                  include: {
+                    pages: {
+                      include: {
+                        owner: {
+                          omit: {
+                            passwd: true,
+                            salt: true,
+                            userWorkspaceId: true,
+                          },
+                        },
+                      },
+                      omit: {
+                        ownerId: true,
+                        projectId: true,
+                        workspaceId: true,
+                      },
+                    },
+                    owner: {
+                      omit: {
+                        passwd: true,
+                        salt: true,
+                        userWorkspaceId: true,
+                      },
+                    },
+                  },
+                  omit: {
+                    workspaceId: true,
+                    ownerId: true,
+                  },
+                },
+              },
+              omit: {
+                ownerId: true,
+              },
+            },
+          },
+          omit: {
+            userId: true,
+            workspaceId: true,
+          },
+        },
+        userWorkspace: {
+          omit: {
+            ownerId: true,
+          },
+          include: {
+            owner: {
+              omit: {
+                userWorkspaceId: true,
+                passwd: true,
+                salt: true,
+              },
+            },
+            projects: {
+              include: {
+                pages: {
+                  include: {
+                    owner: {
+                      omit: {
+                        passwd: true,
+                        salt: true,
+                        userWorkspaceId: true,
+                      },
+                    },
+                  },
+                  omit: {
+                    ownerId: true,
+                    projectId: true,
+                    workspaceId: true,
+                  },
+                },
+                owner: {
+                  omit: {
+                    passwd: true,
+                    salt: true,
+                    userWorkspaceId: true,
+                  },
+                },
+              },
+              omit: {
+                workspaceId: true,
+                ownerId: true,
+              },
+            },
+          },
+        },
+      },
       omit: {
         passwd: true,
         salt: true,
+        userWorkspaceId: true,
       },
     });
   }

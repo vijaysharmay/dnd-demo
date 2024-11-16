@@ -42,8 +42,7 @@ export function LoginForm() {
   const loginMutation = useMutation({
     mutationFn: loginUser,
     onSuccess: (data: AuthResponse) => {
-      sessionStorage.setItem("accessToken", data.accessToken);
-      authStore.login();
+      authStore.login(data.accessToken);
       navigate("/home");
     },
     onError: (error: Error) => {

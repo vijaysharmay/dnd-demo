@@ -109,7 +109,13 @@ export class WorkspaceService {
     const { members, ownerId, ...updateWorkspaceDtoWithOutMembers } =
       updateWorkspaceDto;
 
-    if (!isUndefined(members) && members.length > 0) {
+    const workspace = await this.findOne(workspaceId);
+
+    if (
+      !isUndefined(members) &&
+      members.length > 0 &&
+      workspace.isUserWorkspace === false
+    ) {
       for (const member of members) {
         try {
           await this.prisma.userWorkspaceRole.upsert({

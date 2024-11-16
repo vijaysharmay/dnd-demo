@@ -9,9 +9,9 @@ import {
 } from '@nestjs/common';
 
 import { CreateWorkspaceDto } from './dto/create-workspace.dto';
+import { RemoveMembersDto } from './dto/remove-members.dto';
 import { UpdateWorkspaceDto } from './dto/update-workspace.dto';
 import { WorkspaceService } from './workspace.service';
-import { RemoveMembersDto } from './dto/remove-members.dto';
 
 @Controller()
 export class WorkspaceController {
@@ -45,7 +45,10 @@ export class WorkspaceController {
     @Param('workspaceId') workspaceId: string,
     @Body() removeMembersDto: RemoveMembersDto,
   ) {
-    return this.workspaceService.removeMembersFromWorkspace(workspaceId, removeMembersDto);
+    return this.workspaceService.removeMembersFromWorkspace(
+      workspaceId,
+      removeMembersDto,
+    );
   }
 
   @Delete(':workspaceId')

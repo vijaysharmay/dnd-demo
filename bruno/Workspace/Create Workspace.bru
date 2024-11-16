@@ -10,11 +10,15 @@ post {
   auth: none
 }
 
+headers {
+  Authorization: Bearer {{accessToken}}
+}
+
 body:json {
   {
-    "name": "Sample",
+    "name": "Dummy",
     "ownerId": "{{currentUserId}}",
-    "route": "sample"
+    "route": "dummy"
   }
 }
 

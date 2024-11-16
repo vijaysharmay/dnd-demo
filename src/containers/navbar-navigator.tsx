@@ -1,5 +1,4 @@
 "use client";
-
 import {
   ChevronRight,
   File,
@@ -32,31 +31,37 @@ import {
   SidebarMenuSub,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { Skeleton } from "@/components/ui/skeleton";
+import { convertToTree } from "@/lib/utils";
+import useWorkspaceStore from "@/store/workspace-store";
 
 export function ConcordSidebarNavigator() {
-  const projects = [
-    {
-      name: "Design Engineering",
-      children: [{ name: "as" }],
-    },
-    {
-      name: "Sales & Marketing",
-      children: [{ name: "as" }],
-    },
-    {
-      name: "Travel",
-      children: [{ name: "as" }],
-    },
-  ];
+  const { currentWorkspace, isWorkspaceDataLoading } = useWorkspaceStore();
+
+  if (!currentWorkspace) return;
+  const workspaceTree = convertToTree(currentWorkspace);
+  const projects = workspaceTree.children;
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
       <SidebarGroupLabel>Projects</SidebarGroupLabel>
-      <SidebarMenu>
-        {projects.map((item) => (
-          <NavTree key={item.name} item={item} />
-        ))}
-      </SidebarMenu>
+      {projects && (
+        <>
+          {isWorkspaceDataLoading && (
+            <Skeleton className="w-full rounded h-12" />
+          )}
+          {projects.length === 0 && (
+            <div className="ml-2 mt-2">No Projects Found</div>
+          )}
+          {projects.length > 0 && (
+            <SidebarMenu>
+              {projects.map((item) => (
+                <NavTree key={item.name} item={item} />
+              ))}
+            </SidebarMenu>
+          )}
+        </>
+      )}
     </SidebarGroup>
   );
 }

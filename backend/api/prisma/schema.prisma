@@ -31,8 +31,8 @@ model User {
   ownerOfProject   Project[]           @relation(name: "ownerOfProject")
   ownerOfPage      Page[]              @relation(name: "ownerOfPage")
   workspaces       UserWorkspaceRole[] @relation(name: "userOfWorkspace")
-  userWorkSpace    Workspace?          @relation(fields: [userWorkSpaceId], references: [id], name: "userWorkspace")
-  userWorkSpaceId  String?             @unique @map("user_workspace_id")
+  userWorkspace    Workspace?          @relation(fields: [userWorkspaceId], references: [id], name: "userWorkspace")
+  userWorkspaceId  String?             @unique @map("user_workspace_id")
 
   @@map("users")
 }
@@ -41,7 +41,7 @@ model Workspace {
   id                     String              @id @map("id")
   name                   String              @unique @map("workspace_name")
   owner                  User                @relation(fields: [ownerId], references: [id], name: "ownerOfWorkspace")
-  ownerId                String              @unique
+  ownerId                String
   isUserWorkspace        Boolean             @map("is_user_workspace")
   route                  String?             @unique @map("workspace_route")
   members                UserWorkspaceRole[] @relation(name: "workspaceForUser")

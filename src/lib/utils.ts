@@ -1,5 +1,6 @@
 import { libraryElements } from "@/elements";
 import { ComponentElementInstance } from "@/types";
+import { PageSchema, ProjectSchema, WorkspaceSchema } from "@/types/api/user";
 import { CustomPropsSchema, InputPropsSchema } from "@/types/properties";
 import { ClassValue, clsx } from "clsx";
 import {
@@ -112,4 +113,32 @@ export function initFormChildren(
     }
   });
   return children;
+}
+
+interface Tree {
+  name: string;
+  type: string;
+  children?: Tree[];
+}
+
+export function convertToTree(data: WorkspaceSchema): Tree {
+  const mapWorkspaceToTree = (workspace: WorkspaceSchema): Tree => ({
+    name: workspace.name,
+    type: "workspace",
+    children: (workspace.projects || []).map(mapProjectToTree),
+  });
+
+  const mapProjectToTree = (project: ProjectSchema): Tree => ({
+    name: project.name,
+    type: "project",
+    children: (project.pages || []).map(mapPageToTree),
+  });
+
+  const mapPageToTree = (page: PageSchema): Tree => ({
+    name: page.name,
+    type: "page",
+  });
+
+  // Assuming we start from userWorkspace
+  return mapWorkspaceToTree(data);
 }

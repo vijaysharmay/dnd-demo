@@ -13,6 +13,12 @@ export class AuthService {
     private jwtService: JwtService,
     private userService: UserService,
   ) {}
+
+  getCurrentUser(accessToken: string) {
+    const { sub: id } = this.jwtService.decode(accessToken);
+    return this.userService.findOne(id);
+  }
+
   logout() {
     throw new Error('Method not implemented.');
   }
@@ -49,6 +55,7 @@ export class AuthService {
     // Compare securely using timingSafeEqual
     if (timingSafeEqual(storedPasswdBuffer, loginHashBuffer)) {
       return {
+        id,
         accessToken: await this.jwtService.signAsync({ sub: id, email: email }),
       };
     } else {

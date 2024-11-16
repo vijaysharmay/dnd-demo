@@ -1,0 +1,31 @@
+meta {
+  name: Bulk Create Users
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:3000/user/bulk
+  body: json
+  auth: none
+}
+
+body:json {
+  [
+    {
+      "fullName": "Shilpa Y",
+      "email": "shilpa@abc.com",
+      "passwd": "abcdef"
+    },
+    {
+      "fullName": "Shivank Y",
+      "email": "shivank@abc.com",
+      "passwd": "abcdef"
+    },
+    {
+      "fullName": "Vijay Y",
+      "email": "vijay@abc.com",
+      "passwd": "abcdef"
+    }
+  ]
+}

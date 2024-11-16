@@ -1,11 +1,27 @@
-import { Body, Controller, Delete, Get, Param, Patch } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 
+import { CreateUserDto } from 'src/auth/dto/create-user.dto';
+import { Public } from 'src/utils';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserService } from './user.service';
 
 @Controller()
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
+  @Public()
+  @Post('bulk')
+  bulkCreate(@Body() createBulkUserDto: CreateUserDto[]) {
+    return this.userService.bulkCreate(createBulkUserDto);
+  }
 
   @Get()
   findAll() {
