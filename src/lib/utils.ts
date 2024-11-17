@@ -116,6 +116,8 @@ export function initFormChildren(
 }
 
 export interface Tree {
+  id: string;
+  parentId?: string;
   name: string;
   type: string;
   children?: Tree[];
@@ -123,18 +125,30 @@ export interface Tree {
 
 export function convertToTree(data: WorkspaceSchema): Tree {
   const mapWorkspaceToTree = (workspace: WorkspaceSchema): Tree => ({
+    id: workspace.id,
     name: workspace.name,
     type: "workspace",
-    children: (workspace.projects || []).map(mapProjectToTree),
+    children: (workspace.projects || []).map((project: ProjectSchema) =>
+      mapProjectToTree(workspace.id, project)
+    ),
   });
 
-  const mapProjectToTree = (project: ProjectSchema): Tree => ({
+  const mapProjectToTree = (
+    workspaceId: string,
+    project: ProjectSchema
+  ): Tree => ({
+    id: project.id,
+    parentId: workspaceId,
     name: project.name,
     type: "project",
-    children: (project.pages || []).map(mapPageToTree),
+    children: (project.pages || []).map((page: PageSchema) =>
+      mapPageToTree(project.id, page)
+    ),
   });
 
-  const mapPageToTree = (page: PageSchema): Tree => ({
+  const mapPageToTree = (projectId: string, page: PageSchema): Tree => ({
+    id: page.id,
+    parentId: projectId,
     name: page.name,
     type: "page",
   });

@@ -216,7 +216,9 @@ export function WorkspaceSwitcher() {
                         className="gap-2 p-2"
                       >
                         {workspace.name}
-                        {workspace.id === currentWorkspace?.id && <Check className="stroke-green-600" />}
+                        {workspace.id === currentWorkspace?.id && (
+                          <Check className="stroke-green-600" />
+                        )}
                       </DropdownMenuItem>
                     ))}
                     <DropdownMenuSeparator />
@@ -254,10 +256,10 @@ export function WorkspaceSwitcher() {
                               name="name"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel>Project Name</FormLabel>
+                                  <FormLabel>Workspace Name</FormLabel>
                                   <FormControl>
                                     <Input
-                                      placeholder="Enter a project name"
+                                      placeholder="Enter a workspace name"
                                       className={cn(
                                         createWorkspaceForm.formState.errors[
                                           "name"
@@ -275,10 +277,10 @@ export function WorkspaceSwitcher() {
                               name="route"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel>Password</FormLabel>
+                                  <FormLabel>Workspace Route</FormLabel>
                                   <FormControl>
                                     <Input
-                                      placeholder="Enter a project route"
+                                      placeholder="Enter a workspace route"
                                       className={cn(
                                         createWorkspaceForm.formState.errors[
                                           "route"
@@ -358,7 +360,7 @@ export function WorkspaceSwitcher() {
                               name="route"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel>Password</FormLabel>
+                                  <FormLabel>Project Route</FormLabel>
                                   <FormControl>
                                     <Input
                                       placeholder="Enter a project route"

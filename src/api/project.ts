@@ -55,3 +55,33 @@ export const createProjectInWorkspace = async (
 
   return result.data;
 };
+
+export const deleteProjectInWorkspace = async (
+  workspaceId: string,
+  projecctId: string
+): Promise<boolean> => {
+  const accessToken = sessionStorage.getItem("accessToken");
+
+  if (!accessToken) {
+    throw new Error("Couldnt find access token");
+  }
+
+  const url = `http://localhost:3000/workspace/${workspaceId}/project/${projecctId}`;
+  const response = await fetch(url, {
+    method: "DELETE",
+    headers: new Headers({
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    }),
+  });
+
+  console.log(response.status);
+  if (response.status !== 200) {
+    throw new Error(`Server Error: ${JSON.stringify(response.text())}`);
+  }
+
+  const data = await response.json();
+
+  return data;
+};
