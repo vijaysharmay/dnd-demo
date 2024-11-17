@@ -58,8 +58,10 @@ import { cn, convertToTree, Tree } from "@/lib/utils";
 import useWorkspaceStore from "@/store/workspace-store";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
+import { startsWith } from "lodash";
 import { Dispatch, SetStateAction, useState } from "react";
 import { useForm } from "react-hook-form";
+import { useLocation } from "wouter";
 
 export function ConcordSidebarNavigator() {
   const { currentWorkspace, isWorkspaceDataLoading } = useWorkspaceStore();
@@ -97,20 +99,21 @@ export function ConcordSidebarNavigator() {
 }
 
 function NavTree({ workspaceId, item }: { workspaceId: string; item: Tree }) {
+  const [location, navigate] = useLocation();
   if (!item.children) {
     return (
       <SidebarMenuItem className="cursor-pointer hover:bg-sidebar-accent rounded">
-        <SidebarMenuButton className="">
-          <File />
-          <NodeOptions
-            nodeType={item.type}
-            workspaceId={workspaceId}
-            node={item}
+        <NodeOptions nodeType={item.type} workspaceId={workspaceId} node={item}>
+          <SidebarMenuButton
+            isActive={location === item.url}
+            onClick={() => {
+              navigate(item.url, { replace: true });
+            }}
           >
+            <File />
             <>{item.name}</>
-          </NodeOptions>
-        </SidebarMenuButton>
-        {/* <DropdownContainer /> */}
+          </SidebarMenuButton>
+        </NodeOptions>
       </SidebarMenuItem>
     );
   }
@@ -119,20 +122,33 @@ function NavTree({ workspaceId, item }: { workspaceId: string; item: Tree }) {
     <SidebarMenuItem>
       {item.children.length > 0 && (
         <>
-          <Collapsible className="group/collapsible [&[data-state=open]>button>svg:first-child]:rotate-90">
-            <SidebarMenuButton>
-              <CollapsibleTrigger asChild>
-                <ChevronRight className="transition-transform" />
-              </CollapsibleTrigger>
-              <Folder />
-              <NodeOptions
-                nodeType={item.type}
-                workspaceId={workspaceId}
-                node={item}
-              >
-                <>{item.name}</>
-              </NodeOptions>
-            </SidebarMenuButton>
+          <Collapsible
+            className="group/collapsible [&[data-state=open]>span>button>svg:first-child]:rotate-90"
+            defaultOpen={
+              startsWith(location, item.url) && location !== item.url
+            }
+          >
+            <NodeOptions
+              nodeType={item.type}
+              workspaceId={workspaceId}
+              node={item}
+            >
+              <SidebarMenuButton isActive={location === item.url}>
+                <CollapsibleTrigger asChild>
+                  <ChevronRight className="transition-transform" />
+                </CollapsibleTrigger>
+                <Folder />
+                <div
+                  className="w-full"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    navigate(item.url, { replace: true });
+                  }}
+                >
+                  {item.name}
+                </div>
+              </SidebarMenuButton>
+            </NodeOptions>
             <CollapsibleContent>
               <SidebarMenuSub className="mr-0">
                 {item.children?.map((node: Tree) => (

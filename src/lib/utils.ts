@@ -120,6 +120,7 @@ export interface Tree {
   parentId?: string;
   name: string;
   type: string;
+  url: string;
   children?: Tree[];
 }
 
@@ -128,6 +129,7 @@ export function convertToTree(data: WorkspaceSchema): Tree {
     id: workspace.id,
     name: workspace.name,
     type: "workspace",
+    url: `/workspace/${workspace.id}`,
     children: (workspace.projects || []).map((project: ProjectSchema) =>
       mapProjectToTree(workspace.id, project)
     ),
@@ -141,16 +143,22 @@ export function convertToTree(data: WorkspaceSchema): Tree {
     parentId: workspaceId,
     name: project.name,
     type: "project",
+    url: `/workspace/${workspaceId}/project/${project.id}`,
     children: (project.pages || []).map((page: PageSchema) =>
-      mapPageToTree(project.id, page)
+      mapPageToTree(workspaceId, project.id, page)
     ),
   });
 
-  const mapPageToTree = (projectId: string, page: PageSchema): Tree => ({
+  const mapPageToTree = (
+    workspaceId: string,
+    projectId: string,
+    page: PageSchema
+  ): Tree => ({
     id: page.id,
     parentId: projectId,
     name: page.name,
     type: "page",
+    url: `/workspace/${workspaceId}/project/${projectId}/page/${page.id}`,
   });
 
   // Assuming we start from userWorkspace

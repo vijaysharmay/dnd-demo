@@ -1,9 +1,18 @@
+import { Input } from "@/components/ui/input";
 import { Toaster } from "@/components/ui/toaster";
+import AppContainer from "@/containers/app-container";
 import { ComponentLibrary } from "@/containers/component-library";
 import Designer from "@/containers/designer";
 import DragOverlayWrapper from "@/containers/drag-overlay-wrapper";
 import Properties from "@/containers/properties";
-import { DndContext, KeyboardSensor, MouseSensor, TouchSensor, useSensor, useSensors } from "@dnd-kit/core";
+import {
+  DndContext,
+  KeyboardSensor,
+  MouseSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
 import { restrictToWindowEdges } from "@dnd-kit/modifiers";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 
@@ -19,29 +28,36 @@ export default function Page() {
   const sensors = useSensors(mouseSensor, touchSensor, keyboardSensor);
 
   return (
-    <>
-      <PanelGroup direction="horizontal">
-        <DndContext modifiers={[restrictToWindowEdges]} sensors={sensors}>
+    <AppContainer title="Page">
+      <>
+        <PanelGroup direction="horizontal">
+          <DndContext modifiers={[restrictToWindowEdges]} sensors={sensors}>
+            <Panel
+              defaultSize={10}
+              minSize={0}
+              maxSize={15}
+              className="shadow-md"
+            >
+              <ComponentLibrary />
+            </Panel>
+            <PanelResizeHandle />
+            <Panel defaultSize={80} minSize={60} maxSize={85}>
+              <Designer />
+            </Panel>
+            <DragOverlayWrapper />
+          </DndContext>
+          <PanelResizeHandle />
           <Panel
             defaultSize={15}
             minSize={15}
-            maxSize={15}
+            maxSize={20}
             className="shadow-md"
           >
-            <ComponentLibrary />
+            <Properties />
           </Panel>
-          <PanelResizeHandle />
-          <Panel defaultSize={65} minSize={65} maxSize={65}>
-            <Designer />
-          </Panel>
-          <DragOverlayWrapper />
-        </DndContext>
-        <PanelResizeHandle />
-        <Panel defaultSize={20} minSize={20} maxSize={20} className="shadow-md">
-          <Properties />
-        </Panel>
-      </PanelGroup>
-      <Toaster />
-    </>
+        </PanelGroup>
+        <Toaster />
+      </>
+    </AppContainer>
   );
 }
