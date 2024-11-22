@@ -13,6 +13,7 @@ import { ProjectModule } from './project/project.module';
 import { UserModule } from './user/user.module';
 import { WorkspaceModule } from './workspace/workspace.module';
 import { AuthGuard } from './auth/auth.guard';
+import { AccordModule } from './accord/accord.module';
 
 @Module({
   imports: [
@@ -56,6 +57,10 @@ import { AuthGuard } from './auth/auth.guard';
                   },
                 ],
               },
+              {
+                path: ":projectId/accord",
+                module: AccordModule,
+              }
             ],
           },
         ],
@@ -64,6 +69,7 @@ import { AuthGuard } from './auth/auth.guard';
     ActionModule,
     UserModule,
     AuthModule,
+    AccordModule,
   ],
   controllers: [AppController],
   providers: [

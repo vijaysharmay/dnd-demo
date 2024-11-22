@@ -3,11 +3,11 @@ import { PrismaService } from 'src/prisma.service';
 import { v4 } from 'uuid';
 
 import { JwtService } from '@nestjs/jwt';
-import { CreatePageDto } from './dto/create-page.dto';
-import { UpdatePageDto } from './dto/update-page.dto';
+import { CreateAccordDto } from './dto/create-accord.dto';
+import { UpdateAccordDto } from './dto/update-accord.dto';
 
 @Injectable()
-export class PageService {
+export class AccordService {
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
@@ -16,21 +16,30 @@ export class PageService {
     accessToken: string,
     workspaceId: string,
     projectId: string,
-    createPageDto: CreatePageDto,
+    createAccordDto: CreateAccordDto,
   ) {
     const { sub: ownerId } = this.jwtService.decode(accessToken);
-    const { name, route } = createPageDto;
-    const PageId = v4();
-    return this.prisma.page.create({
+    const accordId = v4();
+    const {
+      accordName,
+      accordAPIUrl,
+      accordSchema,
+      accordType,
+      accordVersion,
+    } = createAccordDto;
+    return this.prisma.accord.create({
       data: {
-        id: PageId,
-        name,
+        id: accordId,
+        accordName,
+        accordAPIUrl,
+        accordSchema,
+        accordType,
+        accordVersion,
         owner: {
           connect: {
             id: ownerId,
           },
         },
-        route,
         project: {
           connect: {
             id: projectId,
@@ -41,14 +50,6 @@ export class PageService {
             id: workspaceId,
           },
         },
-        root: {
-          create: {
-            id: v4(),
-            blockUniqId: v4(),
-            blockType: 'root',
-            props: {},
-          },
-        },
       },
       select: {
         id: true,
@@ -57,7 +58,7 @@ export class PageService {
   }
 
   findAll(workspaceId: string, projectId: string) {
-    return this.prisma.page.findMany({
+    return this.prisma.accord.findMany({
       where: {
         workspaceId,
         projectId,
@@ -105,10 +106,10 @@ export class PageService {
     });
   }
 
-  findOne(workspaceId: string, projectId: string, pageId: string) {
-    return this.prisma.page.findFirst({
+  findOne(workspaceId: string, projectId: string, accordId: string) {
+    return this.prisma.accord.findFirst({
       where: {
-        id: pageId,
+        id: accordId,
         workspaceId,
         projectId,
       },
@@ -158,13 +159,13 @@ export class PageService {
   async update(
     workspaceId: string,
     projectId: string,
-    pageId: string,
-    updatePageDto: UpdatePageDto,
+    accordId: string,
+    updateAccordDto: UpdateAccordDto,
   ) {
-    return this.prisma.page.update({
-      data: updatePageDto,
+    return this.prisma.accord.update({
+      data: updateAccordDto,
       where: {
-        id: pageId,
+        id: accordId,
         workspaceId,
         projectId,
       },
@@ -211,10 +212,10 @@ export class PageService {
     });
   }
 
-  async remove(workspaceId: string, projectId: string, pageId: string) {
-    await this.prisma.page.delete({
+  async remove(workspaceId: string, projectId: string, accordId: string) {
+    await this.prisma.accord.delete({
       where: {
-        id: pageId,
+        id: accordId,
         workspaceId,
         projectId,
       },

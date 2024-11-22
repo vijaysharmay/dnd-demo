@@ -1,4 +1,3 @@
-"use client";
 import { ChevronRight, File, Folder, Plus, Trash2 } from "lucide-react";
 
 import {
@@ -18,7 +17,6 @@ import {
 import {
   ContextMenu,
   ContextMenuContent,
-  ContextMenuItem,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
 
@@ -29,20 +27,7 @@ import {
   deletePageInProjectWorkspace,
   deleteProjectInWorkspace,
 } from "@/api";
-import {
-  createAccordInProjectWorkspace,
-  CreateAccordRequestSchema,
-  CreateAccordRequestZSchema,
-} from "@/api/accord";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -54,7 +39,7 @@ import {
 
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { cn, convertToTree, Tree } from "@/lib/utils";
+import { cn, convertToTree, NodeOptionsItem, Tree } from "@/lib/utils";
 import useWorkspaceStore from "@/store/workspace-store";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
@@ -100,7 +85,7 @@ export function ConcordSidebarNavigator() {
 
 function NavTree({ workspaceId, item }: { workspaceId: string; item: Tree }) {
   const [location, navigate] = useLocation();
-  if (!item.children) {
+  if (!item.children || item.children.length === 0) {
     return (
       <SidebarMenuItem className="cursor-pointer hover:bg-sidebar-accent rounded">
         <NodeOptions nodeType={item.type} workspaceId={workspaceId} node={item}>
@@ -193,8 +178,6 @@ function NodeOptions({
   children: React.ReactElement;
 }) {
   const [isCreatePageDialogOpen, setIsCreatePageDialogOpen] = useState(false);
-  const [isCreateAccordDialogOpen, setIsCreateAccordDialogOpen] =
-    useState(false);
   const [isDeletePageFormDialogOpen, setIsDeletePageFormDialogOpen] =
     useState(false);
   const [isDeleteProjectFormDialogOpen, setIsDeleteProjectFormDialogOpen] =
@@ -218,19 +201,6 @@ function NodeOptions({
               }
               open={isCreatePageDialogOpen}
               onOpenChange={setIsCreatePageDialogOpen}
-            />
-            <NodeOptionsItem
-              name="Add Accord"
-              icon={<Plus className="size-4" />}
-              form={
-                <AddAccordForm
-                  workspaceId={workspaceId}
-                  projectId={node.id}
-                  setIsCreateAccordDialogOpen={setIsCreateAccordDialogOpen}
-                />
-              }
-              open={isCreateAccordDialogOpen}
-              onOpenChange={setIsCreateAccordDialogOpen}
             />
             <NodeOptionsItem
               name="Delete Project"
@@ -269,43 +239,6 @@ function NodeOptions({
         )}
       </ContextMenuContent>
     </ContextMenu>
-  );
-}
-
-function NodeOptionsItem({
-  name,
-  icon,
-  form,
-  open,
-  onOpenChange,
-}: {
-  name: string;
-  icon: React.ReactElement;
-  form: React.ReactElement;
-  open: boolean;
-  onOpenChange: Dispatch<SetStateAction<boolean>>;
-}) {
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogTrigger asChild>
-        <ContextMenuItem
-          className="gap-2 p-2"
-          onSelect={(e) => e.preventDefault()}
-        >
-          <div className="flex size-6 items-center justify-center rounded-md border bg-background text-muted-foreground">
-            {icon}
-          </div>
-          <div className="font-medium text-muted-foreground">{name}</div>
-        </ContextMenuItem>
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>{name}</DialogTitle>
-        </DialogHeader>
-        <DialogDescription></DialogDescription>
-        {form}
-      </DialogContent>
-    </Dialog>
   );
 }
 
@@ -396,100 +329,6 @@ function AddPageForm({
         <div className="text-right">
           <Button className="mt-2" type="submit">
             Create Page
-          </Button>
-        </div>
-      </form>
-    </Form>
-  );
-}
-
-function AddAccordForm({
-  workspaceId,
-  projectId,
-  setIsCreateAccordDialogOpen,
-}: {
-  workspaceId: string;
-  projectId: string;
-  setIsCreateAccordDialogOpen: Dispatch<SetStateAction<boolean>>;
-}) {
-  const createAccordForm = useForm<CreateAccordRequestSchema>({
-    resolver: zodResolver(CreateAccordRequestZSchema),
-    values: {
-      name: "",
-      route: "",
-    },
-  });
-
-  const createAccordMutation = useMutation({
-    mutationFn: async ({
-      workspaceId,
-      projectId,
-      values,
-    }: {
-      workspaceId: string;
-      projectId: string;
-      values: CreateAccordRequestSchema;
-    }) => createAccordInProjectWorkspace(workspaceId, projectId, values),
-    onSuccess: () => {
-      setIsCreateAccordDialogOpen(false);
-      window.location.reload();
-    },
-    onError: (e: Error) => {
-      console.log(e.message);
-    },
-  });
-
-  const onCreateAccordFormSubmit = (values: CreateAccordRequestSchema) => {
-    createAccordMutation.mutate({ workspaceId, projectId, values });
-  };
-
-  return (
-    <Form {...createAccordForm}>
-      <form
-        onSubmit={createAccordForm.handleSubmit(onCreateAccordFormSubmit)}
-        className="space-y-4"
-      >
-        <FormField
-          control={createAccordForm.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Accord Name</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="Enter a Accord name"
-                  className={cn(
-                    createAccordForm.formState.errors["name"] && "bg-red-50"
-                  )}
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={createAccordForm.control}
-          name="route"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Accord Route</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="Enter a Accord route"
-                  className={cn(
-                    createAccordForm.formState.errors["route"] && "bg-red-50"
-                  )}
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <div className="text-right">
-          <Button className="mt-2" type="submit">
-            Create Accord
           </Button>
         </div>
       </form>

@@ -1,0 +1,29 @@
+meta {
+  name: Create Accord
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:3000/workspace/{{currentWorkspaceId}}/project/{{currentProjectId}}/accord
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{accessToken}}
+}
+
+body:json {
+  {
+    "accordName": "a",
+    "accordType": "OPENAPI",
+    "accordSchema": "{}",
+    "accordVersion": "2",
+    "accordAPIUrl": "as"
+  }
+}
+
+tests {
+  bru.setEnvVar("currentPageId",res.getBody().id)
+}

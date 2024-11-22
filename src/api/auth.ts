@@ -1,7 +1,5 @@
 import { z } from "zod";
 
-export const LOGIN_URL = "";
-
 export const LoginFormZSchema = z
   .object({
     email: z.string().email(),

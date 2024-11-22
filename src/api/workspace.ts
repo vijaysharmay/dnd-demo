@@ -1,7 +1,5 @@
 import { z } from "zod";
 
-export const LOGIN_URL = "";
-
 export const CreateWorkspaceRequestZSchema = z
   .object({
     name: z.string().min(1, "Workspace Name Required"),
@@ -54,4 +52,3 @@ export const createWorkspace = async (
 
   return result.data;
 };
-

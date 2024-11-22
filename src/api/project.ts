@@ -1,7 +1,5 @@
 import { z } from "zod";
 
-export const LOGIN_URL = "";
-
 export const CreateProjectRequestZSchema = z
   .object({
     name: z.string().min(1, "Project Name Required"),

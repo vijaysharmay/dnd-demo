@@ -1,0 +1,11 @@
+meta {
+  name: Get Accord Details
+  type: http
+  seq: 5
+}
+
+get {
+  url: http://localhost:3000/workspace/{{currentWorkspaceId}}/project/{{currentProjectId}}/page/{{currentPageId}}
+  body: json
+  auth: none
+}

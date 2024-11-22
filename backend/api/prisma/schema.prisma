@@ -21,6 +21,11 @@ enum UserRole {
   OWNER
 }
 
+enum AccordType {
+  OPENAPI
+  JSONSCHEMA
+}
+
 model User {
   id               String              @id @map("id")
   fullName         String              @map("full_name")
@@ -29,6 +34,7 @@ model User {
   salt             String
   ownerOfWorkspace Workspace[]         @relation(name: "ownerOfWorkspace")
   ownerOfProject   Project[]           @relation(name: "ownerOfProject")
+  ownerOfAccord    Accord[]            @relation(name: "ownerOfAccord")
   ownerOfPage      Page[]              @relation(name: "ownerOfPage")
   workspaces       UserWorkspaceRole[] @relation(name: "userOfWorkspace")
   userWorkspace    Workspace?          @relation(fields: [userWorkspaceId], references: [id], name: "userWorkspace")
@@ -44,11 +50,12 @@ model Workspace {
   ownerId                String
   isUserWorkspace        Boolean             @map("is_user_workspace")
   route                  String?             @unique @map("workspace_route")
-  members                UserWorkspaceRole[] @relation(name: "workspaceForUser")
-  projects               Project[]           @relation(name: "partOfWorkspace")
-  pages                  Page[]              @relation(name: "partOfWorkspacePage")
-  blocks                 Block[]             @relation(name: "partOfWorkspacePageBlock")
+  members                UserWorkspaceRole[] @relation(name: "workspaceUsers")
+  projects               Project[]           @relation(name: "projectsInWorkspace")
+  pages                  Page[]              @relation(name: "pagesInWorkspace")
+  accords                Accord[]            @relation(name: "accordsInWorkspace")
   defaultWorkspaceUserId User?               @relation(name: "userWorkspace")
+  versions               Version[]           @relation(name: "versionsInWorkspace")
 
   @@map("workspaces")
 }
@@ -56,7 +63,7 @@ model Workspace {
 model UserWorkspaceRole {
   user        User      @relation(fields: [userId], references: [id], name: "userOfWorkspace", onDelete: Cascade, onUpdate: Cascade, map: "user_of_workspace_fkey")
   userId      String
-  workspace   Workspace @relation(fields: [workspaceId], references: [id], name: "workspaceForUser", onDelete: Cascade, onUpdate: Cascade, map: "workspace_for_user_fkey")
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], name: "workspaceUsers", onDelete: Cascade, onUpdate: Cascade, map: "workspace_for_user_fkey")
   workspaceId String
   role        UserRole
 
@@ -69,13 +76,31 @@ model Project {
   name        String    @map("name")
   owner       User      @relation(fields: [ownerId], references: [id], name: "ownerOfProject")
   ownerId     String
-  workspace   Workspace @relation(fields: [workspaceId], references: [id], name: "partOfWorkspace")
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], name: "projectsInWorkspace")
   workspaceId String
   route       String    @unique @map("route")
-  pages       Page[]    @relation(name: "partOfProject")
-  blocks      Block[]   @relation(name: "partOfProjectPage")
+  pages       Page[]    @relation(name: "pagesInProject")
+  accords     Accord[]  @relation(name: "accordsInProject")
 
   @@map("projects")
+}
+
+model Accord {
+  id            String     @id @map("id")
+  accordName    String     @map("accord_name")
+  accordType    AccordType @map("accord_type")
+  accordSchema  Json       @map("accord_schema")
+  accordVersion String     @map("accord_version")
+  accordAPIUrl  String?    @map("accord_apiurl")
+  owner         User       @relation(fields: [ownerId], references: [id], name: "ownerOfAccord")
+  ownerId       String
+  project       Project    @relation(fields: [projectId], references: [id], name: "accordsInProject")
+  projectId     String
+  workspace     Workspace  @relation(fields: [workspaceId], references: [id], name: "accordsInWorkspace")
+  workspaceId   String
+
+  @@unique([workspaceId, projectId, accordName])
+  @@map("accords")
 }
 
 model Page {
@@ -83,12 +108,13 @@ model Page {
   name        String    @map("name")
   owner       User      @relation(fields: [ownerId], references: [id], name: "ownerOfPage")
   ownerId     String
-  project     Project   @relation(fields: [projectId], references: [id], name: "partOfProject")
+  project     Project   @relation(fields: [projectId], references: [id], name: "pagesInProject")
   projectId   String
-  workspace   Workspace @relation(fields: [workspaceId], references: [id], name: "partOfWorkspacePage")
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], name: "pagesInWorkspace")
   workspaceId String
   route       String    @unique @map("route")
-  blocks      Block[]   @relation(name: "partOfPage")
+  root        Block     @relation(fields: [rootId], references: [id], name: "rootBlock")
+  rootId      String    @unique
 
   @@unique([workspaceId, projectId])
   @@map("pages")
@@ -96,29 +122,37 @@ model Page {
 
 model Block {
   id          String    @id @map("id")
-  blockId     String    @unique @map("block_id")
+  blockUniqId String    @map("block_uniq_id")
   blockType   String    @map("block_type") //should be enum
   props       Json      @map("props")
   order       Int?      @default(0) @map("order") // only relevant for child blocks
   children    Block[]   @relation("nestedBlocks")
   parent      Block?    @relation("nestedBlocks", fields: [parentId], references: [id])
   parentId    String?
-  page        Page      @relation(fields: [pageId], references: [id], name: "partOfPage")
-  pageId      String
-  project     Project   @relation(fields: [projectId], references: [id], name: "partOfProjectPage")
-  projectId   String
-  workspace   Workspace @relation(fields: [workspaceId], references: [id], name: "partOfWorkspacePageBlock")
-  workspaceId String
-  flow        Flow[]    @relation(name: "hasFlow")
+  flows       Flow[]    @relation(name: "flowsInBlock")
+  page        Page?     @relation(name: "rootBlock")
+  versions    Version[] @relation(name: "versionsOfBlock")
 
   @@map("blocks")
+}
+
+model Version {
+  id          String    @id @map("id")
+  name        String    @map("version_name")
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], name: "versionsInWorkspace")
+  workspaceId String
+  block       Block     @relation(fields: [blockId], references: [id], name: "versionsOfBlock")
+  blockId     String
+
+  @@unique([workspaceId, name])
+  @@map("versions")
 }
 
 model Flow {
   id           String   @id @map("id")
   name         String   @map("name")
   triggerEvent String   @map("trigger_event") // should be enum
-  ofBlock      Block    @relation(name: "hasFlow", fields: [blockId], references: [id])
+  ofBlock      Block    @relation(name: "flowsInBlock", fields: [blockId], references: [id])
   blockId      String
   actions      Action[]
   // actions      ActionsInFlows[] @relation(name: "partOfFlow")

@@ -1,0 +1,22 @@
+meta {
+  name: Update Accord
+  type: http
+  seq: 2
+}
+
+patch {
+  url: http://localhost:3000/workspace/{{currentWorkspaceId}}/project/{{currentProjectId}}/page/{{currentPageId}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Sample Page",
+    "route": "p112"
+  }
+}
+
+vars:post-response {
+  : 
+}

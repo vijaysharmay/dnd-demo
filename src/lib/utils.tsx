@@ -1,3 +1,12 @@
+import { ContextMenuItem } from "@/components/ui/context-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { libraryElements } from "@/elements";
 import { ComponentElementInstance } from "@/types";
 import { PageSchema, ProjectSchema, WorkspaceSchema } from "@/types/api/user";
@@ -10,6 +19,7 @@ import {
   JSONSchema7TypeName,
 } from "json-schema";
 import { capitalize, includes, isNull, keys } from "lodash";
+import { Dispatch, SetStateAction } from "react";
 import { twMerge } from "tailwind-merge";
 import { v4 } from "uuid";
 import { z, ZodTypeAny } from "zod";
@@ -163,4 +173,41 @@ export function convertToTree(data: WorkspaceSchema): Tree {
 
   // Assuming we start from userWorkspace
   return mapWorkspaceToTree(data);
+}
+
+export function NodeOptionsItem({
+  name,
+  icon,
+  form,
+  open,
+  onOpenChange,
+}: {
+  name: string;
+  icon: React.ReactElement;
+  form: React.ReactElement;
+  open: boolean;
+  onOpenChange: Dispatch<SetStateAction<boolean>>;
+}) {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogTrigger asChild>
+        <ContextMenuItem
+          className="gap-2 p-2"
+          onSelect={(e) => e.preventDefault()}
+        >
+          <div className="flex size-6 items-center justify-center rounded-md border bg-background text-muted-foreground">
+            {icon}
+          </div>
+          <div className="font-medium text-muted-foreground">{name}</div>
+        </ContextMenuItem>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{name}</DialogTitle>
+        </DialogHeader>
+        <DialogDescription></DialogDescription>
+        {form}
+      </DialogContent>
+    </Dialog>
+  );
 }
