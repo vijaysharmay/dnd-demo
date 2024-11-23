@@ -1,10 +1,13 @@
+import { removeBlockFromPage } from "@/api/block";
 import { libraryElements } from "@/elements";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import useElementStore from "@/store/element-store";
+import usePageStore from "@/store/page-store";
 import { Button, ComponentElementInstance, Input } from "@/types";
 import { ButtonPropsSchema, InputPropsSchema } from "@/types/properties";
 import { useDraggable, useDroppable } from "@dnd-kit/core";
+import { useMutation } from "@tanstack/react-query";
 import { Trash2Icon } from "lucide-react";
 import { useState } from "react";
 
@@ -57,6 +60,30 @@ export default function DesignerElementWrapper({
   const getDesignerElementDeleteId = () =>
     `designerElementDelete-${element.id}`;
 
+  const removeBlockFromPageMutation = useMutation({
+    mutationFn: async ({
+      workspaceId,
+      projectId,
+      pageId,
+      blockId,
+    }: {
+      workspaceId: string;
+      projectId: string;
+      pageId: string;
+      blockId: string;
+    }) => removeBlockFromPage(workspaceId, projectId, pageId, blockId),
+    onSuccess: () => {
+      console.log("remmoved");
+    },
+    onError: (e: Error) => {
+      console.log(e.message);
+    },
+  });
+
+  const { currentPage } = usePageStore();
+  if (!currentPage) return;
+  const { workspace, project, id: pageId } = currentPage;
+
   const handleDelete = () => {
     const isButton = element.type === Button;
     const isInput = element.type === Input;
@@ -75,6 +102,12 @@ export default function DesignerElementWrapper({
       }
     }
     removeElement(element.id, element.parentId);
+    removeBlockFromPageMutation.mutate({
+      workspaceId: workspace.id,
+      projectId: project.id,
+      pageId,
+      blockId: element.id,
+    });
     setActiveElement(null);
     setActiveElementId(null);
   };

@@ -26,6 +26,7 @@ import {
   CreatePageRequestZSchema,
   deletePageInProjectWorkspace,
   deleteProjectInWorkspace,
+  moveProjectToNewWorkspace,
 } from "@/api";
 import { Button } from "@/components/ui/button";
 import {
@@ -38,15 +39,24 @@ import {
 } from "@/components/ui/form";
 
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn, convertToTree, NodeOptionsItem, Tree } from "@/lib/utils";
 import useWorkspaceStore from "@/store/workspace-store";
+import { WorkspaceSchema } from "@/types/api/user";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { startsWith } from "lodash";
 import { Dispatch, SetStateAction, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useLocation } from "wouter";
+import { z } from "zod";
 
 export function ConcordSidebarNavigator() {
   const { currentWorkspace, isWorkspaceDataLoading } = useWorkspaceStore();
@@ -95,7 +105,7 @@ function NavTree({ workspaceId, item }: { workspaceId: string; item: Tree }) {
               navigate(item.url, { replace: true });
             }}
           >
-            <File />
+            {item.type === "project" ? <Folder /> : <File />}
             <>{item.name}</>
           </SidebarMenuButton>
         </NodeOptions>
@@ -177,11 +187,14 @@ function NodeOptions({
   workspaceId: string;
   children: React.ReactElement;
 }) {
-  const [isCreatePageDialogOpen, setIsCreatePageDialogOpen] = useState(false);
+  const [isCreatePageDialogOpen, setIsCreatePageDialogOpen] =
+    useState<boolean>(false);
+  const [isMoveProjectDialogOpen, setIsMoveProjectDialogOpen] =
+    useState<boolean>(false);
   const [isDeletePageFormDialogOpen, setIsDeletePageFormDialogOpen] =
-    useState(false);
+    useState<boolean>(false);
   const [isDeleteProjectFormDialogOpen, setIsDeleteProjectFormDialogOpen] =
-    useState(false);
+    useState<boolean>(false);
 
   return (
     <ContextMenu>
@@ -203,6 +216,19 @@ function NodeOptions({
               onOpenChange={setIsCreatePageDialogOpen}
             />
             <NodeOptionsItem
+              name="Move Project"
+              icon={<Plus className="size-4" />}
+              form={
+                <MoveProjectForm
+                  workspaceId={workspaceId}
+                  projectId={node.id}
+                  setIsMoveProjectDialogOpen={setIsMoveProjectDialogOpen}
+                />
+              }
+              open={isMoveProjectDialogOpen}
+              onOpenChange={setIsMoveProjectDialogOpen}
+            />
+            <NodeOptionsItem
               name="Delete Project"
               icon={<Trash2 className="size-4" />}
               form={
@@ -219,7 +245,7 @@ function NodeOptions({
             />
           </>
         )}
-        {nodeType === "page" && (
+        {nodeType === "page" && node.parentId && (
           <>
             <NodeOptionsItem
               name="Delete Page"
@@ -329,6 +355,99 @@ function AddPageForm({
         <div className="text-right">
           <Button className="mt-2" type="submit">
             Create Page
+          </Button>
+        </div>
+      </form>
+    </Form>
+  );
+}
+
+function MoveProjectForm({
+  workspaceId,
+  projectId,
+  setIsMoveProjectDialogOpen,
+}: {
+  workspaceId: string;
+  projectId: string;
+  setIsMoveProjectDialogOpen: Dispatch<SetStateAction<boolean>>;
+}) {
+  const { workspaces } = useWorkspaceStore();
+  const MoveProjectRequestZSchema = z.object({
+    newWorkspaceId: z.string().min(1, "New workspace needs to be selected"),
+  });
+
+  type MoveProjectRequestSchema = z.infer<typeof MoveProjectRequestZSchema>;
+  const moveProjectForm = useForm<MoveProjectRequestSchema>({
+    resolver: zodResolver(MoveProjectRequestZSchema),
+    values: {
+      newWorkspaceId: "",
+    },
+  });
+
+  const moveProjectMutation = useMutation({
+    mutationFn: async ({
+      workspaceId,
+      projectId,
+      newWorkspaceId,
+    }: {
+      workspaceId: string;
+      projectId: string;
+      newWorkspaceId: string;
+    }) => moveProjectToNewWorkspace(workspaceId, projectId, newWorkspaceId),
+    onSuccess: () => {
+      setIsMoveProjectDialogOpen(false);
+      window.location.reload();
+    },
+    onError: (e: Error) => {
+      console.log(e.message);
+    },
+  });
+
+  const onMoveProjectFormSubmit = ({
+    newWorkspaceId,
+  }: {
+    newWorkspaceId: string;
+  }) => {
+    moveProjectMutation.mutate({ workspaceId, projectId, newWorkspaceId });
+  };
+  return (
+    <Form {...moveProjectForm}>
+      <form
+        onSubmit={moveProjectForm.handleSubmit(onMoveProjectFormSubmit)}
+        className="space-y-4"
+      >
+        <FormField
+          control={moveProjectForm.control}
+          name="newWorkspaceId"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Workspace</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a workspace to move the project to" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {workspaces &&
+                    workspaces.map((workspace: WorkspaceSchema) => {
+                      return (
+                        !workspace.isUserWorkspace && (
+                          <SelectItem key={workspace.id} value={workspace.id}>
+                            {workspace.name}
+                          </SelectItem>
+                        )
+                      );
+                    })}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <div className="text-right">
+          <Button className="mt-2" type="submit">
+            Move Project
           </Button>
         </div>
       </form>

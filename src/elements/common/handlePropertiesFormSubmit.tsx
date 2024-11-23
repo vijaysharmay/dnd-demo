@@ -1,82 +1,130 @@
+import { updateBlockPropsInPage } from "@/api/block";
 import { initFormChildren } from "@/lib/utils";
 import useElementStore from "@/store/element-store";
 import { ComponentElementInstance, Form, HContainer } from "@/types";
+import { JSONZType } from "@/types/api/common";
 import {
   colsIntRec,
   FormPropsSchema,
   HContainerPropsSchema,
   PropsSchema,
 } from "@/types/properties";
+import { useMutation } from "@tanstack/react-query";
 import { drop, dropRight, fill, isNull } from "lodash";
+import { z } from "zod";
 
-export const handlePropertiesFormSubmit = (
-  activeElementProps: PropsSchema,
-  activeElement: ComponentElementInstance
-) => {
-  const {
-    updateElement,
-    addElement,
-    getElementIndexById,
-    setActiveElement,
-    updateElementInParent,
-  } = useElementStore.getState();
+export const usePropertiesFormSubmit = ({
+  workspaceId,
+  projectId,
+  pageId,
+  blockId,
+}: {
+  workspaceId: string;
+  projectId: string;
+  pageId: string;
+  blockId: string;
+}) => {
+  const removeBlockFromPageMutation = useMutation({
+    mutationFn: async ({
+      workspaceId,
+      projectId,
+      pageId,
+      blockId,
+      props,
+    }: {
+      workspaceId: string;
+      projectId: string;
+      pageId: string;
+      blockId: string;
+      props: z.infer<typeof JSONZType>;
+    }) =>
+      updateBlockPropsInPage(workspaceId, projectId, pageId, blockId, props),
+    onSuccess: () => {
+      console.log("remmoved");
+    },
+    onError: (e: Error) => {
+      console.log(e.message);
+    },
+  });
 
-  const hasParent: boolean = !isNull(activeElement.parentId);
+  const handlePropertiesFormSubmit = (
+    activeElementProps: PropsSchema,
+    activeElement: ComponentElementInstance
+  ) => {
+    const {
+      updateElement,
+      addElement,
+      getElementIndexById,
+      setActiveElement,
+      updateElementInParent,
+    } = useElementStore.getState();
 
-  const updatedChildren =
-    activeElement.type === Form
-      ? {
-          children: initFormChildren(
-            (activeElementProps as FormPropsSchema).responseSchemaMapping
-          ),
-        }
-      : { children: activeElement.children };
+    const hasParent: boolean = !isNull(activeElement.parentId);
 
-  const updatedElement: ComponentElementInstance = {
-    ...activeElement,
-    ...updatedChildren,
-    props: activeElementProps,
+    const updatedChildren =
+      activeElement.type === Form
+        ? {
+            children: initFormChildren(
+              (activeElementProps as FormPropsSchema).responseSchemaMapping
+            ),
+          }
+        : { children: activeElement.children };
+
+    const updatedElement: ComponentElementInstance = {
+      ...activeElement,
+      ...updatedChildren,
+      props: activeElementProps,
+    };
+
+    const childCount = updatedElement.children.length;
+
+    if (activeElement.type === HContainer) {
+      const noOfColumns =
+        colsIntRec[
+          (activeElementProps as HContainerPropsSchema).hContainerColumns
+        ];
+      if (childCount > noOfColumns) {
+        const updatedElementIndex = getElementIndexById(activeElement.id);
+
+        drop(updatedElement.children, noOfColumns).forEach((child) => {
+          if (child) {
+            addElement(
+              updatedElementIndex + 1,
+              child as ComponentElementInstance
+            );
+          }
+        });
+
+        const childCountDiff = childCount - noOfColumns;
+        updatedElement.children = dropRight(
+          updatedElement.children,
+          childCountDiff
+        );
+      } else {
+        const childCountDiff = noOfColumns - childCount;
+
+        updatedElement.children = [
+          ...updatedElement.children,
+          ...fill(Array(childCountDiff), null),
+        ];
+      }
+    }
+
+    if (hasParent) {
+      updateElementInParent(activeElement.parentId as string, updatedElement);
+    } else {
+      removeBlockFromPageMutation.mutate({
+        workspaceId,
+        projectId,
+        pageId,
+        blockId,
+        props: updatedElement.props,
+      });
+      updateElement(activeElement.id, updatedElement);
+    }
+
+    setActiveElement(updatedElement);
   };
 
-  const childCount = updatedElement.children.length;
-
-  if (activeElement.type === HContainer) {
-    const noOfColumns =
-      colsIntRec[
-        (activeElementProps as HContainerPropsSchema).hContainerColumns
-      ];
-    if (childCount > noOfColumns) {
-      const updatedElementIndex = getElementIndexById(activeElement.id);
-
-      drop(updatedElement.children, noOfColumns).forEach((child) => {
-        if (child) {
-          addElement(
-            updatedElementIndex + 1,
-            child as ComponentElementInstance
-          );
-        }
-      });
-
-      const childCountDiff = childCount - noOfColumns;
-      updatedElement.children = dropRight(
-        updatedElement.children,
-        childCountDiff
-      );
-    } else {
-      const childCountDiff = noOfColumns - childCount;
-
-      updatedElement.children = [
-        ...updatedElement.children,
-        ...fill(Array(childCountDiff), null),
-      ];
-    }
-  }
-
-  if (hasParent) {
-    updateElementInParent(activeElement.parentId as string, updatedElement);
-  } else {
-    updateElement(activeElement.id, updatedElement);
-  }
-
-  setActiveElement(updatedElement);
+  return handlePropertiesFormSubmit;
 };

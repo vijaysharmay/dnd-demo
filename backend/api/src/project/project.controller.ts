@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 
 import { CreateProjectDto } from './dto/create-project.dto';
-import { UpdateProjectDto } from './dto/update-project.dto';
+import { UpdateProjectDto, UpdateWorkspaceDto } from './dto/update-project.dto';
 import { ProjectService } from './project.service';
 
 @Controller()
@@ -53,6 +53,18 @@ export class ProjectController {
     @Body() updateProjectDto: UpdateProjectDto,
   ) {
     return this.projectService.update(workspaceId, projectId, updateProjectDto);
+  }
+
+  @Post(':projectId/move')
+  moveProjectToWorkspace(
+    @Param('workspaceId') workspaceId: string,
+    @Param('projectId') projectId: string,
+    @Body() updateProjectDto: UpdateWorkspaceDto,
+  ) {
+    return this.projectService.moveProjectToWorkspace(
+      projectId,
+      updateProjectDto.newWorkspaceId,
+    );
   }
 
   @Delete(':projectId')

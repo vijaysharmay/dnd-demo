@@ -109,7 +109,7 @@ model Page {
   name        String    @map("name")
   owner       User      @relation(fields: [ownerId], references: [id], name: "ownerOfPage")
   ownerId     String
-  project     Project   @relation(fields: [projectId], references: [id], name: "pagesInProject")
+  project     Project   @relation(fields: [projectId], references: [id], name: "pagesInProject", onDelete: Cascade, onUpdate: Cascade)
   projectId   String
   workspace   Workspace @relation(fields: [workspaceId], references: [id], name: "pagesInWorkspace")
   workspaceId String
@@ -131,7 +131,7 @@ model Block {
   parentId    String?
   flows       Flow[]    @relation(name: "flowsInBlock")
   versions    Version[] @relation(name: "versionsOfBlock")
-  project     Project   @relation(fields: [projectId], references: [id], name: "blocksInProject")
+  project     Project   @relation(fields: [projectId], references: [id], name: "blocksInProject", onDelete: Cascade, onUpdate: Cascade)
   projectId   String
   workspace   Workspace @relation(fields: [workspaceId], references: [id], name: "blocksInWorkspace")
   workspaceId String

@@ -19,8 +19,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { isEmpty } from "lodash";
 import { SubmitHandler, useForm } from "react-hook-form";
 
+import usePageStore from "@/store/page-store";
 import { FormFieldRender } from "../common/form-fields";
-import { handlePropertiesFormSubmit } from "../common/handlePropertiesFormSubmit";
+import { usePropertiesFormSubmit } from "../common/handlePropertiesFormSubmit";
 
 export const InputPropertiesComponent: React.FC<{
   elementInstance: ComponentElementInstance;
@@ -28,6 +29,17 @@ export const InputPropertiesComponent: React.FC<{
   const form = useForm<InputPropsSchema>({
     resolver: zodResolver(InputPropsZSchema),
     values: elementInstance.props as InputPropsSchema,
+  });
+
+  const { currentPage } = usePageStore();
+  if (!currentPage) throw new Error("no current page");
+  const { workspace, project, id: pageId } = currentPage;
+
+  const handlePropertiesFormSubmit = usePropertiesFormSubmit({
+    workspaceId: workspace.id,
+    projectId: project.id,
+    pageId,
+    blockId: elementInstance.id,
   });
 
   const onSubmit: SubmitHandler<InputPropsSchema> = (data) =>

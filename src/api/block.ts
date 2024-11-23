@@ -1,7 +1,5 @@
-import { PageZSchema } from "@/types/api/page";
-import { z } from "zod";
-import { PageSchema } from "./page";
 import { JSONZType } from "@/types/api/common";
+import { z } from "zod";
 
 export const CreateBlockRequestZSchema = z
   .object({
@@ -29,7 +27,7 @@ export const createBlockInPage = async (
   projecctId: string,
   pageId: string,
   values: CreateBlockRequestSchema
-): Promise<PageSchema> => {
+): Promise<CreateBlockResponseSchema> => {
   const accessToken = sessionStorage.getItem("accessToken");
 
   if (!accessToken) {
@@ -52,7 +50,7 @@ export const createBlockInPage = async (
   }
 
   const data = await response.json();
-  const result = PageZSchema.safeParse(data);
+  const result = CreateBlockZResponseSchema.safeParse(data);
 
   if (!result.success) {
     throw new Error("Error creating Block - response schema mismatch");
@@ -61,7 +59,7 @@ export const createBlockInPage = async (
   return result.data;
 };
 
-export const deleteBlockInPage = async (
+export const removeBlockFromPage = async (
   workspaceId: string,
   projecctId: string,
   pageId: string,
@@ -83,13 +81,11 @@ export const deleteBlockInPage = async (
     }),
   });
 
-  if (response.status !== 201) {
+  if (response.status !== 200) {
     throw new Error(`Server Error: ${JSON.stringify(response.text())}`);
   }
 
-  const data = await response.json();
-
-  return data;
+  return true;
 };
 
 export const updateBlockPropsInPage = async (
@@ -105,10 +101,10 @@ export const updateBlockPropsInPage = async (
     throw new Error("Couldnt find access token");
   }
 
-  const url = `http://localhost:3000/workspace/${workspaceId}/project/${projecctId}/page/${pageId}block/${blockId}`;
+  const url = `http://localhost:3000/workspace/${workspaceId}/project/${projecctId}/page/${pageId}/block/${blockId}`;
   const response = await fetch(url, {
     method: "PATCH",
-    body: JSON.stringify(props),
+    body: JSON.stringify({ props }),
     headers: new Headers({
       "Content-Type": "application/json",
       Accept: "application/json",
@@ -116,7 +112,7 @@ export const updateBlockPropsInPage = async (
     }),
   });
 
-  if (response.status !== 201) {
+  if (response.status !== 200) {
     throw new Error(`Server Error: ${JSON.stringify(response.text())}`);
   }
 

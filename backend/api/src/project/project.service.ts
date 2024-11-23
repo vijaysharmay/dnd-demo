@@ -2,9 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { v4 } from 'uuid';
 
+import { JwtService } from '@nestjs/jwt';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-Project.dto';
-import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class ProjectService {
@@ -117,4 +117,44 @@ export class ProjectService {
     });
     return;
   }
+
+  async moveProjectToWorkspace(
+    projectId: string,
+    targetWorkspaceId: string,
+  ) {
+    await this.prisma.$transaction(async (tx) => {
+      // Update the project to reference the new workspace
+      await tx.project.update({
+        where: { id: projectId },
+        data: {
+          workspaceId: targetWorkspaceId,
+        },
+      });
+  
+      // Update all related pages to the new workspace
+      await tx.page.updateMany({
+        where: { projectId },
+        data: {
+          workspaceId: targetWorkspaceId,
+        },
+      });
+  
+      // Update all related blocks to the new workspace
+      await tx.block.updateMany({
+        where: { projectId },
+        data: {
+          workspaceId: targetWorkspaceId,
+        },
+      });
+  
+      // Update all related accords to the new workspace
+      await tx.accord.updateMany({
+        where: { projectId },
+        data: {
+          workspaceId: targetWorkspaceId,
+        },
+      });
+    });
+  }
+  
 }

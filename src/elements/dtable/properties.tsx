@@ -17,7 +17,8 @@ import { isEmpty } from "lodash";
 import { SubmitHandler, useForm } from "react-hook-form";
 
 import { FormFieldRender } from "../common/form-fields";
-import { handlePropertiesFormSubmit } from "../common/handlePropertiesFormSubmit";
+import { usePropertiesFormSubmit } from "../common/handlePropertiesFormSubmit";
+import usePageStore from "@/store/page-store";
 
 export const DTablePropertiesComponent: React.FC<{
   elementInstance: ComponentElementInstance;
@@ -26,6 +27,17 @@ export const DTablePropertiesComponent: React.FC<{
   const form = useForm<DTablePropsSchema>({
     resolver: zodResolver(DTablePropsZSchema),
     values: elementInstance.props as DTablePropsSchema,
+  });
+
+  const { currentPage } = usePageStore();
+  if (!currentPage) throw new Error("no current page");
+  const { workspace, project, id: pageId } = currentPage;
+
+  const handlePropertiesFormSubmit = usePropertiesFormSubmit({
+    workspaceId: workspace.id,
+    projectId: project.id,
+    pageId,
+    blockId: elementInstance.id,
   });
 
   const onSubmit: SubmitHandler<DTablePropsSchema> = (data) =>

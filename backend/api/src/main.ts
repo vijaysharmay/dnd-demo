@@ -24,7 +24,7 @@ async function bootstrap() {
     ],
     exposedHeaders: 'Authorization',
     credentials: true,
-    methods: ['GET', 'PUT', 'OPTIONS', 'POST', 'DELETE'],
+    methods: ['GET', 'PUT', 'OPTIONS', 'POST', 'DELETE', 'PATCH'],
   };
   const fastifyAdapter = new FastifyAdapter();
   fastifyAdapter.enableCors(CORS_OPTIONS);
