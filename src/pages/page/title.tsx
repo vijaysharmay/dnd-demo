@@ -17,7 +17,7 @@ export default function PageTitle({
 }) {
   const { currentPage } = usePageStore();
   const { elements } = useElementStore();
-  const savePageMutation = useMutation({
+  const commitPageMutation = useMutation({
     mutationFn: async ({
       workspaceId,
       projectId,
@@ -38,9 +38,8 @@ export default function PageTitle({
     },
   });
 
-  const handleSave = () => {
-    debugger;
-    savePageMutation.mutate({ workspaceId, projectId, pageId, elements });
+  const handleCommit = () => {
+    console.log({ workspaceId, projectId, pageId, elements });
   };
 
   if (!currentPage) return;
@@ -51,15 +50,13 @@ export default function PageTitle({
       <div>{name}</div>
       <div className="grow"></div>
       <div className="ml-auto">
-        <Button className="mr-2" onClick={() => handleSave()}>
-          Save
-        </Button>
         <Button
           variant="outline"
           className={cn(
             "bg-blue-600 text-white",
             !workspace.isUserWorkspace ? "mr-2" : "mr-0"
           )}
+          onClick={handleCommit}
         >
           Commit
         </Button>

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { JSONZType } from "./common";
 import {
   PageWithoutRootZSchema,
   ProjectWithoutPagesZSchema,
@@ -7,12 +8,14 @@ import {
 
 export const BlockWithoutChildrenZSchema = z.object({
   id: z.string(),
-  blockUniqId: z.string(),
   blockType: z.string(),
-  props: z.object({}),
+  props: JSONZType,
   depth: z.number(),
   position: z.number(),
   parentId: z.nullable(z.string()),
+  workspaceId: z.string(),
+  projectId: z.string(),
+  pageId: z.string(),
 });
 
 export type BlockSchema = z.infer<typeof BlockWithoutChildrenZSchema> & {
@@ -27,6 +30,5 @@ export const BlockZSchema: z.ZodType<BlockSchema> =
 export const PageZSchema = PageWithoutRootZSchema.extend({
   project: ProjectWithoutPagesZSchema,
   workspace: WorkspaceWithOutProjectsZSchema,
-  rootId: z.string(),
-  root: BlockZSchema,
+  blocks: z.array(BlockZSchema),
 });

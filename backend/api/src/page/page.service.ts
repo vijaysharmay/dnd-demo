@@ -41,14 +41,6 @@ export class PageService {
             id: workspaceId,
           },
         },
-        root: {
-          create: {
-            id: v4(),
-            blockUniqId: v4(),
-            blockType: 'ROOT',
-            props: {},
-          },
-        },
       },
       select: {
         id: true,
@@ -152,7 +144,7 @@ export class PageService {
             userWorkspaceId: true,
           },
         },
-        root: {
+        blocks: {
           include: {
             children: true,
           },

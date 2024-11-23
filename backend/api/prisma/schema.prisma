@@ -55,7 +55,7 @@ model Workspace {
   pages                  Page[]              @relation(name: "pagesInWorkspace")
   accords                Accord[]            @relation(name: "accordsInWorkspace")
   defaultWorkspaceUserId User?               @relation(name: "userWorkspace")
-  versions               Version[]           @relation(name: "versionsInWorkspace")
+  blocks                 Block[]             @relation(name: "blocksInWorkspace")
 
   @@map("workspaces")
 }
@@ -81,6 +81,7 @@ model Project {
   route       String    @unique @map("route")
   pages       Page[]    @relation(name: "pagesInProject")
   accords     Accord[]  @relation(name: "accordsInProject")
+  blocks      Block[]   @relation(name: "blocksInProject")
 
   @@map("projects")
 }
@@ -113,16 +114,14 @@ model Page {
   workspace   Workspace @relation(fields: [workspaceId], references: [id], name: "pagesInWorkspace")
   workspaceId String
   route       String    @unique @map("route")
-  root        Block     @relation(fields: [rootId], references: [id], name: "rootBlock")
-  rootId      String    @unique
+  blocks      Block[]   @relation(name: "blocksInPage")
 
-  @@unique([workspaceId, projectId])
+  @@unique([workspaceId, projectId, name, route])
   @@map("pages")
 }
 
 model Block {
   id          String    @id @map("id")
-  blockUniqId String    @map("block_uniq_id")
   blockType   String    @map("block_type") //should be enum
   props       Json      @map("props")
   depth       Int       @default(0)
@@ -131,21 +130,23 @@ model Block {
   parent      Block?    @relation("nestedBlocks", fields: [parentId], references: [id])
   parentId    String?
   flows       Flow[]    @relation(name: "flowsInBlock")
-  page        Page?     @relation(name: "rootBlock")
   versions    Version[] @relation(name: "versionsOfBlock")
+  project     Project   @relation(fields: [projectId], references: [id], name: "blocksInProject")
+  projectId   String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], name: "blocksInWorkspace")
+  workspaceId String
+  page        Page      @relation(fields: [pageId], references: [id], name: "blocksInPage")
+  pageId      String
 
   @@map("blocks")
 }
 
 model Version {
-  id          String    @id @map("id")
-  name        String    @map("version_name")
-  workspace   Workspace @relation(fields: [workspaceId], references: [id], name: "versionsInWorkspace")
-  workspaceId String
-  block       Block     @relation(fields: [blockId], references: [id], name: "versionsOfBlock")
-  blockId     String
+  id      String @id @map("id")
+  name    String @map("version_name")
+  block   Block  @relation(fields: [blockId], references: [id], name: "versionsOfBlock")
+  blockId String
 
-  @@unique([workspaceId, name])
   @@map("versions")
 }
 

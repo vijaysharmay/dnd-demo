@@ -6,10 +6,12 @@ import { DragEndEvent, useDndMonitor, useDroppable } from "@dnd-kit/core";
 import { v4 as uuidv4 } from "uuid";
 
 import { getPageInProjectWorkspace } from "@/api";
+import { createBlockInPage, CreateBlockRequestSchema } from "@/api/block";
 import { Skeleton } from "@/components/ui/skeleton";
 import usePageStore from "@/store/page-store";
 import { BlockSchema } from "@/types/api/page";
-import { useQuery } from "@tanstack/react-query";
+import { InputPropsSchema, PropsSchema } from "@/types/properties";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { isNull } from "lodash";
 import { useEffect } from "react";
 import DesignerElementWrapper from "./designer-element-wrapper";
@@ -45,6 +47,40 @@ export default function Designer({
     },
   });
 
+  const addBlockToPageMutation = useMutation({
+    mutationFn: async ({
+      workspaceId,
+      projectId,
+      pageId,
+      values,
+    }: {
+      workspaceId: string;
+      projectId: string;
+      pageId: string;
+      values: CreateBlockRequestSchema;
+    }) => createBlockInPage(workspaceId, projectId, pageId, values),
+    onSuccess: () => {
+      console.log("added");
+    },
+    onError: (e: Error) => {
+      console.log(e.message);
+    },
+  });
+
+  const handleAddElement = (
+    index: number,
+    element: ComponentElementInstance
+  ) => {
+    addElement(index, element);
+    const values = {
+      blockType: element.type,
+      props: element.props,
+      depth: 0,
+      position: index,
+    };
+    addBlockToPageMutation.mutate({ workspaceId, projectId, pageId, values });
+  };
+
   useDndMonitor({
     onDragEnd: (event: DragEndEvent) => {
       const { active, over } = event;
@@ -66,11 +102,11 @@ export default function Designer({
 
         if (hoveredElementIndex > -1 && (isTop || isBottom)) {
           if (isTop) {
-            addElement(hoveredElementIndex, newElement);
+            handleAddElement(hoveredElementIndex, newElement);
           }
 
           if (isBottom) {
-            addElement(hoveredElementIndex + 1, newElement);
+            handleAddElement(hoveredElementIndex + 1, newElement);
           }
         } else {
           if (isHContainerDroppable) {
@@ -79,7 +115,7 @@ export default function Designer({
             newElement.parentId = hContainerId;
             addElementToParent(hContainerId, index, newElement);
           } else {
-            addElement(0, newElement);
+            handleAddElement(0, newElement);
           }
         }
 
@@ -132,21 +168,27 @@ export default function Designer({
   useEffect(() => {
     if (data) {
       setCurrentPage(data);
-      if (isNull(data.root.children) || !data.root.children) {
-        setElements([]);
-      } else {
-        const elements = data.root.children.map((x: BlockSchema) => {
-          const type: ComponentElementType =
-            x.blockType as ComponentElementType;
-          const { blockType, props, ...rest } = x;
+      const elements: ComponentElementInstance[] = data.blocks.map(
+        (block: BlockSchema) => {
+          const {
+            blockType,
+            props: unParsedProps,
+            parentId,
+            id,
+            children,
+          } = block;
+          const type: ComponentElementType = blockType as ComponentElementType;
+          const props: PropsSchema = unParsedProps as InputPropsSchema;
           return {
-            ...rest,
+            id,
             type,
-            props: JSON.parse(x.props as string),
+            props,
+            parentId,
+            children,
           };
-        });
-        setElements(elements);
-      }
+        }
+      );
+      setElements(elements);
     }
   }, [data, setCurrentPage, setElements]);
 

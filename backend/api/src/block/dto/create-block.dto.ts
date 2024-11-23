@@ -3,8 +3,7 @@ import { JSONZType } from 'src/utils/types';
 import { z } from 'zod';
 
 export const blockZSchema = z.object({
-  blockUniqId: z.string(),
-  blockType: z.enum(['Input', 'Button', 'HContainer', 'DTable']),
+  blockType: z.string(),
   props: JSONZType,
   depth: z.number(),
   position: z.number(),

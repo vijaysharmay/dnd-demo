@@ -1,4 +1,3 @@
-import { ComponentElementInstance } from "@/types";
 import { PageZSchema } from "@/types/api/page";
 import { z } from "zod";
 
@@ -84,7 +83,7 @@ export const getPageInProjectWorkspace = async (
   const data = await response.json();
   const result = PageZSchema.safeParse(data);
 
-  // console.log(result.error, data)
+  // console.log(result.error, data);
   if (!result.success) {
     throw new Error("Error fetching Page - response schema mismatch");
   }
@@ -126,8 +125,8 @@ export const updatePageInProjectWorkspace = async (
   workspaceId: string,
   projecctId: string,
   pageId: string,
-  values: ComponentElementInstance[]
-): Promise<boolean> => {
+  values: CreatePageRequestSchema
+): Promise<CreatePageResponseSchema> => {
   const accessToken = sessionStorage.getItem("accessToken");
 
   if (!accessToken) {

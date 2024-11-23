@@ -68,7 +68,17 @@ export class BlockController {
     );
   }
 
-  @Put(':blockId')
+  @Delete(':blockId')
+  remove(
+    @Param('workspaceId') workspaceId: string,
+    @Param('projectId') projectId: string,
+    @Param('pageId') pageId: string,
+    @Param('blockId') blockId: string,
+  ) {
+    return this.blockService.remove(workspaceId, projectId, pageId, blockId);
+  }
+
+  @Put(':blockId/child')
   addChildToBlock(
     @Param('workspaceId') workspaceId: string,
     @Param('projectId') projectId: string,
@@ -85,7 +95,24 @@ export class BlockController {
     );
   }
 
-  @Put(':blockId/bulk')
+  @Delete(':blockId/child')
+  removeChildFromBlock(
+    @Param('workspaceId') workspaceId: string,
+    @Param('projectId') projectId: string,
+    @Param('pageId') pageId: string,
+    @Param('parentBlockId') parentBlockId: string,
+    @Param('blockId') blockId: string,
+  ) {
+    return this.blockService.removeChildFromBlock(
+      workspaceId,
+      projectId,
+      pageId,
+      parentBlockId,
+      blockId,
+    );
+  }
+
+  @Put(':blockId/child/bulk')
   addChildrenToBlock(
     @Param('workspaceId') workspaceId: string,
     @Param('projectId') projectId: string,
@@ -102,7 +129,7 @@ export class BlockController {
     );
   }
 
-  @Patch(':blockId/bulk')
+  @Delete(':blockId/child/bulk')
   removeChildrenFromBlock(
     @Param('workspaceId') workspaceId: string,
     @Param('projectId') projectId: string,
@@ -117,15 +144,5 @@ export class BlockController {
       blockId,
       removeChildrenDto,
     );
-  }
-
-  @Delete(':blockId')
-  remove(
-    @Param('workspaceId') workspaceId: string,
-    @Param('projectId') projectId: string,
-    @Param('pageId') pageId: string,
-    @Param('blockId') blockId: string,
-  ) {
-    return this.blockService.remove(workspaceId, projectId, pageId, blockId);
   }
 }

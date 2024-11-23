@@ -14,14 +14,23 @@ export class BlockService {
     pageId: string,
     createBlockDto: CreateBlockDto,
   ) {
-    const { blockUniqId, blockType, props } = createBlockDto;
+    const { blockType, props } = createBlockDto;
     const id = v4();
     return this.prisma.block.create({
       data: {
         id,
-        blockUniqId,
         blockType,
         props,
+        workspace: {
+          connect: {
+            id: workspaceId,
+          },
+        },
+        project: {
+          connect: {
+            id: projectId,
+          },
+        },
         page: {
           connect: {
             id: pageId,
@@ -39,6 +48,8 @@ export class BlockService {
       where: {
         page: {
           id: pageId,
+          workspaceId,
+          projectId,
         },
       },
     });
@@ -48,13 +59,15 @@ export class BlockService {
     workspaceId: string,
     projectId: string,
     pageId: string,
-    blockUniqId: string,
+    blockId: string,
   ) {
     return this.prisma.block.findFirst({
       where: {
-        id: blockUniqId,
+        id: blockId,
         page: {
           id: pageId,
+          workspaceId,
+          projectId,
         },
       },
       include: {
@@ -67,15 +80,17 @@ export class BlockService {
     workspaceId: string,
     projectId: string,
     pageId: string,
-    blockUniqId: string,
+    blockId: string,
     updateBlockDto: UpdateBlockDto,
   ) {
     return this.prisma.block.update({
       data: updateBlockDto,
       where: {
-        id: blockUniqId,
+        id: blockId,
         page: {
           id: pageId,
+          workspaceId,
+          projectId,
         },
       },
     });
@@ -88,12 +103,14 @@ export class BlockService {
     parentBlockUniqId: string,
     createBlockDto: CreateBlockDto,
   ) {
-    const { blockUniqId, blockType, props, depth, position } = createBlockDto;
+    const { blockType, props, depth, position } = createBlockDto;
     return this.prisma.block.update({
       data: {
         children: {
           create: {
-            blockUniqId,
+            projectId,
+            workspaceId,
+            pageId,
             blockType,
             props,
             depth,
@@ -122,8 +139,10 @@ export class BlockService {
       data: {
         children: {
           create: createBlocksDto.map((block) => ({
+            workspaceId,
+            projectId,
+            pageId,
             id: v4(),
-            blockUniqId: block.blockUniqId,
             blockType: block.blockType,
             props: block.props,
             depth: block.depth,
@@ -168,7 +187,7 @@ export class BlockService {
     workspaceId: string,
     projectId: string,
     pageId: string,
-    parentBlockUniqId: string,
+    parentBlockId: string,
     blockId: string,
   ) {
     return this.prisma.block.update({
@@ -180,7 +199,7 @@ export class BlockService {
         },
       },
       where: {
-        id: parentBlockUniqId,
+        id: parentBlockId,
         page: {
           id: pageId,
         },
