@@ -5,7 +5,7 @@ export default function AppContainer({
   title,
   children,
 }: {
-  title: string;
+  title: React.ReactElement;
   children: React.ReactElement;
 }) {
   return (
@@ -13,10 +13,12 @@ export default function AppContainer({
       <AppSidebar />
       <SidebarInset>
         <header className="flex h-12 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
-          <div className="flex items-center gap-2 px-4">{title}</div>
+          <div className="flex flex-row items-center gap-2 px-2 w-full">
+            {title}
+          </div>
         </header>
         <hr />
-        <div className="flex flex-1 flex-col gap-4 p-4">{children}</div>
+        <div className="flex flex-1 flex-col gap-4">{children}</div>
       </SidebarInset>
     </SidebarProvider>
   );

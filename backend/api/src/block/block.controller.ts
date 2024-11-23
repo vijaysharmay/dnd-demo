@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 
 import { BlockService } from './block.service';
-import { CreateBlockDto } from './dto/create-block.dto';
+import { CreateBlockDto, RemoveChildrenDto } from './dto/create-block.dto';
 import { UpdateBlockDto } from './dto/update-block.dto';
 
 @Controller()
@@ -82,6 +82,40 @@ export class BlockController {
       pageId,
       blockId,
       createBlockDto,
+    );
+  }
+
+  @Put(':blockId/bulk')
+  addChildrenToBlock(
+    @Param('workspaceId') workspaceId: string,
+    @Param('projectId') projectId: string,
+    @Param('pageId') pageId: string,
+    @Param('blockId') blockId: string,
+    @Body() createBlocksDto: CreateBlockDto[],
+  ) {
+    return this.blockService.addChildrenToBlock(
+      workspaceId,
+      projectId,
+      pageId,
+      blockId,
+      createBlocksDto,
+    );
+  }
+
+  @Patch(':blockId/bulk')
+  removeChildrenFromBlock(
+    @Param('workspaceId') workspaceId: string,
+    @Param('projectId') projectId: string,
+    @Param('pageId') pageId: string,
+    @Param('blockId') blockId: string,
+    @Body() removeChildrenDto: RemoveChildrenDto,
+  ) {
+    return this.blockService.removeChildrenFromBlock(
+      workspaceId,
+      projectId,
+      pageId,
+      blockId,
+      removeChildrenDto,
     );
   }
 

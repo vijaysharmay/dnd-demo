@@ -1,7 +1,7 @@
 import { PathPattern, Redirect, Route, RouteProps, Switch } from "wouter";
 
 import { ThemeProvider } from "@/components/theme-provider";
-import Preview from "./containers/preview";
+import Preview from "./pages/page/preview";
 import Auth from "./pages/auth";
 import Home from "./pages/home";
 import Page from "./pages/page";

@@ -1,3 +1,5 @@
+import { ComponentElementInstance } from "@/types";
+import { PageZSchema } from "@/types/api/page";
 import { z } from "zod";
 
 export const CreatePageRequestZSchema = z
@@ -16,6 +18,8 @@ const CreatePageZResponseSchema = z.object({
 export type CreatePageResponseSchema = z.infer<
   typeof CreatePageZResponseSchema
 >;
+
+export type PageSchema = z.infer<typeof PageZSchema>;
 
 export const createPageInProjectWorkspace = async (
   workspaceId: string,
@@ -53,6 +57,41 @@ export const createPageInProjectWorkspace = async (
   return result.data;
 };
 
+export const getPageInProjectWorkspace = async (
+  workspaceId: string,
+  projecctId: string,
+  pageId: string
+): Promise<PageSchema> => {
+  const accessToken = sessionStorage.getItem("accessToken");
+
+  if (!accessToken) {
+    throw new Error("Couldnt find access token");
+  }
+
+  const url = `http://localhost:3000/workspace/${workspaceId}/project/${projecctId}/page/${pageId}`;
+  const response = await fetch(url, {
+    headers: new Headers({
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    }),
+  });
+
+  if (response.status !== 200) {
+    throw new Error(`Server Error: ${JSON.stringify(response.text())}`);
+  }
+
+  const data = await response.json();
+  const result = PageZSchema.safeParse(data);
+
+  // console.log(result.error, data)
+  if (!result.success) {
+    throw new Error("Error fetching Page - response schema mismatch");
+  }
+
+  return result.data;
+};
+
 export const deletePageInProjectWorkspace = async (
   workspaceId: string,
   projecctId: string,
@@ -81,4 +120,41 @@ export const deletePageInProjectWorkspace = async (
   const data = await response.json();
 
   return data;
+};
+
+export const updatePageInProjectWorkspace = async (
+  workspaceId: string,
+  projecctId: string,
+  pageId: string,
+  values: ComponentElementInstance[]
+): Promise<boolean> => {
+  const accessToken = sessionStorage.getItem("accessToken");
+
+  if (!accessToken) {
+    throw new Error("Couldnt find access token");
+  }
+
+  const url = `http://localhost:3000/workspace/${workspaceId}/project/${projecctId}/page/${pageId}`;
+  const response = await fetch(url, {
+    method: "PATCH",
+    body: JSON.stringify(values),
+    headers: new Headers({
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    }),
+  });
+
+  if (response.status !== 201) {
+    throw new Error(`Server Error: ${JSON.stringify(response.text())}`);
+  }
+
+  const data = await response.json();
+  const result = CreatePageZResponseSchema.safeParse(data);
+
+  if (!result.success) {
+    throw new Error("Error creating Page - response schema mismatch");
+  }
+
+  return result.data;
 };

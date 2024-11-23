@@ -11,7 +11,7 @@ export function ComponentLibrary() {
       <div className="text-center w-full font-semibold text-muted-foreground">
         Library
       </div>
-      <div className="grid xs:grid-cols-1 lg:grid-cols-2 grow gap-2">
+      <div className="flex flex-col gap-2 w-full">
         {elementKeys.map((key: string) => {
           return (
             <LibraryListDraggableItem
@@ -38,9 +38,9 @@ function LibraryListDraggableItem({ element }: { element: ComponentElement }) {
   return (
     <Button
       ref={draggable.setNodeRef}
-      variant={"outline"}
+      variant="secondary"
       className={cn(
-        "flex-col cursor-grab gap-1 h-full bg-gray-100",
+        "flex-row cursor-grab",
         draggable.isDragging && "ring-2 ring-slate-200"
       )}
       {...draggable.listeners}

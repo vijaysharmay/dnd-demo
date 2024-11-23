@@ -45,7 +45,7 @@ export class PageService {
           create: {
             id: v4(),
             blockUniqId: v4(),
-            blockType: 'root',
+            blockType: 'ROOT',
             props: {},
           },
         },
@@ -73,6 +73,7 @@ export class PageService {
               omit: {
                 passwd: true,
                 salt: true,
+                userWorkspaceId: true,
               },
             },
           },
@@ -86,6 +87,7 @@ export class PageService {
               omit: {
                 passwd: true,
                 salt: true,
+                userWorkspaceId: true,
               },
             },
           },
@@ -94,6 +96,7 @@ export class PageService {
           omit: {
             passwd: true,
             salt: true,
+            userWorkspaceId: true,
           },
         },
       },
@@ -123,6 +126,7 @@ export class PageService {
               omit: {
                 passwd: true,
                 salt: true,
+                userWorkspaceId: true,
               },
             },
           },
@@ -136,6 +140,7 @@ export class PageService {
               omit: {
                 passwd: true,
                 salt: true,
+                userWorkspaceId: true,
               },
             },
           },
@@ -144,6 +149,12 @@ export class PageService {
           omit: {
             passwd: true,
             salt: true,
+            userWorkspaceId: true,
+          },
+        },
+        root: {
+          include: {
+            children: true,
           },
         },
       },
@@ -179,6 +190,7 @@ export class PageService {
               omit: {
                 passwd: true,
                 salt: true,
+                userWorkspaceId: true,
               },
             },
           },
@@ -192,6 +204,7 @@ export class PageService {
               omit: {
                 passwd: true,
                 salt: true,
+                userWorkspaceId: true,
               },
             },
           },
@@ -200,6 +213,7 @@ export class PageService {
           omit: {
             passwd: true,
             salt: true,
+            userWorkspaceId: true,
           },
         },
       },

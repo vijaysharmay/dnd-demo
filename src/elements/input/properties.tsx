@@ -1,10 +1,20 @@
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import PropertiesElementWrapper from "@/containers/properties-element.wrapper";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import PropertiesElementWrapper from "@/pages/page/properties-element.wrapper";
 import { ComponentElementInstance } from "@/types";
-import { InputPropsSchema, InputPropsZSchema, InputVariants } from "@/types/properties";
+import {
+  InputPropsSchema,
+  InputPropsZSchema,
+  InputVariants,
+} from "@/types/properties";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { isEmpty } from "lodash";
 import { SubmitHandler, useForm } from "react-hook-form";

@@ -1,10 +1,11 @@
-import { Input } from "@/components/ui/input";
 import { Toaster } from "@/components/ui/toaster";
 import AppContainer from "@/containers/app-container";
-import { ComponentLibrary } from "@/containers/component-library";
-import Designer from "@/containers/designer";
-import DragOverlayWrapper from "@/containers/drag-overlay-wrapper";
-import Properties from "@/containers/properties";
+import Messages from "@/containers/messages";
+import { cn } from "@/lib/utils";
+import { ComponentLibrary } from "@/pages/page/component-library";
+import Designer from "@/pages/page/designer";
+import DragOverlayWrapper from "@/pages/page/drag-overlay-wrapper";
+import Properties from "@/pages/page/properties";
 import {
   DndContext,
   KeyboardSensor,
@@ -14,7 +15,12 @@ import {
   useSensors,
 } from "@dnd-kit/core";
 import { restrictToWindowEdges } from "@dnd-kit/modifiers";
+import { GitBranch, Info, MessageSquareText } from "lucide-react";
+import { useState } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
+import { useParams } from "wouter";
+import History from "./history";
+import PageTitle from "./title";
 
 export default function Page() {
   const mouseSensor = useSensor(MouseSensor, {
@@ -24,38 +30,106 @@ export default function Page() {
   });
   const touchSensor = useSensor(TouchSensor);
   const keyboardSensor = useSensor(KeyboardSensor);
-
   const sensors = useSensors(mouseSensor, touchSensor, keyboardSensor);
 
+  const [showProperties, setShowProperties] = useState<boolean>(false);
+  const [showMessages, setShowMessages] = useState<boolean>(false);
+  const [showHistory, setShowHistory] = useState<boolean>(false);
+
+  const { workspaceId, projectId, pageId } = useParams();
+
+  if (!workspaceId || !projectId || !pageId) return;
+
   return (
-    <AppContainer title="Page">
+    <AppContainer
+      title={
+        <PageTitle
+          workspaceId={workspaceId}
+          projectId={projectId}
+          pageId={pageId}
+        />
+      }
+    >
       <>
         <PanelGroup direction="horizontal">
           <DndContext modifiers={[restrictToWindowEdges]} sensors={sensors}>
-            <Panel
-              defaultSize={10}
-              minSize={0}
-              maxSize={15}
-              className="shadow-md"
-            >
+            <Panel maxSize={15} className="shadow-md">
               <ComponentLibrary />
             </Panel>
             <PanelResizeHandle />
-            <Panel defaultSize={80} minSize={60} maxSize={85}>
-              <Designer />
+            <Panel>
+              <Designer
+                workspaceId={workspaceId}
+                projectId={projectId}
+                pageId={pageId}
+              />
             </Panel>
             <DragOverlayWrapper />
           </DndContext>
+          {showProperties && (
+            <Panel
+              collapsible={true}
+              minSize={20}
+              maxSize={20}
+              className="shadow-md"
+            >
+              <Properties />
+            </Panel>
+          )}
+          {showMessages && (
+            <Panel
+              collapsible={true}
+              minSize={20}
+              maxSize={20}
+              className="shadow-md"
+            >
+              <Messages />
+            </Panel>
+          )}
+          {showHistory && (
+            <Panel
+              collapsible={true}
+              minSize={20}
+              maxSize={20}
+              className="shadow-md"
+            >
+              <History />
+            </Panel>
+          )}
           <PanelResizeHandle />
-          <Panel
-            defaultSize={15}
-            minSize={15}
-            maxSize={20}
-            className="shadow-md"
-          >
-            <Properties />
+          <Panel collapsible={true} maxSize={5} className="shadow-md">
+            <div className="grid grid-col-1 justify-center pt-2 cursor-pointer">
+              <div
+                className={cn(
+                  "p-2 hover:bg-gray-200 rounded-md",
+                  showProperties && "bg-gray-200"
+                )}
+                onClick={() => setShowProperties(!showProperties)}
+              >
+                <Info />
+              </div>
+              <div
+                className={cn(
+                  "p-2 hover:bg-gray-200 rounded-md",
+                  showMessages && "bg-gray-200"
+                )}
+                onClick={() => setShowMessages(!showMessages)}
+              >
+                <MessageSquareText />
+              </div>
+              <div
+                className={cn(
+                  "p-2 hover:bg-gray-200 rounded-md",
+                  showHistory && "bg-gray-200"
+                )}
+                onClick={() => setShowHistory(!showHistory)}
+              >
+                <GitBranch />
+              </div>
+            </div>
           </Panel>
         </PanelGroup>
+
         <Toaster />
       </>
     </AppContainer>

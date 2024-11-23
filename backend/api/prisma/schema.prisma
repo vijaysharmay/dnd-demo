@@ -125,7 +125,8 @@ model Block {
   blockUniqId String    @map("block_uniq_id")
   blockType   String    @map("block_type") //should be enum
   props       Json      @map("props")
-  order       Int?      @default(0) @map("order") // only relevant for child blocks
+  depth       Int       @default(0)
+  position    Float     @default(1)
   children    Block[]   @relation("nestedBlocks")
   parent      Block?    @relation("nestedBlocks", fields: [parentId], references: [id])
   parentId    String?

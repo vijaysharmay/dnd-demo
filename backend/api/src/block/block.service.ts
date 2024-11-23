@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { v4 } from 'uuid';
 
-import { CreateBlockDto } from './dto/create-block.dto';
+import { CreateBlockDto, RemoveChildrenDto } from './dto/create-block.dto';
 import { UpdateBlockDto } from './dto/update-block.dto';
 
 @Injectable()
@@ -88,7 +88,7 @@ export class BlockService {
     parentBlockUniqId: string,
     createBlockDto: CreateBlockDto,
   ) {
-    const { blockUniqId, blockType, props } = createBlockDto;
+    const { blockUniqId, blockType, props, depth, position } = createBlockDto;
     return this.prisma.block.update({
       data: {
         children: {
@@ -96,7 +96,62 @@ export class BlockService {
             blockUniqId,
             blockType,
             props,
+            depth,
+            position,
             id: v4(),
+          },
+        },
+      },
+      where: {
+        id: parentBlockUniqId,
+        page: {
+          id: pageId,
+        },
+      },
+    });
+  }
+
+  async addChildrenToBlock(
+    workspaceId: string,
+    projectId: string,
+    pageId: string,
+    parentBlockUniqId: string,
+    createBlocksDto: CreateBlockDto[],
+  ) {
+    return this.prisma.block.update({
+      data: {
+        children: {
+          create: createBlocksDto.map((block) => ({
+            id: v4(),
+            blockUniqId: block.blockUniqId,
+            blockType: block.blockType,
+            props: block.props,
+            depth: block.depth,
+            position: block.position,
+          })),
+        },
+      },
+      where: {
+        id: parentBlockUniqId,
+        page: {
+          id: pageId,
+        },
+      },
+    });
+  }
+
+  async removeChildrenFromBlock(
+    workspaceId: string,
+    projectId: string,
+    pageId: string,
+    parentBlockUniqId: string,
+    blockIds: RemoveChildrenDto,
+  ) {
+    return this.prisma.block.update({
+      data: {
+        children: {
+          deleteMany: {
+            id: { in: blockIds.map((x) => x.id) },
           },
         },
       },
@@ -114,13 +169,13 @@ export class BlockService {
     projectId: string,
     pageId: string,
     parentBlockUniqId: string,
-    blockUniqId: string,
+    blockId: string,
   ) {
     return this.prisma.block.update({
       data: {
         children: {
           delete: {
-            id: blockUniqId,
+            id: blockId,
           },
         },
       },

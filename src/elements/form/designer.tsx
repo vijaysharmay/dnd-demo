@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import DesignerElementWrapper from "@/containers/designer-element-wrapper";
+import DesignerElementWrapper from "@/pages/page/designer-element-wrapper";
 import { ComponentElementInstance } from "@/types";
 import { FormPropsSchema } from "@/types/properties";
 
