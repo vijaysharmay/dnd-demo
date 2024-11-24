@@ -27,8 +27,18 @@ export const BlockZSchema: z.ZodType<BlockSchema> =
     children: z.lazy(() => BlockZSchema.array()),
   });
 
+export const VersionZSchema = z.object({
+  blocks: z.array(BlockZSchema),
+  currentStatus: z.string(),
+  id: z.string(),
+  name: z.string(),
+  pageId: z.string(),
+  projectId: z.string(),
+  workspaceId: z.string(),
+});
+
 export const PageZSchema = PageWithoutRootZSchema.extend({
   project: ProjectWithoutPagesZSchema,
   workspace: WorkspaceWithOutProjectsZSchema,
-  blocks: z.array(BlockZSchema),
+  versions: z.array(VersionZSchema),
 });

@@ -21,15 +21,19 @@ export class PublishedService {
               select: {
                 name: true,
                 route: true,
-                blocks: {
+                versions: {
                   select: {
-                    id: true,
-                    parentId: true,
-                    blockType: true,
-                    props: true,
-                    depth: true,
-                    position: true,
-                    children: true,
+                    blocks: {
+                      select: {
+                        id: true,
+                        parentId: true,
+                        blockType: true,
+                        props: true,
+                        depth: true,
+                        position: true,
+                        children: true,
+                      },
+                    },
                   },
                 },
               },

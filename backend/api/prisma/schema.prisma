@@ -27,18 +27,21 @@ enum AccordType {
 }
 
 model User {
-  id               String              @id @map("id")
-  fullName         String              @map("full_name")
-  email            String              @unique @map("email")
+  id               String                      @id @map("id")
+  fullName         String                      @map("full_name")
+  email            String                      @unique @map("email")
   passwd           String
   salt             String
-  ownerOfWorkspace Workspace[]         @relation(name: "ownerOfWorkspace")
-  ownerOfProject   Project[]           @relation(name: "ownerOfProject")
-  ownerOfAccord    Accord[]            @relation(name: "ownerOfAccord")
-  ownerOfPage      Page[]              @relation(name: "ownerOfPage")
-  workspaces       UserWorkspaceRole[] @relation(name: "userOfWorkspace")
-  userWorkspace    Workspace?          @relation(fields: [userWorkspaceId], references: [id], name: "userWorkspace")
-  userWorkspaceId  String?             @unique @map("user_workspace_id")
+  ownerOfWorkspace Workspace[]                 @relation(name: "ownerOfWorkspace")
+  ownerOfProject   Project[]                   @relation(name: "ownerOfProject")
+  ownerOfAccord    Accord[]                    @relation(name: "ownerOfAccord")
+  ownerOfPage      Page[]                      @relation(name: "ownerOfPage")
+  workspaces       UserWorkspaceRole[]         @relation(name: "userOfWorkspace")
+  userWorkspace    Workspace?                  @relation(fields: [userWorkspaceId], references: [id], name: "userWorkspace")
+  userWorkspaceId  String?                     @unique @map("user_workspace_id")
+  changes          VersionChangeLog[]          @relation(name: "madeChangesToVersion")
+  statusChanges    VersionStatusLog[]          @relation(name: "madeStatusChangesToVersion")
+  approverFor      VersionStatusLogApprovers[] @relation(name: "approverForStatusChangesToVersion")
 
   @@map("users")
 }
@@ -55,7 +58,7 @@ model Workspace {
   pages                  Page[]              @relation(name: "pagesInWorkspace")
   accords                Accord[]            @relation(name: "accordsInWorkspace")
   defaultWorkspaceUserId User?               @relation(name: "userWorkspace")
-  blocks                 Block[]             @relation(name: "blocksInWorkspace")
+  versions               Version[]           @relation(name: "versionsInWorkspace")
 
   @@map("workspaces")
 }
@@ -81,7 +84,7 @@ model Project {
   route       String    @unique @map("route")
   pages       Page[]    @relation(name: "pagesInProject")
   accords     Accord[]  @relation(name: "accordsInProject")
-  blocks      Block[]   @relation(name: "blocksInProject")
+  versions    Version[] @relation(name: "versionsInProject")
 
   @@map("projects")
 }
@@ -104,50 +107,103 @@ model Accord {
   @@map("accords")
 }
 
+enum PageVersionStatus {
+  DRAFT
+  PENDING
+  APPROVED
+  PUBLISHED
+  REJECTED
+}
+
 model Page {
   id          String    @id @map("id")
   name        String    @map("name")
+  route       String    @unique @map("route")
   owner       User      @relation(fields: [ownerId], references: [id], name: "ownerOfPage")
   ownerId     String
   project     Project   @relation(fields: [projectId], references: [id], name: "pagesInProject", onDelete: Cascade, onUpdate: Cascade)
   projectId   String
   workspace   Workspace @relation(fields: [workspaceId], references: [id], name: "pagesInWorkspace")
   workspaceId String
-  route       String    @unique @map("route")
-  blocks      Block[]   @relation(name: "blocksInPage")
+  versions    Version[] @relation(name: "versionsInPage")
 
   @@unique([workspaceId, projectId, name, route])
   @@map("pages")
 }
 
 model Block {
-  id          String    @id @map("id")
-  blockType   String    @map("block_type") //should be enum
-  props       Json      @map("props")
-  depth       Int       @default(0)
-  position    Float     @default(1)
-  children    Block[]   @relation("nestedBlocks")
-  parent      Block?    @relation("nestedBlocks", fields: [parentId], references: [id])
-  parentId    String?
-  flows       Flow[]    @relation(name: "flowsInBlock")
-  versions    Version[] @relation(name: "versionsOfBlock")
-  project     Project   @relation(fields: [projectId], references: [id], name: "blocksInProject", onDelete: Cascade, onUpdate: Cascade)
-  projectId   String
-  workspace   Workspace @relation(fields: [workspaceId], references: [id], name: "blocksInWorkspace")
-  workspaceId String
-  page        Page      @relation(fields: [pageId], references: [id], name: "blocksInPage")
-  pageId      String
+  id        String   @id @map("id")
+  blockType String   @map("block_type") //should be enum
+  props     Json     @map("props")
+  depth     Int      @default(0)
+  position  Float    @default(1)
+  children  Block[]  @relation("nestedBlocks")
+  parent    Block?   @relation("nestedBlocks", fields: [parentId], references: [id])
+  parentId  String?
+  flows     Flow[]   @relation(name: "flowsInBlock")
+  version   Version? @relation(fields: [versionId], references: [id], name: "blocksInVersion")
+  versionId String?
 
   @@map("blocks")
 }
 
 model Version {
-  id      String @id @map("id")
-  name    String @map("version_name")
-  block   Block  @relation(fields: [blockId], references: [id], name: "versionsOfBlock")
-  blockId String
+  id            String             @id @map("id")
+  name          String             @default("main") @map("version_name")
+  currentStatus PageVersionStatus  @default(value: DRAFT)
+  blocks        Block[]            @relation(name: "blocksInVersion")
+  page          Page?              @relation(fields: [pageId], references: [id], name: "versionsInPage")
+  pageId        String?
+  project       Project            @relation(fields: [projectId], references: [id], name: "versionsInProject", onDelete: Cascade, onUpdate: Cascade)
+  projectId     String
+  workspace     Workspace          @relation(fields: [workspaceId], references: [id], name: "versionsInWorkspace")
+  workspaceId   String
+  changeLog     VersionChangeLog[] @relation(name: "changesMadeToVersion")
+  statusLog     VersionStatusLog[] @relation(name: "statusChangesMadeToVersion")
 
   @@map("versions")
+}
+
+model VersionStatusLog {
+  id            String                      @id @map("id")
+  status        PageVersionStatus
+  changeLog     String
+  changeOwner   User                        @relation(fields: [changeOwnerId], references: [id], name: "madeStatusChangesToVersion")
+  changeOwnerId String
+  approvers     VersionStatusLogApprovers[] @relation(name: "requestedApprovalForStatusChangesToVersion")
+  version       Version?                    @relation(fields: [versionId], references: [id], name: "statusChangesMadeToVersion")
+  versionId     String?
+  changesMadeOn DateTime                    @default(now())
+
+  @@map("version_status_log")
+}
+
+enum VersionStatusLogApprovalStatus {
+  APPROVED
+  REJECTED
+}
+
+model VersionStatusLogApprovers {
+  id                 String                         @id @map("id")
+  approver           User                           @relation(fields: [approverId], references: [id], name: "approverForStatusChangesToVersion")
+  approverId         String
+  versionStatusLog   VersionStatusLog?              @relation(fields: [versionStatusLogId], references: [id], name: "requestedApprovalForStatusChangesToVersion")
+  versionStatusLogId String?
+  status             VersionStatusLogApprovalStatus
+
+  @@map("version_status_log_approvers")
+}
+
+model VersionChangeLog {
+  id            String   @id @map("id")
+  changeLog     String
+  changeOwner   User     @relation(fields: [changeOwnerId], references: [id], name: "madeChangesToVersion")
+  changeOwnerId String
+  version       Version? @relation(fields: [versionId], references: [id], name: "changesMadeToVersion")
+  versionId     String?
+  changesMadeOn DateTime @default(now())
+
+  @@map("version_change_log")
 }
 
 model Flow {

@@ -22,12 +22,14 @@ export class BlockController {
     @Param('workspaceId') workspaceId: string,
     @Param('projectId') projectId: string,
     @Param('pageId') pageId: string,
+    @Param('versionId') versionId: string,
     @Body() createBlockDto: CreateBlockDto,
   ) {
     return this.blockService.create(
       workspaceId,
       projectId,
       pageId,
+      versionId,
       createBlockDto,
     );
   }
@@ -37,8 +39,9 @@ export class BlockController {
     @Param('workspaceId') workspaceId: string,
     @Param('projectId') projectId: string,
     @Param('pageId') pageId: string,
+    @Param('versionId') versionId: string,
   ) {
-    return this.blockService.findAll(workspaceId, projectId, pageId);
+    return this.blockService.findAll(workspaceId, projectId, pageId, versionId);
   }
 
   @Get(':blockId')
@@ -46,9 +49,16 @@ export class BlockController {
     @Param('workspaceId') workspaceId: string,
     @Param('projectId') projectId: string,
     @Param('pageId') pageId: string,
+    @Param('versionId') versionId: string,
     @Param('blockId') blockId: string,
   ) {
-    return this.blockService.findOne(workspaceId, projectId, pageId, blockId);
+    return this.blockService.findOne(
+      workspaceId,
+      projectId,
+      pageId,
+      blockId,
+      versionId,
+    );
   }
 
   @Patch(':blockId')
@@ -56,6 +66,7 @@ export class BlockController {
     @Param('workspaceId') workspaceId: string,
     @Param('projectId') projectId: string,
     @Param('pageId') pageId: string,
+    @Param('versionId') versionId: string,
     @Param('blockId') blockId: string,
     @Body() updateBlockDto: UpdateBlockDto,
   ) {
@@ -63,6 +74,7 @@ export class BlockController {
       workspaceId,
       projectId,
       pageId,
+      versionId,
       blockId,
       updateBlockDto,
     );
@@ -73,9 +85,16 @@ export class BlockController {
     @Param('workspaceId') workspaceId: string,
     @Param('projectId') projectId: string,
     @Param('pageId') pageId: string,
+    @Param('versionId') versionId: string,
     @Param('blockId') blockId: string,
   ) {
-    return this.blockService.remove(workspaceId, projectId, pageId, blockId);
+    return this.blockService.remove(
+      workspaceId,
+      projectId,
+      pageId,
+      versionId,
+      blockId,
+    );
   }
 
   @Put(':blockId/child')
@@ -83,6 +102,7 @@ export class BlockController {
     @Param('workspaceId') workspaceId: string,
     @Param('projectId') projectId: string,
     @Param('pageId') pageId: string,
+    @Param('versionId') versionId: string,
     @Param('blockId') blockId: string,
     @Body() createBlockDto: CreateBlockDto,
   ) {
@@ -90,6 +110,7 @@ export class BlockController {
       workspaceId,
       projectId,
       pageId,
+      versionId,
       blockId,
       createBlockDto,
     );
@@ -100,6 +121,7 @@ export class BlockController {
     @Param('workspaceId') workspaceId: string,
     @Param('projectId') projectId: string,
     @Param('pageId') pageId: string,
+    @Param('versionId') versionId: string,
     @Param('parentBlockId') parentBlockId: string,
     @Param('blockId') blockId: string,
   ) {
@@ -107,6 +129,7 @@ export class BlockController {
       workspaceId,
       projectId,
       pageId,
+      versionId,
       parentBlockId,
       blockId,
     );
@@ -117,6 +140,7 @@ export class BlockController {
     @Param('workspaceId') workspaceId: string,
     @Param('projectId') projectId: string,
     @Param('pageId') pageId: string,
+    @Param('versionId') versionId: string,
     @Param('blockId') blockId: string,
     @Body() createBlocksDto: CreateBlockDto[],
   ) {
@@ -124,6 +148,7 @@ export class BlockController {
       workspaceId,
       projectId,
       pageId,
+      versionId,
       blockId,
       createBlocksDto,
     );
@@ -134,6 +159,7 @@ export class BlockController {
     @Param('workspaceId') workspaceId: string,
     @Param('projectId') projectId: string,
     @Param('pageId') pageId: string,
+    @Param('versionId') versionId: string,
     @Param('blockId') blockId: string,
     @Body() removeChildrenDto: RemoveChildrenDto,
   ) {
@@ -141,6 +167,7 @@ export class BlockController {
       workspaceId,
       projectId,
       pageId,
+      versionId,
       blockId,
       removeChildrenDto,
     );

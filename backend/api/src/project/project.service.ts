@@ -118,10 +118,7 @@ export class ProjectService {
     return;
   }
 
-  async moveProjectToWorkspace(
-    projectId: string,
-    targetWorkspaceId: string,
-  ) {
+  async moveProjectToWorkspace(projectId: string, targetWorkspaceId: string) {
     await this.prisma.$transaction(async (tx) => {
       // Update the project to reference the new workspace
       await tx.project.update({
@@ -130,7 +127,7 @@ export class ProjectService {
           workspaceId: targetWorkspaceId,
         },
       });
-  
+
       // Update all related pages to the new workspace
       await tx.page.updateMany({
         where: { projectId },
@@ -138,15 +135,14 @@ export class ProjectService {
           workspaceId: targetWorkspaceId,
         },
       });
-  
-      // Update all related blocks to the new workspace
-      await tx.block.updateMany({
+
+      await tx.version.updateMany({
         where: { projectId },
         data: {
           workspaceId: targetWorkspaceId,
         },
       });
-  
+
       // Update all related accords to the new workspace
       await tx.accord.updateMany({
         where: { projectId },
@@ -156,5 +152,4 @@ export class ProjectService {
       });
     });
   }
-  
 }

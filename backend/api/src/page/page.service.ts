@@ -41,6 +41,13 @@ export class PageService {
             id: workspaceId,
           },
         },
+        versions: {
+          create: {
+            id: v4(),
+            projectId,
+            workspaceId,
+          },
+        },
       },
       select: {
         id: true,
@@ -144,9 +151,13 @@ export class PageService {
             userWorkspaceId: true,
           },
         },
-        blocks: {
+        versions: {
           include: {
-            children: true,
+            blocks: {
+              include: {
+                children: true,
+              },
+            },
           },
         },
       },
