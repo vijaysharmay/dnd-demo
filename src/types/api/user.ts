@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const OwnerZSchema = z.object({
+export const UserZSchema = z.object({
   id: z.string(),
   fullName: z.string(),
   email: z.string(),
@@ -10,7 +10,7 @@ export const PageWithoutRootZSchema = z.object({
   id: z.string(),
   name: z.string(),
   route: z.string(),
-  owner: OwnerZSchema,
+  owner: UserZSchema,
 });
 
 export const WorkspaceWithOutProjectsZSchema = z.object({
@@ -18,14 +18,14 @@ export const WorkspaceWithOutProjectsZSchema = z.object({
   name: z.string(),
   isUserWorkspace: z.boolean(),
   route: z.nullable(z.string()),
-  owner: OwnerZSchema,
+  owner: UserZSchema,
 });
 
 export const ProjectWithoutPagesZSchema = z.object({
   id: z.string(),
   name: z.string(),
   route: z.string(),
-  owner: OwnerZSchema,
+  owner: UserZSchema,
 });
 
 export const VersionWithoutBlocksZSchema = z.object({
@@ -47,7 +47,7 @@ export const SidebarWorkspaceZSchema = WorkspaceWithOutProjectsZSchema.extend({
 });
 
 export type SidebarWorkspaceSchema = z.infer<typeof SidebarWorkspaceZSchema>;
-export type OwnerSchema = z.infer<typeof OwnerZSchema>;
+export type OwnerSchema = z.infer<typeof UserZSchema>;
 export type SidebarPageSchema = z.infer<typeof SidebarPageZSchema>;
 export type SidebarProjectSchema = z.infer<typeof SidebarProjectZSchema>;
 export type SidebarVersionSchema = z.infer<typeof VersionWithoutBlocksZSchema>;

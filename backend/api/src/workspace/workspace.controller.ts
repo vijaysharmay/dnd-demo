@@ -38,6 +38,15 @@ export class WorkspaceController {
     return this.workspaceService.update(workspaceId, updateWorkspaceDto);
   }
 
+  @Get(':workspaceId/member')
+  getMembersInWorkspace(
+    @Param('workspaceId') workspaceId: string,
+  ) {
+    return this.workspaceService.getMembersInWorkspace(
+      workspaceId,
+    );
+  }
+
   @Patch(':workspaceId/member')
   removeMembersFromWorkspace(
     @Param('workspaceId') workspaceId: string,

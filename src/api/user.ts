@@ -2,7 +2,7 @@ import {
   CurrentUserResponse,
   CurrentUserZResponse,
   OwnerSchema,
-  OwnerZSchema,
+  UserZSchema,
 } from "@/types/api/user";
 import { z } from "zod";
 
@@ -60,7 +60,7 @@ export const getUsers = async (searchValue: string): Promise<OwnerSchema[]> => {
   }
 
   const data = await response.json();
-  const result = z.array(OwnerZSchema).safeParse(data);
+  const result = z.array(UserZSchema).safeParse(data);
 
   if (!result.success) {
     throw new Error("Error fetching current user details");

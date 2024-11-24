@@ -85,6 +85,28 @@ export class WorkspaceService {
     });
   }
 
+  getMembersInWorkspace(workspaceId: string) {
+    return this.prisma.workspace.findMany({
+      where: {
+        id: workspaceId,
+      },
+      select: {
+        members: {
+          select: {
+            user: {
+              omit: {
+                passwd: true,
+                salt: true,
+                userWorkspaceId: true,
+              },
+            },
+            role: true,
+          },
+        },
+      },
+    });
+  }
+
   findOne(workspaceId: string) {
     return this.prisma.workspace.findFirst({
       where: {
@@ -103,6 +125,7 @@ export class WorkspaceService {
               omit: {
                 passwd: true,
                 salt: true,
+                userWorkspaceId: true,
               },
             },
           },
