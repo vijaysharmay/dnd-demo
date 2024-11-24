@@ -41,16 +41,7 @@ export default function Version() {
   if (!workspaceId || !projectId || !pageId || !versionId) return;
 
   return (
-    <AppContainer
-      title={
-        <VersionTitle
-          workspaceId={workspaceId}
-          projectId={projectId}
-          pageId={pageId}
-          versionId={versionId}
-        />
-      }
-    >
+    <AppContainer title={<VersionTitle />}>
       <>
         <PanelGroup direction="horizontal">
           <DndContext modifiers={[restrictToWindowEdges]} sensors={sensors}>

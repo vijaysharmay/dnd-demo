@@ -15,7 +15,7 @@ export class WorkspaceService {
     private jwtService: JwtService,
   ) {}
   async create(accessToken: string, createWorkspaceDto: CreateWorkspaceDto) {
-    const { name, route } = createWorkspaceDto;
+    const { name, route, members } = createWorkspaceDto;
     const { sub: ownerId } = this.jwtService.decode(accessToken);
     const workspaceId = v4();
     const { id } = await this.prisma.workspace.create({
@@ -42,6 +42,29 @@ export class WorkspaceService {
         role: 'ADMIN',
       },
     });
+
+    for (const member of members) {
+      try {
+        await this.prisma.userWorkspaceRole.upsert({
+          where: {
+            userId_workspaceId: { userId: member.memberId, workspaceId },
+          },
+          update: {
+            role: member.role,
+          },
+          create: {
+            userId: member.memberId,
+            workspaceId,
+            role: member.role,
+          },
+        });
+      } catch (error) {
+        console.error(
+          `Failed to create or connect user role for member ${member.memberId}:`,
+          error,
+        );
+      }
+    }
 
     return this.findOne(id);
   }

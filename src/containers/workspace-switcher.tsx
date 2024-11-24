@@ -1,4 +1,4 @@
-import { Check, ChevronsUpDown, Plus } from "lucide-react";
+import { Check, ChevronsUpDown, Plus, Trash2 } from "lucide-react";
 
 import {
   createProjectInWorkspace,
@@ -8,7 +8,7 @@ import {
   CreateWorkspaceRequestSchema,
   CreateWorkspaceRequestZSchema,
 } from "@/api";
-import { getUser } from "@/api/user";
+import { getUser, getUsers } from "@/api/user";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -36,6 +36,14 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -47,14 +55,15 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import useWorkspaceStore from "@/store/workspace-store";
-import { WorkspaceSchema } from "@/types/api/user";
+import { SidebarWorkspaceSchema } from "@/types/api/user";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { find, map } from "lodash";
+import { find, findIndex, map } from "lodash";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useParams } from "wouter";
 import { navigate } from "wouter/use-browser-location";
+import { AutoComplete } from "./autocomplete";
 
 export function WorkspaceSwitcher() {
   const { isMobile } = useSidebar();
@@ -71,6 +80,30 @@ export function WorkspaceSwitcher() {
     queryKey: ["getCurrentUser"],
     queryFn: getUser,
   });
+
+  type WorkspaceMember = {
+    memberId: string;
+    role: string;
+  };
+
+  const [searchValue, setSearchValue] = useState<string>("");
+  // const [selectedValue, setSelectedValue] = useState<string>("");
+  const [selectedMembers, setSelectedMembers] = useState<WorkspaceMember[]>([]);
+  const [newMember, setNewMember] = useState<WorkspaceMember | null>(null);
+  const [usersForSearch, setUsersForSearch] = useState<
+    {
+      value: string;
+      label: string;
+    }[]
+  >();
+
+  const { data: users, isLoading } = useQuery({
+    queryKey: ["getUserList", searchValue],
+    queryFn: () => getUsers(searchValue),
+  });
+
+  const roles = ["ADMIN", "DESIGNER", "DEVELOPER"];
+  const [activeRole, setActiveRole] = useState("");
 
   const {
     workspaces,
@@ -99,6 +132,18 @@ export function WorkspaceSwitcher() {
       } else {
         setCurrentWorkspace(data.userWorkspace);
       }
+
+      if (users) {
+        const items = users
+          .filter((x) => x.id !== data.id)
+          .map((x) => {
+            return {
+              value: `${x.id}|${x.fullName}|${x.email}`,
+              label: x.fullName,
+            };
+          });
+        setUsersForSearch(items);
+      }
     }
   }, [
     currentWorkspace,
@@ -107,6 +152,7 @@ export function WorkspaceSwitcher() {
     setCurrentWorkspace,
     setIsWorkspaceDataLoading,
     setWorkspaces,
+    users,
     workspaceId,
   ]);
 
@@ -115,6 +161,7 @@ export function WorkspaceSwitcher() {
     values: {
       name: "",
       route: "",
+      members: [],
     },
   });
 
@@ -154,7 +201,9 @@ export function WorkspaceSwitcher() {
     },
   });
 
-  const onCreateWorkspaceFormSubmit = (values: CreateProjectRequestSchema) => {
+  const onCreateWorkspaceFormSubmit = (
+    values: CreateWorkspaceRequestSchema
+  ) => {
     if (!currentWorkspace) {
       throw new Error("Workspace ID is required to create a project");
     }
@@ -170,7 +219,7 @@ export function WorkspaceSwitcher() {
 
   if (error) return "An error has occurred: " + error.message;
 
-  const handleWorkspaceChange = (workspace: WorkspaceSchema) => {
+  const handleWorkspaceChange = (workspace: SidebarWorkspaceSchema) => {
     setCurrentWorkspace(workspace);
     navigate(`/workspace/${workspace.id}`, { replace: true });
   };
@@ -293,6 +342,150 @@ export function WorkspaceSwitcher() {
                                 </FormItem>
                               )}
                             />
+                            <FormField
+                              control={createWorkspaceForm.control}
+                              name="members"
+                              render={({ field }) => {
+                                const addMember = () => {
+                                  if (newMember) {
+                                    const newMemberIndex = findIndex(
+                                      selectedMembers,
+                                      (x) => {
+                                        return (
+                                          newMember.memberId.split("|")[0] ===
+                                          x.memberId.split("|")[0]
+                                        );
+                                      }
+                                    );
+
+                                    if (newMemberIndex < 0) {
+                                      setSelectedMembers([
+                                        ...selectedMembers,
+                                        newMember,
+                                      ]);
+                                    } else {
+                                      setSelectedMembers([
+                                        ...selectedMembers.splice(
+                                          newMemberIndex,
+                                          1,
+                                          newMember
+                                        ),
+                                      ]);
+                                    }
+                                    setSearchValue("");
+                                    setActiveRole("");
+                                    setNewMember(null); // Reset new member input
+                                    field.onChange([
+                                      ...selectedMembers,
+                                      newMember,
+                                    ]); // Update form state
+                                  }
+                                };
+
+                                const removeMember = (index: number) => {
+                                  const updatedMembers = selectedMembers.filter(
+                                    (_, i) => i !== index
+                                  );
+                                  setSelectedMembers(updatedMembers);
+                                  field.onChange(updatedMembers); // Update form state
+                                };
+
+                                return (
+                                  <FormItem>
+                                    <FormLabel>Members (Optional)</FormLabel>
+                                    <div className="space-y-2">
+                                      {/* Add New Member Section */}
+                                      <div className="flex gap-2 items-center">
+                                        <div className="w-1/2">
+                                          <AutoComplete
+                                            selectedValue={
+                                              newMember?.memberId || ""
+                                            }
+                                            onSelectedValueChange={(memberId) =>
+                                              setNewMember({
+                                                memberId,
+                                                role: newMember?.role,
+                                              })
+                                            }
+                                            searchValue={searchValue}
+                                            onSearchValueChange={setSearchValue}
+                                            items={usersForSearch ?? []}
+                                            isLoading={isLoading}
+                                            placeholder="Search users..."
+                                          />
+                                        </div>
+                                        <Select
+                                          onValueChange={(role: string) => {
+                                            setNewMember({
+                                              memberId:
+                                                newMember?.memberId || "",
+                                              role,
+                                            });
+                                            setActiveRole(role);
+                                          }}
+                                          value={activeRole}
+                                        >
+                                          <SelectTrigger className="w-1/2">
+                                            <SelectValue placeholder="Select a role" />
+                                          </SelectTrigger>
+                                          <SelectContent>
+                                            <SelectGroup>
+                                              {roles.map((role: string) => (
+                                                <SelectItem
+                                                  key={role}
+                                                  value={role}
+                                                >
+                                                  {role}
+                                                </SelectItem>
+                                              ))}
+                                            </SelectGroup>
+                                          </SelectContent>
+                                        </Select>
+                                        <Button
+                                          onClick={addMember}
+                                          disabled={
+                                            !newMember?.memberId ||
+                                            !newMember?.role
+                                          }
+                                        >
+                                          Add
+                                        </Button>
+                                      </div>
+
+                                      <hr className="" />
+                                      {/* List of Selected Members */}
+                                      <ul className="space-y-1">
+                                        {selectedMembers.map(
+                                          (member, index) => (
+                                            <li
+                                              key={index}
+                                              className="flex gap-2 items-center"
+                                            >
+                                              <div>
+                                                {member.memberId.split("|")[1]}
+                                              </div>
+                                              <div>({member.role})</div>
+                                              <Button
+                                                variant="ghost"
+                                                className="ml-auto"
+                                                size="sm"
+                                                onClick={() =>
+                                                  removeMember(index)
+                                                }
+                                              >
+                                                <Trash2 />
+                                              </Button>
+                                            </li>
+                                          )
+                                        )}
+                                      </ul>
+                                    </div>
+                                    <FormMessage />
+                                  </FormItem>
+                                );
+                              }}
+                            />
+
                             <div className="text-right">
                               <Button className="mt-2" type="submit">
                                 Create Workspace

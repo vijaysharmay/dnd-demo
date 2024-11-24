@@ -1,48 +1,9 @@
-import { updatePageInProjectWorkspace } from "@/api";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import useElementStore from "@/store/element-store";
 import useVersionStore from "@/store/page-store";
-import { ComponentElementInstance } from "@/types";
-import { useMutation } from "@tanstack/react-query";
 
-export default function VersionTitle({
-  workspaceId,
-  projectId,
-  pageId,
-  versionId,
-}: {
-  workspaceId: string;
-  projectId: string;
-  pageId: string;
-  versionId: string;
-}) {
+export default function VersionTitle() {
   const { currentVersion } = useVersionStore();
-  const { elements } = useElementStore();
-  const commitPageMutation = useMutation({
-    mutationFn: async ({
-      workspaceId,
-      projectId,
-      pageId,
-      elements,
-    }: {
-      workspaceId: string;
-      projectId: string;
-      pageId: string;
-      elements: ComponentElementInstance[];
-    }) =>
-      updatePageInProjectWorkspace(workspaceId, projectId, pageId, elements),
-    onSuccess: () => {
-      window.location.reload();
-    },
-    onError: (e: Error) => {
-      console.log(e.message);
-    },
-  });
-
-  const handleCommit = () => {
-    console.log({ workspaceId, projectId, pageId, elements });
-  };
 
   if (!currentVersion) return;
   const { name, workspace, project, page } = currentVersion;

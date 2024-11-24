@@ -85,11 +85,20 @@ export class UserService {
     });
   }
 
-  findAll() {
+  findAll(search?: string) {
     return this.prisma.user.findMany({
+      where: search
+        ? {
+            OR: [
+              { fullName: { contains: search, mode: 'insensitive' } },
+              { email: { contains: search, mode: 'insensitive' } },
+            ],
+          }
+        : undefined,
       omit: {
         passwd: true,
         salt: true,
+        userWorkspaceId: true,
       },
     });
   }

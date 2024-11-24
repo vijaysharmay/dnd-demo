@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 
 import { CreateUserDto } from 'src/auth/dto/create-user.dto';
@@ -24,8 +25,8 @@ export class UserController {
   }
 
   @Get()
-  findAll() {
-    return this.userService.findAll();
+  findAll(@Query('search') search?: string) {
+    return this.userService.findAll(search);
   }
 
   @Get(':userId')

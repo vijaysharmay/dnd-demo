@@ -4,6 +4,10 @@ export const CreateWorkspaceRequestZSchema = z
   .object({
     name: z.string().min(1, "Workspace Name Required"),
     route: z.string().min(1, "Workspace Route Required"),
+    members: z.array(z.object({
+      memberId: z.string(),
+      role: z.string(),
+    })),
   })
   .required();
 
