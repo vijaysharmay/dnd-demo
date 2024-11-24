@@ -1,10 +1,11 @@
+import { ThemeProvider } from "@/components/theme-provider";
 import { PathPattern, Redirect, Route, RouteProps, Switch } from "wouter";
 
-import { ThemeProvider } from "@/components/theme-provider";
-import Preview from "./pages/page/preview";
+import AppRenderer from "./pages/app";
 import Auth from "./pages/auth";
 import Home from "./pages/home";
 import Page from "./pages/page";
+import Preview from "./pages/page/preview";
 import Project from "./pages/project";
 import Workspace from "./pages/workspace";
 
@@ -21,6 +22,9 @@ export default function App() {
     <>
       <Switch>
         <Route path="/" component={Auth}></Route>
+
+        <Route path="/app/:appId" component={AppRenderer} nest></Route>
+
         <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
           <ProtectedRoute path="/home" component={Home} />
           <ProtectedRoute

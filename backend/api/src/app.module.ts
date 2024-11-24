@@ -2,9 +2,11 @@ import { Module } from '@nestjs/common';
 import { APP_GUARD, APP_PIPE, RouterModule } from '@nestjs/core';
 import { ZodValidationPipe } from 'nestjs-zod';
 
+import { AccordModule } from './accord/accord.module';
 import { ActionModule } from './action/action.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { AuthGuard } from './auth/auth.guard';
 import { AuthModule } from './auth/auth.module';
 import { BlockModule } from './block/block.module';
 import { FlowModule } from './flow/flow.module';
@@ -12,8 +14,7 @@ import { PageModule } from './page/page.module';
 import { ProjectModule } from './project/project.module';
 import { UserModule } from './user/user.module';
 import { WorkspaceModule } from './workspace/workspace.module';
-import { AuthGuard } from './auth/auth.guard';
-import { AccordModule } from './accord/accord.module';
+import { PublishedModule } from './published/published.module';
 
 @Module({
   imports: [
@@ -58,9 +59,9 @@ import { AccordModule } from './accord/accord.module';
                 ],
               },
               {
-                path: ":projectId/accord",
+                path: ':projectId/accord',
                 module: AccordModule,
-              }
+              },
             ],
           },
         ],
@@ -70,6 +71,7 @@ import { AccordModule } from './accord/accord.module';
     UserModule,
     AuthModule,
     AccordModule,
+    PublishedModule,
   ],
   controllers: [AppController],
   providers: [

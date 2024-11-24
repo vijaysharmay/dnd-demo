@@ -8,7 +8,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { libraryElements } from "@/elements";
-import { ComponentElementInstance } from "@/types";
+import { Block } from "@/pages/app/published-apps";
+import { ComponentElementInstance, ComponentElementType } from "@/types";
+import { BlockSchema } from "@/types/api/page";
 import { PageSchema, ProjectSchema, WorkspaceSchema } from "@/types/api/user";
 import { CustomPropsSchema, InputPropsSchema } from "@/types/properties";
 import { ClassValue, clsx } from "clsx";
@@ -210,4 +212,17 @@ export function NodeOptionsItem({
       </DialogContent>
     </Dialog>
   );
+}
+
+export function blockToElement(block: Block | BlockSchema) {
+  const { id, blockType, parentId, children, props } = block;
+  const type: ComponentElementType = blockType as ComponentElementType;
+  const element: ComponentElementInstance = {
+    id,
+    type,
+    props,
+    parentId,
+    children: children.map(blockToElement),
+  };
+  return element;
 }

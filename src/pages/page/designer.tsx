@@ -1,5 +1,5 @@
 import { libraryElements } from "@/elements";
-import { cn } from "@/lib/utils";
+import { blockToElement, cn } from "@/lib/utils";
 import useElementStore from "@/store/element-store";
 import { ComponentElementInstance, ComponentElementType } from "@/types";
 import { DragEndEvent, useDndMonitor, useDroppable } from "@dnd-kit/core";
@@ -10,7 +10,6 @@ import { createBlockInPage, CreateBlockRequestSchema } from "@/api/block";
 import { Skeleton } from "@/components/ui/skeleton";
 import usePageStore from "@/store/page-store";
 import { BlockSchema } from "@/types/api/page";
-import { InputPropsSchema, PropsSchema } from "@/types/properties";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { isNull } from "lodash";
 import { useEffect } from "react";
@@ -169,24 +168,7 @@ export default function Designer({
     if (data) {
       setCurrentPage(data);
       const elements: ComponentElementInstance[] = data.blocks.map(
-        (block: BlockSchema) => {
-          const {
-            blockType,
-            props: unParsedProps,
-            parentId,
-            id,
-            children,
-          } = block;
-          const type: ComponentElementType = blockType as ComponentElementType;
-          const props: PropsSchema = unParsedProps as InputPropsSchema;
-          return {
-            id,
-            type,
-            props,
-            parentId,
-            children,
-          };
-        }
+        (block: BlockSchema) => blockToElement(block)
       );
       setElements(elements);
     }
