@@ -28,28 +28,39 @@ export const ProjectWithoutPagesZSchema = z.object({
   owner: OwnerZSchema,
 });
 
-export const ProjectZSchema = ProjectWithoutPagesZSchema.extend({
-  pages: z.array(PageWithoutRootZSchema),
+export const VersionWithoutBlocksZSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  currentStatus: z.string(),
 });
 
-export const WorkspaceZSchema = WorkspaceWithOutProjectsZSchema.extend({
-  projects: z.array(ProjectZSchema),
+export const SidebarPageZSchema = PageWithoutRootZSchema.extend({
+  versions: z.array(VersionWithoutBlocksZSchema),
 });
 
-export type WorkspaceSchema = z.infer<typeof WorkspaceZSchema>;
+export const SidebarProjectZSchema = ProjectWithoutPagesZSchema.extend({
+  pages: z.array(SidebarPageZSchema),
+});
+
+export const SidebarWorkspaceZSchema = WorkspaceWithOutProjectsZSchema.extend({
+  projects: z.array(SidebarProjectZSchema),
+});
+
+export type SidebarWorkspaceSchema = z.infer<typeof SidebarWorkspaceZSchema>;
 export type OwnerSchema = z.infer<typeof OwnerZSchema>;
-export type PageSchema = z.infer<typeof PageWithoutRootZSchema>;
-export type ProjectSchema = z.infer<typeof ProjectZSchema>;
+export type SidebarPageSchema = z.infer<typeof SidebarPageZSchema>;
+export type SidebarProjectSchema = z.infer<typeof SidebarProjectZSchema>;
+export type SidebarVersionSchema = z.infer<typeof VersionWithoutBlocksZSchema>;
 
 export const CurrentUserZResponse = z.object({
   id: z.string(),
   fullName: z.string(),
   email: z.string(),
-  userWorkspace: WorkspaceZSchema,
+  userWorkspace: SidebarWorkspaceZSchema,
   workspaces: z.array(
     z.object({
       role: z.string(),
-      workspace: WorkspaceZSchema,
+      workspace: SidebarWorkspaceZSchema,
     })
   ),
 });

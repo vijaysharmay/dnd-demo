@@ -4,11 +4,17 @@ import { PrismaService } from 'src/prisma.service';
 @Injectable()
 export class PublishedService {
   constructor(private prisma: PrismaService) {}
-  findOne(name: string) {
+  findOne(name: string, versionName: string | undefined) {
+    const parsedVersionName = versionName ? versionName : 'main';
     return this.prisma.workspace.findFirstOrThrow({
       where: {
         route: name,
         isUserWorkspace: false,
+        versions: {
+          every: {
+            name: parsedVersionName,
+          },
+        },
       },
       select: {
         name: true,

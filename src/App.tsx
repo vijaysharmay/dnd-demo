@@ -4,10 +4,11 @@ import { PathPattern, Redirect, Route, RouteProps, Switch } from "wouter";
 import AppRenderer from "./pages/app";
 import Auth from "./pages/auth";
 import Home from "./pages/home";
-import Page from "./pages/page";
-import Preview from "./pages/page/preview";
 import Project from "./pages/project";
 import Workspace from "./pages/workspace";
+import Page from "./pages/page";
+import Version from "./pages/version";
+import Preview from "./pages/version/preview";
 
 const ProtectedRoute = (props: RouteProps<undefined, PathPattern>) => {
   return sessionStorage.getItem("accessToken") ? (
@@ -38,6 +39,10 @@ export default function App() {
           <ProtectedRoute
             path="/workspace/:workspaceId/project/:projectId/page/:pageId"
             component={Page}
+          />
+          <ProtectedRoute
+            path="/workspace/:workspaceId/project/:projectId/page/:pageId/version/:versionId"
+            component={Version}
           />
           <ProtectedRoute
             path="/workspace/:workspaceId/project/:projectId/page/:pageId/preview"

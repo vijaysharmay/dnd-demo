@@ -123,6 +123,23 @@ export class UserService {
                   include: {
                     pages: {
                       include: {
+                        versions: {
+                          include: {
+                            owner: {
+                              omit: {
+                                passwd: true,
+                                salt: true,
+                                userWorkspaceId: true,
+                              },
+                            },
+                          },
+                          omit: {
+                            ownerId: true,
+                            projectId: true,
+                            workspaceId: true,
+                            pageId: true,
+                          },
+                        },
                         owner: {
                           omit: {
                             passwd: true,
@@ -177,6 +194,7 @@ export class UserService {
               include: {
                 pages: {
                   include: {
+                    versions: true,
                     owner: {
                       omit: {
                         passwd: true,

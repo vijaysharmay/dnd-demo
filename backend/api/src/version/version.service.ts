@@ -3,11 +3,11 @@ import { PrismaService } from 'src/prisma.service';
 import { v4 } from 'uuid';
 
 import { JwtService } from '@nestjs/jwt';
-import { CreatePageDto } from './dto/create-page.dto';
-import { UpdatePageDto } from './dto/update-page.dto';
+import { CreateVersionDto } from './dto/create-version.dto';
+import { UpdateVersionDto } from './dto/update-version.dto';
 
 @Injectable()
-export class PageService {
+export class VersionService {
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
@@ -16,21 +16,26 @@ export class PageService {
     accessToken: string,
     workspaceId: string,
     projectId: string,
-    createPageDto: CreatePageDto,
+    pageId: string,
+    createVersionDto: CreateVersionDto,
   ) {
     const { sub: ownerId } = this.jwtService.decode(accessToken);
-    const { name, route } = createPageDto;
-    const PageId = v4();
-    return this.prisma.page.create({
+    const { name } = createVersionDto;
+    const VersionId = v4();
+    return this.prisma.version.create({
       data: {
-        id: PageId,
+        id: VersionId,
         name,
         owner: {
           connect: {
             id: ownerId,
           },
         },
-        route,
+        page: {
+          connect: {
+            id: pageId,
+          },
+        },
         project: {
           connect: {
             id: projectId,
@@ -41,14 +46,6 @@ export class PageService {
             id: workspaceId,
           },
         },
-        versions: {
-          create: {
-            id: v4(),
-            ownerId,
-            projectId,
-            workspaceId,
-          },
-        },
       },
       select: {
         id: true,
@@ -56,11 +53,12 @@ export class PageService {
     });
   }
 
-  findAll(workspaceId: string, projectId: string) {
-    return this.prisma.page.findMany({
+  findAll(workspaceId: string, projectId: string, pageId: string) {
+    return this.prisma.version.findMany({
       where: {
         workspaceId,
         projectId,
+        pageId,
       },
       include: {
         project: {
@@ -108,12 +106,18 @@ export class PageService {
     });
   }
 
-  findOne(workspaceId: string, projectId: string, pageId: string) {
-    return this.prisma.page.findFirst({
+  findOne(
+    workspaceId: string,
+    projectId: string,
+    pageId: string,
+    versionId: string,
+  ) {
+    return this.prisma.version.findFirst({
       where: {
-        id: pageId,
+        id: versionId,
         workspaceId,
         projectId,
+        pageId,
       },
       include: {
         project: {
@@ -145,6 +149,20 @@ export class PageService {
             },
           },
         },
+        page: {
+          omit: {
+            ownerId: true,
+          },
+          include: {
+            owner: {
+              omit: {
+                passwd: true,
+                salt: true,
+                userWorkspaceId: true,
+              },
+            },
+          },
+        },
         owner: {
           omit: {
             passwd: true,
@@ -152,13 +170,9 @@ export class PageService {
             userWorkspaceId: true,
           },
         },
-        versions: {
+        blocks: {
           include: {
-            blocks: {
-              include: {
-                children: true,
-              },
-            },
+            children: true,
           },
         },
       },
@@ -174,14 +188,22 @@ export class PageService {
     workspaceId: string,
     projectId: string,
     pageId: string,
-    updatePageDto: UpdatePageDto,
+    versionId: string,
+    updateVersionDto: UpdateVersionDto,
   ) {
-    return this.prisma.page.update({
-      data: updatePageDto,
+    const transformedData = {
+      ...updateVersionDto,
+      currentStatus: updateVersionDto.currentStatus
+        ? { set: updateVersionDto.currentStatus }
+        : undefined, // Transform only if it exists
+    };
+    return this.prisma.version.update({
+      data: transformedData,
       where: {
-        id: pageId,
+        id: versionId,
         workspaceId,
         projectId,
+        pageId,
       },
       include: {
         project: {
@@ -229,12 +251,18 @@ export class PageService {
     });
   }
 
-  async remove(workspaceId: string, projectId: string, pageId: string) {
-    await this.prisma.page.delete({
+  async remove(
+    workspaceId: string,
+    projectId: string,
+    pageId: string,
+    versionId: string,
+  ) {
+    await this.prisma.version.delete({
       where: {
-        id: pageId,
+        id: versionId,
         workspaceId,
         projectId,
+        pageId,
       },
     });
     return;

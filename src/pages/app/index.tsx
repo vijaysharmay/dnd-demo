@@ -42,7 +42,7 @@ export default function AppRenderer() {
                 pageRoute={pageRoute}
                 pageName={page.name}
                 projectName={project.name}
-                blocks={page.blocks}
+                blocks={page.versions[0].blocks} //expects only one version
               />
             );
           });

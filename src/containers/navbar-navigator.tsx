@@ -1,4 +1,11 @@
-import { ChevronRight, File, Folder, Plus, Trash2 } from "lucide-react";
+import {
+  ChevronRight,
+  File,
+  Folder,
+  GitFork,
+  Plus,
+  Trash2,
+} from "lucide-react";
 
 import {
   Collapsible,
@@ -49,7 +56,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn, convertToTree, NodeOptionsItem, Tree } from "@/lib/utils";
 import useWorkspaceStore from "@/store/workspace-store";
-import { WorkspaceSchema } from "@/types/api/user";
+import { SidebarWorkspaceSchema } from "@/types/api/user";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { startsWith } from "lodash";
@@ -105,7 +112,9 @@ function NavTree({ workspaceId, item }: { workspaceId: string; item: Tree }) {
               navigate(item.url, { replace: true });
             }}
           >
-            {item.type === "project" ? <Folder /> : <File />}
+            {item.type === "project" && <Folder />}
+            {item.type === "page" && <File />}
+            {item.type === "version" && <GitFork />}
             <>{item.name}</>
           </SidebarMenuButton>
         </NodeOptions>
@@ -132,7 +141,8 @@ function NavTree({ workspaceId, item }: { workspaceId: string; item: Tree }) {
                 <CollapsibleTrigger asChild>
                   <ChevronRight className="transition-transform" />
                 </CollapsibleTrigger>
-                <Folder />
+                {item.type === "project" && <Folder />}
+                {item.type === "page" && <File />}
                 <div
                   className="w-full"
                   onClick={(e) => {
@@ -166,7 +176,8 @@ function NavTree({ workspaceId, item }: { workspaceId: string; item: Tree }) {
             node={item}
           >
             <SidebarMenuButton className="w-full">
-              <Folder />
+              {item.type === "project" && <Folder />}
+              {item.type === "page" && <File />}
               <>{item.name}</>
             </SidebarMenuButton>
           </NodeOptions>
@@ -430,7 +441,7 @@ function MoveProjectForm({
                 </FormControl>
                 <SelectContent>
                   {workspaces &&
-                    workspaces.map((workspace: WorkspaceSchema) => {
+                    workspaces.map((workspace: SidebarWorkspaceSchema) => {
                       return (
                         !workspace.isUserWorkspace && (
                           <SelectItem key={workspace.id} value={workspace.id}>

@@ -4,4 +4,5 @@ export * from "./block";
 export * from "./page";
 export * from "./project";
 export * from "./published";
+export * from "./version";
 export * from "./workspace";

@@ -11,7 +11,12 @@ import { libraryElements } from "@/elements";
 import { Block } from "@/pages/app/published-apps";
 import { ComponentElementInstance, ComponentElementType } from "@/types";
 import { BlockSchema } from "@/types/api/page";
-import { PageSchema, ProjectSchema, WorkspaceSchema } from "@/types/api/user";
+import {
+  SidebarPageSchema,
+  SidebarProjectSchema,
+  SidebarVersionSchema,
+  SidebarWorkspaceSchema,
+} from "@/types/api/user";
 import { CustomPropsSchema, InputPropsSchema } from "@/types/properties";
 import { ClassValue, clsx } from "clsx";
 import {
@@ -136,27 +141,27 @@ export interface Tree {
   children?: Tree[];
 }
 
-export function convertToTree(data: WorkspaceSchema): Tree {
-  const mapWorkspaceToTree = (workspace: WorkspaceSchema): Tree => ({
+export function convertToTree(data: SidebarWorkspaceSchema): Tree {
+  const mapWorkspaceToTree = (workspace: SidebarWorkspaceSchema): Tree => ({
     id: workspace.id,
     name: workspace.name,
     type: "workspace",
     url: `/workspace/${workspace.id}`,
-    children: (workspace.projects || []).map((project: ProjectSchema) =>
+    children: (workspace.projects || []).map((project: SidebarProjectSchema) =>
       mapProjectToTree(workspace.id, project)
     ),
   });
 
   const mapProjectToTree = (
     workspaceId: string,
-    project: ProjectSchema
+    project: SidebarProjectSchema
   ): Tree => ({
     id: project.id,
     parentId: workspaceId,
     name: project.name,
     type: "project",
     url: `/workspace/${workspaceId}/project/${project.id}`,
-    children: (project.pages || []).map((page: PageSchema) =>
+    children: (project.pages || []).map((page: SidebarPageSchema) =>
       mapPageToTree(workspaceId, project.id, page)
     ),
   });
@@ -164,13 +169,29 @@ export function convertToTree(data: WorkspaceSchema): Tree {
   const mapPageToTree = (
     workspaceId: string,
     projectId: string,
-    page: PageSchema
+    page: SidebarPageSchema
   ): Tree => ({
     id: page.id,
     parentId: projectId,
     name: page.name,
     type: "page",
     url: `/workspace/${workspaceId}/project/${projectId}/page/${page.id}`,
+    children: (page.versions || []).map((version: SidebarVersionSchema) =>
+      mapVersionToTree(workspaceId, projectId, page.id, version)
+    ),
+  });
+
+  const mapVersionToTree = (
+    workspaceId: string,
+    projectId: string,
+    pageId: string,
+    version: SidebarVersionSchema
+  ): Tree => ({
+    id: version.id,
+    parentId: pageId,
+    name: version.name,
+    type: "version",
+    url: `/workspace/${workspaceId}/project/${projectId}/page/${pageId}/version/${version.id}`,
   });
 
   // Assuming we start from userWorkspace

@@ -3,6 +3,7 @@ import { JSONZType } from "./common";
 import {
   PageWithoutRootZSchema,
   ProjectWithoutPagesZSchema,
+  VersionWithoutBlocksZSchema,
   WorkspaceWithOutProjectsZSchema,
 } from "./user";
 
@@ -13,9 +14,6 @@ export const BlockWithoutChildrenZSchema = z.object({
   depth: z.number(),
   position: z.number(),
   parentId: z.nullable(z.string()),
-  workspaceId: z.string(),
-  projectId: z.string(),
-  pageId: z.string(),
 });
 
 export type BlockSchema = z.infer<typeof BlockWithoutChildrenZSchema> & {
@@ -27,14 +25,11 @@ export const BlockZSchema: z.ZodType<BlockSchema> =
     children: z.lazy(() => BlockZSchema.array()),
   });
 
-export const VersionZSchema = z.object({
+export const VersionZSchema = VersionWithoutBlocksZSchema.extend({
+  project: ProjectWithoutPagesZSchema,
+  workspace: WorkspaceWithOutProjectsZSchema,
+  page: PageWithoutRootZSchema,
   blocks: z.array(BlockZSchema),
-  currentStatus: z.string(),
-  id: z.string(),
-  name: z.string(),
-  pageId: z.string(),
-  projectId: z.string(),
-  workspaceId: z.string(),
 });
 
 export const PageZSchema = PageWithoutRootZSchema.extend({
@@ -42,3 +37,6 @@ export const PageZSchema = PageWithoutRootZSchema.extend({
   workspace: WorkspaceWithOutProjectsZSchema,
   versions: z.array(VersionZSchema),
 });
+
+export type PageSchema = z.infer<typeof PageZSchema>;
+export type VersionSchema = z.infer<typeof VersionZSchema>;

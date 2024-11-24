@@ -13,6 +13,10 @@ export type Project = {
 export type Page = {
   name: string;
   route: string;
+  versions: Version[];
+};
+
+export type Version = {
   blocks: Block[];
 };
 

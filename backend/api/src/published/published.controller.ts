@@ -1,7 +1,7 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 
-import { PublishedService } from './published.service';
 import { Public } from 'src/utils';
+import { PublishedService } from './published.service';
 
 @Controller('published')
 export class PublishedController {
@@ -9,7 +9,10 @@ export class PublishedController {
 
   @Public()
   @Get(':name')
-  findOne(@Param('name') name: string) {
-    return this.publishedService.findOne(name);
+  findOne(
+    @Param('name') name: string,
+    @Query('versionName') versionName: string,
+  ) {
+    return this.publishedService.findOne(name, versionName);
   }
 }

@@ -42,6 +42,7 @@ model User {
   changes          VersionChangeLog[]          @relation(name: "madeChangesToVersion")
   statusChanges    VersionStatusLog[]          @relation(name: "madeStatusChangesToVersion")
   approverFor      VersionStatusLogApprovers[] @relation(name: "approverForStatusChangesToVersion")
+  versions         Version[]                   @relation(name: "ownerOfVersion")
 
   @@map("users")
 }
@@ -152,6 +153,8 @@ model Version {
   name          String             @default("main") @map("version_name")
   currentStatus PageVersionStatus  @default(value: DRAFT)
   blocks        Block[]            @relation(name: "blocksInVersion")
+  owner         User               @relation(fields: [ownerId], references: [id], name: "ownerOfVersion")
+  ownerId       String
   page          Page?              @relation(fields: [pageId], references: [id], name: "versionsInPage")
   pageId        String?
   project       Project            @relation(fields: [projectId], references: [id], name: "versionsInProject", onDelete: Cascade, onUpdate: Cascade)

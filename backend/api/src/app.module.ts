@@ -12,9 +12,10 @@ import { BlockModule } from './block/block.module';
 import { FlowModule } from './flow/flow.module';
 import { PageModule } from './page/page.module';
 import { ProjectModule } from './project/project.module';
-import { UserModule } from './user/user.module';
-import { WorkspaceModule } from './workspace/workspace.module';
 import { PublishedModule } from './published/published.module';
+import { UserModule } from './user/user.module';
+import { VersionModule } from './version/version.module';
+import { WorkspaceModule } from './workspace/workspace.module';
 
 @Module({
   imports: [
@@ -41,16 +42,22 @@ import { PublishedModule } from './published/published.module';
                 module: PageModule,
                 children: [
                   {
-                    path: ':pageId/block',
-                    module: BlockModule,
+                    path: ':pageId/version',
+                    module: VersionModule,
                     children: [
                       {
-                        path: ':blockId/flow',
-                        module: FlowModule,
+                        path: ':versionId/block',
+                        module: BlockModule,
                         children: [
                           {
-                            path: ':flowId/action',
-                            module: ActionModule,
+                            path: ':blockId/flow',
+                            module: FlowModule,
+                            children: [
+                              {
+                                path: ':flowId/action',
+                                module: ActionModule,
+                              },
+                            ],
                           },
                         ],
                       },
@@ -72,6 +79,7 @@ import { PublishedModule } from './published/published.module';
     AuthModule,
     AccordModule,
     PublishedModule,
+    VersionModule,
   ],
   controllers: [AppController],
   providers: [

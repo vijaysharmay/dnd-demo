@@ -8,7 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import PropertiesElementWrapper from "@/pages/page/properties-element.wrapper";
+import PropertiesElementWrapper from "@/pages/version/properties-element.wrapper";
 import useSchemaStore from "@/store/schema-store";
 import { ComponentElementInstance } from "@/types";
 import { FormPropsSchema, FormPropsZSchema } from "@/types/properties";
@@ -16,7 +16,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { isEmpty } from "lodash";
 import { SubmitHandler, useForm } from "react-hook-form";
 
-import usePageStore from "@/store/page-store";
+import useVersionStore from "@/store/page-store";
 import { FormFieldRender } from "../common/form-fields";
 import { usePropertiesFormSubmit } from "../common/handlePropertiesFormSubmit";
 
@@ -29,14 +29,15 @@ export const FormPropertiesComponent: React.FC<{
     values: elementInstance.props as FormPropsSchema,
   });
 
-  const { currentPage } = usePageStore();
-  if (!currentPage) throw new Error("no current page");
-  const { workspace, project, id: pageId } = currentPage;
+  const { currentVersion } = useVersionStore();
+  if (!currentVersion) throw new Error("no current page");
+  const { workspace, project, page, id: versionId } = currentVersion;
 
   const handlePropertiesFormSubmit = usePropertiesFormSubmit({
     workspaceId: workspace.id,
     projectId: project.id,
-    pageId,
+    pageId: page.id,
+    versionId,
     blockId: elementInstance.id,
   });
 

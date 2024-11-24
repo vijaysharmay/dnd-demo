@@ -5,10 +5,13 @@ import { ComponentElementInstance, ComponentElementType } from "@/types";
 import { DragEndEvent, useDndMonitor, useDroppable } from "@dnd-kit/core";
 import { v4 as uuidv4 } from "uuid";
 
-import { getPageInProjectWorkspace } from "@/api";
-import { createBlockInPage, CreateBlockRequestSchema } from "@/api/block";
+import { getPageVersionInProjectWorkspace } from "@/api";
+import {
+  createBlockInPageVersion,
+  CreateBlockRequestSchema,
+} from "@/api/block";
 import { Skeleton } from "@/components/ui/skeleton";
-import usePageStore from "@/store/page-store";
+import useVersionStore from "@/store/page-store";
 import { BlockSchema } from "@/types/api/page";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { isNull } from "lodash";
@@ -19,10 +22,12 @@ export default function Designer({
   workspaceId,
   projectId,
   pageId,
+  versionId,
 }: {
   workspaceId: string;
   projectId: string;
   pageId: string;
+  versionId: string;
 }) {
   const {
     elements,
@@ -37,7 +42,7 @@ export default function Designer({
     setActiveElementId,
   } = useElementStore();
 
-  const { setCurrentPage } = usePageStore();
+  const { setCurrentVersion } = useVersionStore();
 
   const droppable = useDroppable({
     id: "designer",
@@ -51,13 +56,22 @@ export default function Designer({
       workspaceId,
       projectId,
       pageId,
+      versionId,
       values,
     }: {
       workspaceId: string;
       projectId: string;
       pageId: string;
+      versionId: string;
       values: CreateBlockRequestSchema;
-    }) => createBlockInPage(workspaceId, projectId, pageId, values),
+    }) =>
+      createBlockInPageVersion(
+        workspaceId,
+        projectId,
+        pageId,
+        versionId,
+        values
+      ),
     onSuccess: () => {
       console.log("added");
     },
@@ -77,7 +91,13 @@ export default function Designer({
       depth: 0,
       position: index,
     };
-    addBlockToPageMutation.mutate({ workspaceId, projectId, pageId, values });
+    addBlockToPageMutation.mutate({
+      workspaceId,
+      projectId,
+      pageId,
+      versionId,
+      values,
+    });
   };
 
   useDndMonitor({
@@ -160,19 +180,31 @@ export default function Designer({
   });
 
   const { isPending, error, data } = useQuery({
-    queryKey: ["getPageInProjectWorkspace", workspaceId, projectId, pageId],
-    queryFn: () => getPageInProjectWorkspace(workspaceId, projectId, pageId),
+    queryKey: [
+      "getPageVersionInProjectWorkspace",
+      workspaceId,
+      projectId,
+      pageId,
+      versionId,
+    ],
+    queryFn: () =>
+      getPageVersionInProjectWorkspace(
+        workspaceId,
+        projectId,
+        pageId,
+        versionId
+      ),
   });
 
   useEffect(() => {
     if (data) {
-      setCurrentPage(data);
+      setCurrentVersion(data);
       const elements: ComponentElementInstance[] = data.blocks.map(
         (block: BlockSchema) => blockToElement(block)
       );
       setElements(elements);
     }
-  }, [data, setCurrentPage, setElements]);
+  }, [data, setCurrentVersion, setElements]);
 
   if (error) return <div>{error.message}</div>;
   if (isPending) return <Skeleton />;

@@ -1,4 +1,4 @@
-import { updateBlockPropsInPage } from "@/api/block";
+import { updateBlockPropsInPageVersion } from "@/api/block";
 import { initFormChildren } from "@/lib/utils";
 import useElementStore from "@/store/element-store";
 import { ComponentElementInstance, Form, HContainer } from "@/types";
@@ -17,30 +17,41 @@ export const usePropertiesFormSubmit = ({
   workspaceId,
   projectId,
   pageId,
+  versionId,
   blockId,
 }: {
   workspaceId: string;
   projectId: string;
   pageId: string;
+  versionId: string;
   blockId: string;
 }) => {
-  const removeBlockFromPageMutation = useMutation({
+  const updateBlockPropsMutation = useMutation({
     mutationFn: async ({
       workspaceId,
       projectId,
       pageId,
+      versionId,
       blockId,
       props,
     }: {
       workspaceId: string;
       projectId: string;
       pageId: string;
+      versionId: string;
       blockId: string;
       props: z.infer<typeof JSONZType>;
     }) =>
-      updateBlockPropsInPage(workspaceId, projectId, pageId, blockId, props),
+      updateBlockPropsInPageVersion(
+        workspaceId,
+        projectId,
+        pageId,
+        versionId,
+        blockId,
+        props
+      ),
     onSuccess: () => {
-      console.log("remmoved");
+      console.log("updated props");
     },
     onError: (e: Error) => {
       console.log(e.message);
@@ -113,14 +124,15 @@ export const usePropertiesFormSubmit = ({
     if (hasParent) {
       updateElementInParent(activeElement.parentId as string, updatedElement);
     } else {
-      removeBlockFromPageMutation.mutate({
+      updateElement(activeElement.id, updatedElement);
+      updateBlockPropsMutation.mutate({
         workspaceId,
         projectId,
         pageId,
+        versionId,
         blockId,
         props: updatedElement.props,
       });
-      updateElement(activeElement.id, updatedElement);
     }
 
     setActiveElement(updatedElement);

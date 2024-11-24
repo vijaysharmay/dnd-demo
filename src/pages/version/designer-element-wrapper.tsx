@@ -1,9 +1,9 @@
-import { removeBlockFromPage } from "@/api/block";
+import { removeBlockFromPageVersion } from "@/api/block";
 import { libraryElements } from "@/elements";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import useElementStore from "@/store/element-store";
-import usePageStore from "@/store/page-store";
+import useVersionStore from "@/store/page-store";
 import { Button, ComponentElementInstance, Input } from "@/types";
 import { ButtonPropsSchema, InputPropsSchema } from "@/types/properties";
 import { useDraggable, useDroppable } from "@dnd-kit/core";
@@ -65,13 +65,22 @@ export default function DesignerElementWrapper({
       workspaceId,
       projectId,
       pageId,
+      versionId,
       blockId,
     }: {
       workspaceId: string;
       projectId: string;
       pageId: string;
+      versionId: string;
       blockId: string;
-    }) => removeBlockFromPage(workspaceId, projectId, pageId, blockId),
+    }) =>
+      removeBlockFromPageVersion(
+        workspaceId,
+        projectId,
+        pageId,
+        versionId,
+        blockId
+      ),
     onSuccess: () => {
       console.log("remmoved");
     },
@@ -80,11 +89,11 @@ export default function DesignerElementWrapper({
     },
   });
 
-  const { currentPage } = usePageStore();
-  if (!currentPage) return;
-  const { workspace, project, id: pageId } = currentPage;
+  const { currentVersion } = useVersionStore();
+  if (!currentVersion) return;
 
   const handleDelete = () => {
+    const { workspace, project, page, id: versionId } = currentVersion;
     const isButton = element.type === Button;
     const isInput = element.type === Input;
     if (isButton || isInput) {
@@ -102,12 +111,15 @@ export default function DesignerElementWrapper({
       }
     }
     removeElement(element.id, element.parentId);
+
     removeBlockFromPageMutation.mutate({
       workspaceId: workspace.id,
       projectId: project.id,
-      pageId,
+      pageId: page.id,
+      versionId,
       blockId: element.id,
     });
+
     setActiveElement(null);
     setActiveElementId(null);
   };

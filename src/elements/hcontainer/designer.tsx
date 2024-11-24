@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import DesignerElementWrapper from "@/pages/page/designer-element-wrapper";
+import DesignerElementWrapper from "@/pages/version/designer-element-wrapper";
 import { ComponentElementInstance } from "@/types";
 import { colsIntRec, HContainerPropsSchema } from "@/types/properties";
 import { useDroppable } from "@dnd-kit/core";

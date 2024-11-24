@@ -22,10 +22,11 @@ export type CreateBlockResponseSchema = z.infer<
   typeof CreateBlockZResponseSchema
 >;
 
-export const createBlockInPage = async (
+export const createBlockInPageVersion = async (
   workspaceId: string,
   projecctId: string,
   pageId: string,
+  versionId: string,
   values: CreateBlockRequestSchema
 ): Promise<CreateBlockResponseSchema> => {
   const accessToken = sessionStorage.getItem("accessToken");
@@ -34,7 +35,7 @@ export const createBlockInPage = async (
     throw new Error("Couldnt find access token");
   }
 
-  const url = `http://localhost:3000/workspace/${workspaceId}/project/${projecctId}/page/${pageId}/block`;
+  const url = `http://localhost:3000/workspace/${workspaceId}/project/${projecctId}/page/${pageId}/version/${versionId}/block`;
   const response = await fetch(url, {
     method: "POST",
     body: JSON.stringify(values),
@@ -59,10 +60,11 @@ export const createBlockInPage = async (
   return result.data;
 };
 
-export const removeBlockFromPage = async (
+export const removeBlockFromPageVersion = async (
   workspaceId: string,
   projecctId: string,
   pageId: string,
+  versionId: string,
   blockId: string
 ): Promise<boolean> => {
   const accessToken = sessionStorage.getItem("accessToken");
@@ -71,7 +73,7 @@ export const removeBlockFromPage = async (
     throw new Error("Couldnt find access token");
   }
 
-  const url = `http://localhost:3000/workspace/${workspaceId}/project/${projecctId}/page/${pageId}/block/${blockId}`;
+  const url = `http://localhost:3000/workspace/${workspaceId}/project/${projecctId}/page/${pageId}/version/${versionId}/block/${blockId}`;
   const response = await fetch(url, {
     method: "DELETE",
     headers: new Headers({
@@ -88,10 +90,11 @@ export const removeBlockFromPage = async (
   return true;
 };
 
-export const updateBlockPropsInPage = async (
+export const updateBlockPropsInPageVersion = async (
   workspaceId: string,
   projecctId: string,
   pageId: string,
+  versionId: string,
   blockId: string,
   props: z.infer<typeof JSONZType>
 ): Promise<CreateBlockResponseSchema> => {
@@ -101,7 +104,7 @@ export const updateBlockPropsInPage = async (
     throw new Error("Couldnt find access token");
   }
 
-  const url = `http://localhost:3000/workspace/${workspaceId}/project/${projecctId}/page/${pageId}/block/${blockId}`;
+  const url = `http://localhost:3000/workspace/${workspaceId}/project/${projecctId}/page/${pageId}/version/${versionId}/block/${blockId}`;
   const response = await fetch(url, {
     method: "PATCH",
     body: JSON.stringify({ props }),
