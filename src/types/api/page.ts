@@ -18,12 +18,12 @@ export const BlockWithoutChildrenZSchema = z.object({
 });
 
 export type BlockSchema = z.infer<typeof BlockWithoutChildrenZSchema> & {
-  children: BlockSchema[];
+  children?: BlockSchema[];
 };
 
 export const BlockZSchema: z.ZodType<BlockSchema> =
   BlockWithoutChildrenZSchema.extend({
-    children: z.lazy(() => BlockZSchema.array()),
+    children: z.lazy(() => BlockZSchema.array()).optional(),
   });
 
 export const VersionZSchema = VersionWithoutBlocksZSchema.extend({

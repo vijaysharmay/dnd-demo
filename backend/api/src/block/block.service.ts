@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
-import { v4 } from 'uuid';
 
 import { CreateBlockDto, RemoveChildrenDto } from './dto/create-block.dto';
 import { UpdateBlockDto } from './dto/update-block.dto';
@@ -15,8 +14,7 @@ export class BlockService {
     versionId: string,
     createBlockDto: CreateBlockDto,
   ) {
-    const { blockType, props } = createBlockDto;
-    const id = v4();
+    const { id, blockType, props } = createBlockDto;
     return this.prisma.block.create({
       data: {
         id,
@@ -108,7 +106,7 @@ export class BlockService {
     parentBlockId: string,
     createBlockDto: CreateBlockDto,
   ) {
-    const { blockType, props, depth, position } = createBlockDto;
+    const { id, blockType, props, depth, position } = createBlockDto;
     return this.prisma.block.update({
       data: {
         children: {
@@ -125,7 +123,7 @@ export class BlockService {
             props,
             depth,
             position,
-            id: v4(),
+            id,
           },
         },
       },
@@ -159,7 +157,7 @@ export class BlockService {
               projectId,
               pageId,
             },
-            id: v4(),
+            id: block.id,
             blockType: block.blockType,
             props: block.props,
             depth: block.depth,
@@ -242,6 +240,24 @@ export class BlockService {
     versionId: string,
     blockId: string,
   ) {
+    const children = await this.prisma.block.findMany({
+      where: {
+        parentId: blockId,
+        versionId,
+        version: {
+          pageId,
+          workspaceId,
+          projectId,
+        },
+      },
+    });
+
+    // Recursively delete all child blocks
+    for (const child of children) {
+      await this.remove(workspaceId, projectId, pageId, versionId, child.id);
+    }
+
+    // Delete the parent block
     await this.prisma.block.delete({
       where: {
         id: blockId,

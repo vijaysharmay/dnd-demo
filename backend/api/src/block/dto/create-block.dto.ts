@@ -3,6 +3,7 @@ import { JSONZType } from 'src/utils/types';
 import { z } from 'zod';
 
 export const blockZSchema = z.object({
+  id: z.string(),
   blockType: z.string(),
   props: JSONZType,
   depth: z.number(),

@@ -1,11 +1,12 @@
 import { getPageVersionInProjectWorkspace } from "@/api";
 import {
+  addChildToBlock,
   createBlockInPageVersion,
   CreateBlockRequestSchema,
 } from "@/api/block";
 import { Skeleton } from "@/components/ui/skeleton";
 import { libraryElements } from "@/elements";
-import { blockToElement, cn } from "@/lib/utils";
+import { blockToElement, cn, transformVersionSchema } from "@/lib/utils";
 import useElementStore from "@/store/element-store";
 import useVersionStore from "@/store/version-store";
 import { ComponentElementInstance, ComponentElementType } from "@/types";
@@ -80,12 +81,45 @@ export default function Designer({
     },
   });
 
+  const addChildToBlockMutation = useMutation({
+    mutationFn: async ({
+      workspaceId,
+      projectId,
+      pageId,
+      versionId,
+      blockId,
+      values,
+    }: {
+      workspaceId: string;
+      projectId: string;
+      pageId: string;
+      versionId: string;
+      blockId: string;
+      values: CreateBlockRequestSchema;
+    }) =>
+      addChildToBlock(
+        workspaceId,
+        projectId,
+        pageId,
+        versionId,
+        blockId,
+        values
+      ),
+    onSuccess: () => {
+      console.log("added");
+    },
+    onError: (e: Error) => {
+      console.log(e.message);
+    },
+  });
+
   const handleAddElement = (
     index: number,
     element: ComponentElementInstance
   ) => {
     addElement(index, element);
     const values = {
+      id: element.id,
       blockType: element.type,
       props: element.props,
       depth: 0,
@@ -96,6 +130,29 @@ export default function Designer({
       projectId,
       pageId,
       versionId,
+      values,
+    });
+  };
+
+  const handleAddElementToParent = (
+    parentElementId: string,
+    index: number,
+    element: ComponentElementInstance
+  ) => {
+    addElementToParent(parentElementId, index, element);
+    const values = {
+      id: element.id,
+      blockType: element.type,
+      props: element.props,
+      depth: 0,
+      position: index,
+    };
+    addChildToBlockMutation.mutate({
+      workspaceId,
+      projectId,
+      pageId,
+      versionId,
+      blockId: parentElementId,
       values,
     });
   };
@@ -132,7 +189,7 @@ export default function Designer({
             const hContainerId = over.data?.current?.id;
             const index = over.data?.current?.index;
             newElement.parentId = hContainerId;
-            addElementToParent(hContainerId, index, newElement);
+            handleAddElementToParent(hContainerId, index, newElement);
           } else {
             handleAddElement(0, newElement);
           }
@@ -155,7 +212,7 @@ export default function Designer({
           const activatedElement = getElementById(activatedElementId);
           if (!isNull(activatedElement)) {
             activatedElement.parentId = hContainerId;
-            addElementToParent(hContainerId, index, activatedElement);
+            handleAddElementToParent(hContainerId, index, activatedElement);
             removeElement(activatedElementId, null);
           }
         }
@@ -198,8 +255,9 @@ export default function Designer({
 
   useEffect(() => {
     if (data) {
+      const transformed = transformVersionSchema(data);
       setCurrentVersion(data);
-      const elements: ComponentElementInstance[] = data.blocks.map(
+      const elements: ComponentElementInstance[] = transformed.blocks.map(
         (block: BlockSchema) => blockToElement(block)
       );
       setElements(elements);

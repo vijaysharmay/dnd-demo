@@ -12,7 +12,8 @@ import {
   SidebarProvider,
 } from "@/components/ui/sidebar";
 import { libraryElements } from "@/elements";
-import { blockToElement } from "@/lib/utils";
+import { blockToElement, buildBlockHierarchy } from "@/lib/utils";
+import { BlockSchema } from "@/types/api/page";
 import { useQuery } from "@tanstack/react-query";
 import { Link, Route, useParams, useRoute, useSearch } from "wouter";
 import { Block, Page, Project } from "./published-apps";
@@ -82,7 +83,7 @@ function PageRenderer({
           Rendering page {pageName} in project {projectName}. They have the
           below blocks
         </p>
-        {blocks.map((block: Block) => {
+        {buildBlockHierarchy(blocks).map((block: BlockSchema) => {
           const element = blockToElement(block);
           const RenderComponent = libraryElements[element.type].renderComponent;
           return <RenderComponent key={element.id} elementInstance={element} />;

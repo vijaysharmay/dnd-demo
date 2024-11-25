@@ -125,15 +125,15 @@ export const usePropertiesFormSubmit = ({
       updateElementInParent(activeElement.parentId as string, updatedElement);
     } else {
       updateElement(activeElement.id, updatedElement);
-      updateBlockPropsMutation.mutate({
-        workspaceId,
-        projectId,
-        pageId,
-        versionId,
-        blockId,
-        props: updatedElement.props,
-      });
     }
+    updateBlockPropsMutation.mutate({
+      workspaceId,
+      projectId,
+      pageId,
+      versionId,
+      blockId,
+      props: updatedElement.props,
+    });
 
     setActiveElement(updatedElement);
   };
