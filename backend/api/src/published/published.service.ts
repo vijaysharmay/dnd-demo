@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { PageVersionStatus } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 
 @Injectable()
@@ -28,6 +29,9 @@ export class PublishedService {
                 name: true,
                 route: true,
                 versions: {
+                  where: {
+                    currentStatus: PageVersionStatus.PUBLISHED,
+                  },
                   // where: {
                   //   name: parsedVersionName,
                   // },

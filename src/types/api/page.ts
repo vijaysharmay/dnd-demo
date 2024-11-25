@@ -27,6 +27,7 @@ export const BlockZSchema: z.ZodType<BlockSchema> =
   });
 
 export const VersionZSchema = VersionWithoutBlocksZSchema.extend({
+  owner: UserZSchema,
   project: ProjectWithoutPagesZSchema,
   workspace: WorkspaceWithOutProjectsZSchema,
   page: PageWithoutRootZSchema,

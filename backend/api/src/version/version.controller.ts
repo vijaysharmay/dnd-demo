@@ -137,6 +137,66 @@ export class VersionController {
     );
   }
 
+  @Patch(':versionId/approve')
+  approveUnpublishedVersion(
+    @Param('workspaceId') workspaceId: string,
+    @Param('projectId') projectId: string,
+    @Param('pageId') pageId: string,
+    @Param('versionId') versionId: string,
+    @Headers('Authorization') authorizationHeader?: string,
+  ) {
+    if (!authorizationHeader)
+      throw new Error('Couldnt find access token in header');
+    const accessToken = authorizationHeader.split(' ')[1];
+    return this.versionService.approveUnpublishedVersion(
+      accessToken,
+      workspaceId,
+      projectId,
+      pageId,
+      versionId,
+    );
+  }
+
+  @Patch(':versionId/reject')
+  rejectUnpublishedVersion(
+    @Param('workspaceId') workspaceId: string,
+    @Param('projectId') projectId: string,
+    @Param('pageId') pageId: string,
+    @Param('versionId') versionId: string,
+    @Headers('Authorization') authorizationHeader?: string,
+  ) {
+    if (!authorizationHeader)
+      throw new Error('Couldnt find access token in header');
+    const accessToken = authorizationHeader.split(' ')[1];
+    return this.versionService.rejectUnpublishedVersion(
+      accessToken,
+      workspaceId,
+      projectId,
+      pageId,
+      versionId,
+    );
+  }
+
+  @Patch(':versionId/publish')
+  publishUnpublishedVersion(
+    @Param('workspaceId') workspaceId: string,
+    @Param('projectId') projectId: string,
+    @Param('pageId') pageId: string,
+    @Param('versionId') versionId: string,
+    @Headers('Authorization') authorizationHeader?: string,
+  ) {
+    if (!authorizationHeader)
+      throw new Error('Couldnt find access token in header');
+    const accessToken = authorizationHeader.split(' ')[1];
+    return this.versionService.publishUnpublishedVersion(
+      accessToken,
+      workspaceId,
+      projectId,
+      pageId,
+      versionId,
+    );
+  }
+
   @Delete(':versionId')
   remove(
     @Param('workspaceId') workspaceId: string,

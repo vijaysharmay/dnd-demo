@@ -20,17 +20,17 @@ import useVersionStore from "@/store/version-store";
 import { Reviewer, VersionSchema } from "@/types/api/page";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { includes } from "lodash";
-import { Trash2 } from "lucide-react";
+import { Check, CircleDot, Trash2, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export default function RequestReview({
   version,
-  showExistingReviewers,
+  editMode,
 }: {
   version: VersionSchema;
-  showExistingReviewers: boolean;
+  editMode: boolean;
 }) {
-  const { id, workspace, project, page, currentStatus } = version;
+  const { id, workspace, project, page } = version;
   const { setCurrentVersionReviewers } = useVersionStore();
   const [searchValue, setSearchValue] = useState<string>("");
   const [selectedValue, setSelectedValue] = useState<string>("");
@@ -44,12 +44,12 @@ export default function RequestReview({
     }[]
   >();
 
-  const { data: users, isUsersLoading } = useQuery({
+  const { data: users, isLoading: isUsersLoading } = useQuery({
     queryKey: ["getUserList", searchValue],
     queryFn: () => getUsers(searchValue),
   });
 
-  const { data: existingReviewersData, isReviewersLoading } = useQuery({
+  const { data: existingReviewersData } = useQuery({
     queryKey: [
       "getExistingReviewersForVersion",
       workspace.id,
@@ -161,15 +161,27 @@ export default function RequestReview({
 
   const ShowExistingReviewer = ({ reviewer }: { reviewer: Reviewer }) => {
     return (
-      <div key={reviewer.approver.id} className="flex flex-row">
+      <div key={reviewer.approver.id} className="flex flex-row border rounded bg-gray-50 p-2">
         <div>
           <p className="text-sm">{reviewer.approver.fullName}</p>
-          <p className="text-muted-foreground text-sm">
+          <p className="text-muted-foreground text-sm underline">
             {reviewer.approver.email}
           </p>
         </div>
         <div className="ml-auto mt-0.5">
-          <Button variant="outline">{reviewer.status}</Button>
+          <Button
+            variant="outline"
+            className={cn(
+              "w-28 text-xs text-slate-800",
+              reviewer.status === "APPROVED" && "bg-green-600",
+              reviewer.status === "PENDING" && "bg-yellow-600"
+            )}
+          >
+            {reviewer.status === "APPROVED" && <Check />}
+            {reviewer.status === "PENDING" && <CircleDot />}
+            {reviewer.status === "REJECTED" && <X />}
+            {reviewer.status}
+          </Button>
         </div>
       </div>
     );
@@ -180,10 +192,14 @@ export default function RequestReview({
       <DialogTrigger asChild>
         {!workspace.isUserWorkspace && (
           <Button
-            className={cn(!workspace.isUserWorkspace ? "mr-2" : "mr-0")}
+            variant="ghost"
+            className={cn(
+              !workspace.isUserWorkspace ? "mr-2" : "mr-0",
+              "bg-orange-400"
+            )}
             onClick={() => setIsAddReviewersDialogOpen(true)}
           >
-            Review
+            Review Status
           </Button>
         )}
       </DialogTrigger>
@@ -196,33 +212,41 @@ export default function RequestReview({
           <DialogDescription></DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
-          <div className="flex flex-rows gap-x-2">
-            <div className="w-full">
-              <AutoComplete
-                selectedValue={selectedValue}
-                onSelectedValueChange={setSelectedValue}
-                searchValue={searchValue}
-                onSearchValueChange={setSearchValue}
-                items={usersForSearch ?? []}
-                isLoading={isUsersLoading}
-                placeholder="Search users..."
-              />
-            </div>
-            <Button className="ml-auto" onClick={handleAddReviewer}>
-              Add
-            </Button>
-          </div>
-          <hr />
+          {editMode && (
+            <>
+              <div className="flex flex-rows gap-x-2">
+                <div className="w-full">
+                  <AutoComplete
+                    selectedValue={selectedValue}
+                    onSelectedValueChange={setSelectedValue}
+                    searchValue={searchValue}
+                    onSearchValueChange={setSearchValue}
+                    items={usersForSearch ?? []}
+                    isLoading={isUsersLoading}
+                    placeholder="Search users..."
+                  />
+                </div>
+                <Button className="ml-auto" onClick={handleAddReviewer}>
+                  Add
+                </Button>
+              </div>
+              <hr />
+            </>
+          )}
           {existingReviewers.map((reviewer: Reviewer) => (
             <ShowExistingReviewer
               key={reviewer.approver.id}
               reviewer={reviewer}
             />
           ))}
-          <hr />
-          {reviewers.map((reviewer) => (
-            <ShowReviewer key={reviewer} reviewer={reviewer} />
-          ))}
+          {editMode && (
+            <>
+              <hr />
+              {reviewers.map((reviewer) => (
+                <ShowReviewer key={reviewer} reviewer={reviewer} />
+              ))}
+            </>
+          )}
         </div>
         <DialogFooter>
           <DialogClose asChild>
@@ -234,7 +258,7 @@ export default function RequestReview({
               Close
             </Button>
           </DialogClose>
-          {reviewers.length > 0 && (
+          {reviewers.length > 0 && editMode && (
             <Button onClick={handleAddReviewers}>Save changes</Button>
           )}
         </DialogFooter>

@@ -161,3 +161,93 @@ export const getExistingReviewersForVersion = async (
 
   return data.approvers;
 };
+
+export const approveUnpublishedVersion = async (
+  workspaceId: string,
+  projectId: string,
+  pageId: string,
+  versionId: string
+): Promise<boolean> => {
+  const accessToken = sessionStorage.getItem("accessToken");
+
+  if (!accessToken) {
+    throw new Error("Couldnt find access token");
+  }
+
+  const url = `http://localhost:3000/workspace/${workspaceId}/project/${projectId}/page/${pageId}/version/${versionId}/approve`;
+  const response = await fetch(url, {
+    method: "PATCH",
+    body: JSON.stringify({}),
+    headers: new Headers({
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    }),
+  });
+
+  if (response.status !== 200) {
+    throw new Error(`Server Error: ${JSON.stringify(response.text())}`);
+  }
+
+  return true;
+};
+
+export const rejectUnpublishedVersion = async (
+  workspaceId: string,
+  projectId: string,
+  pageId: string,
+  versionId: string
+): Promise<boolean> => {
+  const accessToken = sessionStorage.getItem("accessToken");
+
+  if (!accessToken) {
+    throw new Error("Couldnt find access token");
+  }
+
+  const url = `http://localhost:3000/workspace/${workspaceId}/project/${projectId}/page/${pageId}/version/${versionId}/reject`;
+  const response = await fetch(url, {
+    method: "PATCH",
+    body: JSON.stringify({}),
+    headers: new Headers({
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    }),
+  });
+
+  if (response.status !== 200) {
+    throw new Error(`Server Error: ${JSON.stringify(response.text())}`);
+  }
+
+  return true;
+};
+
+export const publishUnpublishedVersion = async (
+  workspaceId: string,
+  projectId: string,
+  pageId: string,
+  versionId: string
+): Promise<boolean> => {
+  const accessToken = sessionStorage.getItem("accessToken");
+
+  if (!accessToken) {
+    throw new Error("Couldnt find access token");
+  }
+
+  const url = `http://localhost:3000/workspace/${workspaceId}/project/${projectId}/page/${pageId}/version/${versionId}/publish`;
+  const response = await fetch(url, {
+    method: "PATCH",
+    body: JSON.stringify({}),
+    headers: new Headers({
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    }),
+  });
+
+  if (response.status !== 200) {
+    throw new Error(`Server Error: ${JSON.stringify(response.text())}`);
+  }
+
+  return true;
+};

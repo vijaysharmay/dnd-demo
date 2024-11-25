@@ -7,13 +7,13 @@ import {
   PageVersionStatus,
   VersionStatusLogApprovalStatus,
 } from '@prisma/client';
+import { first } from 'lodash';
 import { CreateVersionDto } from './dto/create-version.dto';
 import {
   AddReviewersDto,
   CloneVersionDto,
   UpdateVersionDto,
 } from './dto/update-version.dto';
-import { first } from 'lodash';
 
 @Injectable()
 export class VersionService {
@@ -402,7 +402,7 @@ export class VersionService {
         where: {
           versionId,
           status: {
-            in: [PageVersionStatus.DRAFT, PageVersionStatus.PENDING_REVIEW]
+            in: [PageVersionStatus.DRAFT, PageVersionStatus.PENDING_REVIEW],
           },
         },
       });
@@ -446,6 +446,188 @@ export class VersionService {
         },
       });
     }
+  }
+
+  async rejectUnpublishedVersion(
+    accessToken: string,
+    workspaceId: string,
+    projectId: string,
+    pageId: string,
+    versionId: string,
+  ) {
+    const { sub: ownerId } = this.jwtService.decode(accessToken);
+    const { id } = await this.prisma.version.findFirst({
+      where: {
+        workspaceId,
+        projectId,
+        pageId,
+        id: versionId,
+      },
+    });
+
+    const statusLog = await this.prisma.versionStatusLog.findFirst({
+      where: {
+        versionId: id,
+      },
+    });
+
+    const approver = await this.prisma.versionStatusLogApprovers.findFirst({
+      where: {
+        versionStatusLogId: statusLog.id,
+        approverId: ownerId,
+        status: VersionStatusLogApprovalStatus.PENDING,
+      },
+    });
+
+    if (!approver) {
+      throw new Error('Approver record not found.');
+    }
+
+    await this.prisma.version.update({
+      where: {
+        id,
+      },
+      data: {
+        currentStatus: PageVersionStatus.REJECTED,
+      },
+    });
+
+    await this.prisma.versionStatusLog.create({
+      data: {
+        id: v4(),
+        version: {
+          connect: {
+            id,
+          },
+        },
+        changeOwner: {
+          connect: {
+            id: ownerId,
+          },
+        },
+        status: PageVersionStatus.REJECTED,
+      },
+    });
+
+    return this.prisma.versionStatusLogApprovers.update({
+      where: { id: approver.id },
+      data: {
+        status: VersionStatusLogApprovalStatus.REJECTED,
+      },
+    });
+  }
+
+  async approveUnpublishedVersion(
+    accessToken: string,
+    workspaceId: string,
+    projectId: string,
+    pageId: string,
+    versionId: string,
+  ) {
+    const { sub: ownerId } = this.jwtService.decode(accessToken);
+    const { id } = await this.prisma.version.findFirst({
+      where: {
+        workspaceId,
+        projectId,
+        pageId,
+        id: versionId,
+      },
+    });
+
+    const statusLog = await this.prisma.versionStatusLog.findFirst({
+      where: {
+        versionId: id,
+      },
+    });
+
+    const approver = await this.prisma.versionStatusLogApprovers.findFirst({
+      where: {
+        versionStatusLogId: statusLog.id,
+        approverId: ownerId,
+        status: VersionStatusLogApprovalStatus.PENDING,
+      },
+    });
+
+    if (!approver) {
+      throw new Error('Approver record not found.');
+    }
+
+    await this.prisma.version.update({
+      where: {
+        id,
+      },
+      data: {
+        currentStatus: PageVersionStatus.APPROVED,
+      },
+    });
+
+    await this.prisma.versionStatusLog.create({
+      data: {
+        id: v4(),
+        version: {
+          connect: {
+            id,
+          },
+        },
+        changeOwner: {
+          connect: {
+            id: ownerId,
+          },
+        },
+        status: PageVersionStatus.APPROVED,
+      },
+    });
+
+    return this.prisma.versionStatusLogApprovers.update({
+      where: { id: approver.id },
+      data: {
+        status: VersionStatusLogApprovalStatus.APPROVED,
+      },
+    });
+  }
+
+  async publishUnpublishedVersion(
+    accessToken: string,
+    workspaceId: string,
+    projectId: string,
+    pageId: string,
+    versionId: string,
+  ) {
+    const { sub: ownerId } = this.jwtService.decode(accessToken);
+    const { id } = await this.prisma.version.findFirst({
+      where: {
+        workspaceId,
+        projectId,
+        pageId,
+        id: versionId,
+      },
+    });
+
+    await this.prisma.version.update({
+      where: {
+        id,
+      },
+      data: {
+        currentStatus: PageVersionStatus.PUBLISHED,
+      },
+    });
+
+    return this.prisma.versionStatusLog.create({
+      data: {
+        id: v4(),
+        version: {
+          connect: {
+            id,
+          },
+        },
+        changeOwner: {
+          connect: {
+            id: ownerId,
+          },
+        },
+        status: PageVersionStatus.PUBLISHED,
+      },
+    });
   }
 
   async remove(

@@ -5,13 +5,17 @@ import useVersionStore from "@/store/version-store";
 import useWorkspaceStore from "@/store/workspace-store";
 import { Reviewer } from "@/types/api/page";
 import { includes } from "lodash";
+import { Check } from "lucide-react";
+import ApproveReject from "./publish-lifecycle/approve-reject";
+import PublishVersion from "./publish-lifecycle/publish";
 import RequestReview from "./publish-lifecycle/request-review";
 
 export default function VersionTitle() {
   const { currentUser } = useWorkspaceStore();
   const { currentVersion, currentVersionReviewers } = useVersionStore();
   if (!currentVersion) return;
-  const { name, workspace, project, page, currentStatus } = currentVersion;
+  const { name, workspace, project, page, currentStatus, owner } =
+    currentVersion;
 
   const handleViewPublishedPage = () => {
     const baseUrl = `/app/${workspace.route}/${project.route}/${page.route}?versionName=${name}`;
@@ -35,31 +39,34 @@ export default function VersionTitle() {
           View Published Page
         </Button>
         {currentStatus === "DRAFT" && (
-          <RequestReview
-            version={currentVersion}
-            showExistingReviewers={false}
-          />
+          <RequestReview version={currentVersion} editMode={true} />
         )}
+
         {currentStatus === "PENDING_REVIEW" && (
           <>
-            {!includes(currentVersionReviewerIds, currentUser.id) && (
-              <RequestReview
-                version={currentVersion}
-                showExistingReviewers={true}
-              />
+            {!includes(currentVersionReviewerIds, currentUser.id) ? (
+              <RequestReview version={currentVersion} editMode={false} />
+            ) : (
+              <ApproveReject version={currentVersion} />
             )}
-            {includes(currentVersionReviewerIds, currentUser.id) && (
+          </>
+        )}
+
+        {currentStatus === "APPROVED" && (
+          <>
+            {includes(owner.id, currentUser.id) && (
               <>
-                <Button
-                  variant="ghost"
-                  className="bg-green-600 text-white mr-2"
-                >
-                  Approve
-                </Button>
-                <Button variant="destructive">Reject</Button>
+                <RequestReview version={currentVersion} editMode={false} />
+                <PublishVersion version={currentVersion} />
               </>
             )}
           </>
+        )}
+
+        {currentStatus === "PUBLISHED" && (
+          <Button variant="ghost" className="bg-blue-600 text-white" disabled>
+            <Check /> PUBLISHED
+          </Button>
         )}
       </div>
     </>
