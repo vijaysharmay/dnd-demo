@@ -3,8 +3,17 @@ import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/prisma.service';
 import { v4 } from 'uuid';
 
+import {
+  PageVersionStatus,
+  VersionStatusLogApprovalStatus,
+} from '@prisma/client';
 import { CreateVersionDto } from './dto/create-version.dto';
-import { CloneVersionDto, UpdateVersionDto } from './dto/update-version.dto';
+import {
+  AddReviewersDto,
+  CloneVersionDto,
+  UpdateVersionDto,
+} from './dto/update-version.dto';
+import { first } from 'lodash';
 
 @Injectable()
 export class VersionService {
@@ -22,7 +31,7 @@ export class VersionService {
     const { sub: ownerId } = this.jwtService.decode(accessToken);
     const { name } = createVersionDto;
     const VersionId = v4();
-    return this.prisma.version.create({
+    const { id } = await this.prisma.version.create({
       data: {
         id: VersionId,
         name,
@@ -49,6 +58,23 @@ export class VersionService {
       },
       select: {
         id: true,
+      },
+    });
+
+    return this.prisma.versionStatusLog.create({
+      data: {
+        id: v4(),
+        version: {
+          connect: {
+            id,
+          },
+        },
+        changeOwner: {
+          connect: {
+            id: ownerId,
+          },
+        },
+        status: PageVersionStatus.DRAFT,
       },
     });
   }
@@ -316,6 +342,110 @@ export class VersionService {
         },
       },
     });
+  }
+
+  async getReviewers(
+    workspaceId: string,
+    projectId: string,
+    pageId: string,
+    versionId: string,
+  ) {
+    const { statusLog } = await this.prisma.version.findFirst({
+      where: {
+        workspaceId,
+        projectId,
+        pageId,
+        id: versionId,
+      },
+      select: {
+        statusLog: {
+          where: {
+            status: PageVersionStatus.PENDING_REVIEW,
+          },
+          orderBy: {
+            changesMadeOn: 'desc',
+          },
+          take: 1,
+          select: {
+            approvers: {
+              include: {
+                approver: {
+                  omit: {
+                    salt: true,
+                    passwd: true,
+                    userWorkspaceId: true,
+                  },
+                },
+              },
+              omit: {
+                approverId: true,
+                versionStatusLogId: true,
+                id: true,
+              },
+            },
+          },
+        },
+      },
+    });
+    return first(statusLog);
+  }
+
+  async addReviewers(
+    workspaceId: string,
+    projectId: string,
+    pageId: string,
+    versionId: string,
+    addReviewersDto: AddReviewersDto,
+  ) {
+    const versionStatusLog =
+      await this.prisma.versionStatusLog.findFirstOrThrow({
+        where: {
+          versionId,
+          status: {
+            in: [PageVersionStatus.DRAFT, PageVersionStatus.PENDING_REVIEW]
+          },
+        },
+      });
+
+    await this.prisma.version.update({
+      where: {
+        workspaceId,
+        projectId,
+        pageId,
+        id: versionId,
+      },
+      data: {
+        currentStatus: PageVersionStatus.PENDING_REVIEW,
+      },
+    });
+
+    await this.prisma.versionStatusLog.update({
+      where: {
+        id: versionStatusLog.id,
+      },
+      data: {
+        status: PageVersionStatus.PENDING_REVIEW,
+      },
+    });
+
+    for (const reviewer of addReviewersDto.reviewers) {
+      await this.prisma.versionStatusLogApprovers.create({
+        data: {
+          id: v4(),
+          approver: {
+            connect: {
+              id: reviewer,
+            },
+          },
+          versionStatusLog: {
+            connect: {
+              id: versionStatusLog.id,
+            },
+          },
+          status: VersionStatusLogApprovalStatus.PENDING,
+        },
+      });
+    }
   }
 
   async remove(

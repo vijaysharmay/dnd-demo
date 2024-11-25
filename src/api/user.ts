@@ -1,7 +1,7 @@
 import {
   CurrentUserResponse,
   CurrentUserZResponse,
-  OwnerSchema,
+  UserSchema,
   UserZSchema,
 } from "@/types/api/user";
 import { z } from "zod";
@@ -38,7 +38,7 @@ export const getUser = async (): Promise<CurrentUserResponse> => {
   return result.data;
 };
 
-export const getUsers = async (searchValue: string): Promise<OwnerSchema[]> => {
+export const getUsers = async (searchValue: string): Promise<UserSchema[]> => {
   // for showcasing loading icon
   // await new Promise((resolve) => setTimeout(resolve, 2000));
   const accessToken = sessionStorage.getItem("accessToken");

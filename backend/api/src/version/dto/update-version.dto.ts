@@ -17,3 +17,8 @@ export class CloneVersionDto {
   @IsString()
   versionName: string;
 }
+
+export class AddReviewersDto {
+  @IsString()
+  reviewers: string[];
+}

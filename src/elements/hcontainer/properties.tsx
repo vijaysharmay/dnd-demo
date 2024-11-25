@@ -19,7 +19,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { isEmpty } from "lodash";
 import { SubmitHandler, useForm } from "react-hook-form";
 
-import useVersionStore from "@/store/page-store";
+import useVersionStore from "@/store/version-store";
 import { FormFieldRender } from "../common/form-fields";
 import { usePropertiesFormSubmit } from "../common/handlePropertiesFormSubmit";
 

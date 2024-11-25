@@ -3,6 +3,7 @@ import { PrismaService } from 'src/prisma.service';
 import { v4 } from 'uuid';
 
 import { JwtService } from '@nestjs/jwt';
+import { PageVersionStatus } from '@prisma/client';
 import { CreatePageDto } from './dto/create-page.dto';
 import { UpdatePageDto } from './dto/update-page.dto';
 
@@ -21,7 +22,7 @@ export class PageService {
     const { sub: ownerId } = this.jwtService.decode(accessToken);
     const { name, route } = createPageDto;
     const PageId = v4();
-    return this.prisma.page.create({
+    const page = await this.prisma.page.create({
       data: {
         id: PageId,
         name,
@@ -52,6 +53,28 @@ export class PageService {
       },
       select: {
         id: true,
+        versions: {
+          select: {
+            id: true,
+          },
+        },
+      },
+    });
+
+    return this.prisma.versionStatusLog.create({
+      data: {
+        id: v4(),
+        version: {
+          connect: {
+            id: page.versions[0].id,
+          },
+        },
+        changeOwner: {
+          connect: {
+            id: ownerId,
+          },
+        },
+        status: PageVersionStatus.DRAFT,
       },
     });
   }

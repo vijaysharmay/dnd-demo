@@ -107,6 +107,7 @@ export function WorkspaceSwitcher() {
 
   const {
     workspaces,
+    setCurrentUser,
     setWorkspaces,
     currentWorkspace,
     setCurrentWorkspace,
@@ -116,6 +117,11 @@ export function WorkspaceSwitcher() {
 
   useEffect(() => {
     if (data) {
+      setCurrentUser({
+        id: data.id,
+        fullName: data.fullName,
+        email: data.email,
+      });
       setIsWorkspaceDataLoading(isPending);
       setWorkspaces(map(data.workspaces, "workspace"));
 
@@ -207,7 +213,16 @@ export function WorkspaceSwitcher() {
     if (!currentWorkspace) {
       throw new Error("Workspace ID is required to create a project");
     }
-    createWorkspaceMutation.mutate(values);
+    const members = values.members.map((member) => {
+      return {
+        memberId: member.memberId.split("|")[0],
+        role: member.role,
+      };
+    });
+    createWorkspaceMutation.mutate({
+      ...values,
+      members,
+    });
   };
 
   const onCreateProjectFormSubmit = (values: CreateProjectRequestSchema) => {

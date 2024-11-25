@@ -110,7 +110,7 @@ model Accord {
 
 enum PageVersionStatus {
   DRAFT
-  PENDING
+  PENDING_REVIEW
   APPROVED
   PUBLISHED
   REJECTED
@@ -155,11 +155,11 @@ model Version {
   blocks        Block[]            @relation(name: "blocksInVersion")
   owner         User               @relation(fields: [ownerId], references: [id], name: "ownerOfVersion")
   ownerId       String
-  page          Page?              @relation(fields: [pageId], references: [id], name: "versionsInPage")
+  page          Page?              @relation(fields: [pageId], references: [id], name: "versionsInPage", onDelete: Cascade, onUpdate: Cascade)
   pageId        String?
   project       Project            @relation(fields: [projectId], references: [id], name: "versionsInProject", onDelete: Cascade, onUpdate: Cascade)
   projectId     String
-  workspace     Workspace          @relation(fields: [workspaceId], references: [id], name: "versionsInWorkspace")
+  workspace     Workspace          @relation(fields: [workspaceId], references: [id], name: "versionsInWorkspace", onDelete: Cascade, onUpdate: Cascade)
   workspaceId   String
   changeLog     VersionChangeLog[] @relation(name: "changesMadeToVersion")
   statusLog     VersionStatusLog[] @relation(name: "statusChangesMadeToVersion")
@@ -170,11 +170,10 @@ model Version {
 model VersionStatusLog {
   id            String                      @id @map("id")
   status        PageVersionStatus
-  changeLog     String
   changeOwner   User                        @relation(fields: [changeOwnerId], references: [id], name: "madeStatusChangesToVersion")
   changeOwnerId String
   approvers     VersionStatusLogApprovers[] @relation(name: "requestedApprovalForStatusChangesToVersion")
-  version       Version?                    @relation(fields: [versionId], references: [id], name: "statusChangesMadeToVersion")
+  version       Version?                    @relation(fields: [versionId], references: [id], name: "statusChangesMadeToVersion", onDelete: Cascade, onUpdate: Cascade)
   versionId     String?
   changesMadeOn DateTime                    @default(now())
 
@@ -182,15 +181,17 @@ model VersionStatusLog {
 }
 
 enum VersionStatusLogApprovalStatus {
+  PENDING
   APPROVED
   REJECTED
 }
 
 model VersionStatusLogApprovers {
   id                 String                         @id @map("id")
+  comment            String?
   approver           User                           @relation(fields: [approverId], references: [id], name: "approverForStatusChangesToVersion")
   approverId         String
-  versionStatusLog   VersionStatusLog?              @relation(fields: [versionStatusLogId], references: [id], name: "requestedApprovalForStatusChangesToVersion")
+  versionStatusLog   VersionStatusLog?              @relation(fields: [versionStatusLogId], references: [id], name: "requestedApprovalForStatusChangesToVersion", onDelete: Cascade, onUpdate: Cascade)
   versionStatusLogId String?
   status             VersionStatusLogApprovalStatus
 

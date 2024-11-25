@@ -100,3 +100,64 @@ export const cloneVersionInProjectWorkspace = async (
 
   return data;
 };
+
+export const setReviewersToUnpublishedVersion = async (
+  workspaceId: string,
+  projectId: string,
+  pageId: string,
+  versionId: string,
+  reviewers: string[]
+): Promise<boolean> => {
+  const accessToken = sessionStorage.getItem("accessToken");
+
+  if (!accessToken) {
+    throw new Error("Couldnt find access token");
+  }
+
+  const url = `http://localhost:3000/workspace/${workspaceId}/project/${projectId}/page/${pageId}/version/${versionId}/reviewers`;
+  const response = await fetch(url, {
+    method: "PUT",
+    body: JSON.stringify({ reviewers }),
+    headers: new Headers({
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    }),
+  });
+
+  if (response.status !== 200) {
+    throw new Error(`Server Error: ${JSON.stringify(response.text())}`);
+  }
+
+  return true;
+};
+
+export const getExistingReviewersForVersion = async (
+  workspaceId: string,
+  projectId: string,
+  pageId: string,
+  versionId: string
+) => {
+  const accessToken = sessionStorage.getItem("accessToken");
+
+  if (!accessToken) {
+    throw new Error("Couldnt find access token");
+  }
+
+  const url = `http://localhost:3000/workspace/${workspaceId}/project/${projectId}/page/${pageId}/version/${versionId}/reviewers`;
+  const response = await fetch(url, {
+    headers: new Headers({
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    }),
+  });
+
+  if (response.status !== 200) {
+    throw new Error(`Server Error: ${JSON.stringify(response.text())}`);
+  }
+
+  const data = await response.json();
+
+  return data.approvers;
+};

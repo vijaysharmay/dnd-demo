@@ -3,7 +3,7 @@ import { libraryElements } from "@/elements";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import useElementStore from "@/store/element-store";
-import useVersionStore from "@/store/page-store";
+import useVersionStore from "@/store/version-store";
 import { Button, ComponentElementInstance, Input } from "@/types";
 import { ButtonPropsSchema, InputPropsSchema } from "@/types/properties";
 import { useDraggable, useDroppable } from "@dnd-kit/core";

@@ -1,15 +1,15 @@
 import { Button } from "@/components/ui/button";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+
 import { cn } from "@/lib/utils";
-import useVersionStore from "@/store/page-store";
+import useVersionStore from "@/store/version-store";
+import useWorkspaceStore from "@/store/workspace-store";
+import { Reviewer } from "@/types/api/page";
+import { includes } from "lodash";
+import RequestReview from "./publish-lifecycle/request-review";
 
 export default function VersionTitle() {
-  const { currentVersion } = useVersionStore();
-
+  const { currentUser } = useWorkspaceStore();
+  const { currentVersion, currentVersionReviewers } = useVersionStore();
   if (!currentVersion) return;
   const { name, workspace, project, page, currentStatus } = currentVersion;
 
@@ -17,6 +17,10 @@ export default function VersionTitle() {
     const baseUrl = `/app/${workspace.route}/${project.route}/${page.route}?versionName=${name}`;
     window.open(baseUrl, "_blank");
   };
+
+  const currentVersionReviewerIds = currentVersionReviewers.map(
+    (x: Reviewer) => x.approver.id
+  );
 
   return (
     <>
@@ -30,21 +34,33 @@ export default function VersionTitle() {
         >
           View Published Page
         </Button>
-        <Popover>
-          <PopoverTrigger asChild>
-            {!workspace.isUserWorkspace && (
-              <Button
-                className={cn(!workspace.isUserWorkspace ? "mr-2" : "mr-0")}
-              >
-                {currentStatus === "DRAFT" && "Request Review"}
-                {currentStatus === "APPROVED" && "Publish"}
-              </Button>
+        {currentStatus === "DRAFT" && (
+          <RequestReview
+            version={currentVersion}
+            showExistingReviewers={false}
+          />
+        )}
+        {currentStatus === "PENDING_REVIEW" && (
+          <>
+            {!includes(currentVersionReviewerIds, currentUser.id) && (
+              <RequestReview
+                version={currentVersion}
+                showExistingReviewers={true}
+              />
             )}
-          </PopoverTrigger>
-          <PopoverContent>
-            <Button>Request</Button>
-          </PopoverContent>
-        </Popover>
+            {includes(currentVersionReviewerIds, currentUser.id) && (
+              <>
+                <Button
+                  variant="ghost"
+                  className="bg-green-600 text-white mr-2"
+                >
+                  Approve
+                </Button>
+                <Button variant="destructive">Reject</Button>
+              </>
+            )}
+          </>
+        )}
       </div>
     </>
   );

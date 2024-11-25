@@ -1,10 +1,13 @@
 import { getPageVersionInProjectWorkspace } from "@/api";
-import { createBlockInPageVersion, CreateBlockRequestSchema } from "@/api/block";
+import {
+  createBlockInPageVersion,
+  CreateBlockRequestSchema,
+} from "@/api/block";
 import { Skeleton } from "@/components/ui/skeleton";
 import { libraryElements } from "@/elements";
 import { blockToElement, cn } from "@/lib/utils";
 import useElementStore from "@/store/element-store";
-import useVersionStore from "@/store/page-store";
+import useVersionStore from "@/store/version-store";
 import { ComponentElementInstance, ComponentElementType } from "@/types";
 import { BlockSchema } from "@/types/api/page";
 import { DragEndEvent, useDndMonitor, useDroppable } from "@dnd-kit/core";

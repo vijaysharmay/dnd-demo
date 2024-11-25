@@ -3,6 +3,7 @@ import { JSONZType } from "./common";
 import {
   PageWithoutRootZSchema,
   ProjectWithoutPagesZSchema,
+  UserZSchema,
   VersionWithoutBlocksZSchema,
   WorkspaceWithOutProjectsZSchema,
 } from "./user";
@@ -40,3 +41,9 @@ export const PageZSchema = PageWithoutRootZSchema.extend({
 
 export type PageSchema = z.infer<typeof PageZSchema>;
 export type VersionSchema = z.infer<typeof VersionZSchema>;
+
+export type Reviewer = {
+  approver: z.infer<typeof UserZSchema>;
+  comment: string | null;
+  status: string;
+};

@@ -47,7 +47,7 @@ export const SidebarWorkspaceZSchema = WorkspaceWithOutProjectsZSchema.extend({
 });
 
 export type SidebarWorkspaceSchema = z.infer<typeof SidebarWorkspaceZSchema>;
-export type OwnerSchema = z.infer<typeof UserZSchema>;
+export type UserSchema = z.infer<typeof UserZSchema>;
 export type SidebarPageSchema = z.infer<typeof SidebarPageZSchema>;
 export type SidebarProjectSchema = z.infer<typeof SidebarProjectZSchema>;
 export type SidebarVersionSchema = z.infer<typeof VersionWithoutBlocksZSchema>;
