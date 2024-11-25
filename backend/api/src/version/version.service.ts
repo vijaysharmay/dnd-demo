@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/prisma.service';
 import { v4 } from 'uuid';
 
-import { JwtService } from '@nestjs/jwt';
 import { CreateVersionDto } from './dto/create-version.dto';
-import { UpdateVersionDto } from './dto/update-version.dto';
+import { CloneVersionDto, UpdateVersionDto } from './dto/update-version.dto';
 
 @Injectable()
 export class VersionService {
@@ -247,6 +247,73 @@ export class VersionService {
         ownerId: true,
         projectId: true,
         workspaceId: true,
+      },
+    });
+  }
+
+  async cloneVersion(
+    accessToken: string,
+    workspaceId: string,
+    projectId: string,
+    pageId: string,
+    versionId: string,
+    cloneVersionDto: CloneVersionDto,
+  ) {
+    const existingVersion = await this.findOne(
+      workspaceId,
+      projectId,
+      pageId,
+      versionId,
+    );
+    const { sub: ownerId } = this.jwtService.decode(accessToken);
+    const { id } = await this.prisma.version.create({
+      data: {
+        id: v4(),
+        name: cloneVersionDto.versionName,
+        owner: {
+          connect: {
+            id: ownerId,
+          },
+        },
+        page: {
+          connect: {
+            id: pageId,
+          },
+        },
+        project: {
+          connect: {
+            id: projectId,
+          },
+        },
+        workspace: {
+          connect: {
+            id: workspaceId,
+          },
+        },
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    return this.prisma.version.update({
+      where: {
+        id,
+      },
+      data: {
+        blocks: {
+          createMany: {
+            data: existingVersion.blocks.map(
+              ({ blockType, props, depth, position }) => ({
+                blockType,
+                props,
+                depth,
+                position,
+                id: v4(),
+              }),
+            ),
+          },
+        },
       },
     });
   }

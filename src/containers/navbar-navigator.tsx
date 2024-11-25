@@ -1,58 +1,11 @@
-import {
-  ChevronRight,
-  File,
-  Folder,
-  GitFork,
-  Plus,
-  Trash2,
-} from "lucide-react";
-
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import {
-  SidebarGroup,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarMenuSub,
-} from "@/components/ui/sidebar";
-
-import {
-  ContextMenu,
-  ContextMenuContent,
-  ContextMenuTrigger,
-} from "@/components/ui/context-menu";
-
-import {
-  createPageInProjectWorkspace,
-  CreatePageRequestSchema,
-  CreatePageRequestZSchema,
-  deletePageInProjectWorkspace,
-  deleteProjectInWorkspace,
-  moveProjectToNewWorkspace,
-} from "@/api";
+import { cloneVersionInProjectWorkspace, createPageInProjectWorkspace, CreatePageRequestSchema, CreatePageRequestZSchema, deletePageInProjectWorkspace, deleteProjectInWorkspace, deleteVersionInProjectWorkspace, moveProjectToNewWorkspace } from "@/api";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { ContextMenu, ContextMenuContent, ContextMenuTrigger } from "@/components/ui/context-menu";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarMenuSub } from "@/components/ui/sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn, convertToTree, NodeOptionsItem, Tree } from "@/lib/utils";
 import useWorkspaceStore from "@/store/workspace-store";
@@ -60,6 +13,7 @@ import { SidebarWorkspaceSchema } from "@/types/api/user";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { startsWith } from "lodash";
+import { ChevronRight, File, Folder, GitFork, Plus, Trash2 } from "lucide-react";
 import { Dispatch, SetStateAction, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useLocation } from "wouter";
@@ -266,6 +220,44 @@ function NodeOptions({
                   workspaceId={workspaceId}
                   projectId={node.parentId}
                   pageId={node.id}
+                  setIsDeletePageFormDialogOpen={setIsDeletePageFormDialogOpen}
+                />
+              }
+              open={isDeletePageFormDialogOpen}
+              onOpenChange={setIsDeletePageFormDialogOpen}
+            />
+          </>
+        )}
+        {nodeType === "version" && node.parentId && (
+          <>
+            <NodeOptionsItem
+              name="Clone Version"
+              icon={<Trash2 className="size-4" />}
+              form={
+                <CloneVersionForm
+                  workspaceId={workspaceId}
+                  projectId={node.parentId.split("|")[1]}
+                  pageId={node.parentId.split("|")[0]}
+                  versionId={node.id}
+                  setIsDeletePageFormDialogOpen={setIsDeletePageFormDialogOpen}
+                />
+              }
+              open={isDeletePageFormDialogOpen}
+              onOpenChange={setIsDeletePageFormDialogOpen}
+            />
+          </>
+        )}
+        {nodeType === "version" && node.parentId && node.name !== "main" && (
+          <>
+            <NodeOptionsItem
+              name="Delete Version"
+              icon={<Trash2 className="size-4" />}
+              form={
+                <DeleteVersionForm
+                  workspaceId={workspaceId}
+                  projectId={node.parentId.split("|")[1]}
+                  pageId={node.parentId.split("|")[0]}
+                  versionId={node.id}
                   setIsDeletePageFormDialogOpen={setIsDeletePageFormDialogOpen}
                 />
               }
@@ -547,6 +539,175 @@ function DeletePageForm({
 
   const handleDeleteConfirmation = () => {
     createAccordMutation.mutate({ workspaceId, projectId, pageId });
+  };
+
+  return (
+    <>
+      <div>Are you sure?</div>
+      <div className="flex flex-row gap-x-2 justify-end">
+        <Button
+          variant="outline"
+          onClick={() => {
+            setIsDeletePageFormDialogOpen(false);
+          }}
+        >
+          Cancel
+        </Button>
+        <Button variant="destructive" onClick={handleDeleteConfirmation}>
+          Confirm
+        </Button>
+      </div>
+    </>
+  );
+}
+
+function CloneVersionForm({
+  workspaceId,
+  projectId,
+  pageId,
+  versionId,
+  setIsDeletePageFormDialogOpen,
+}: {
+  workspaceId: string;
+  projectId: string;
+  pageId: string;
+  versionId: string;
+  setIsDeletePageFormDialogOpen: Dispatch<SetStateAction<boolean>>;
+}) {
+  const CloneVersionRequestZSchema = z.object({
+    versionName: z.string().min(1, "New workspace needs to be selected"),
+  });
+
+  type CloneVersionRequestSchema = z.infer<typeof CloneVersionRequestZSchema>;
+  const cloneVersionForm = useForm<CloneVersionRequestSchema>({
+    resolver: zodResolver(CloneVersionRequestZSchema),
+    values: {
+      versionName: "",
+    },
+  });
+
+  const cloneVersionMutation = useMutation({
+    mutationFn: async ({
+      workspaceId,
+      projectId,
+      pageId,
+      versionId,
+      versionName,
+    }: {
+      workspaceId: string;
+      projectId: string;
+      pageId: string;
+      versionId: string;
+      versionName: string;
+    }) =>
+      cloneVersionInProjectWorkspace(
+        workspaceId,
+        projectId,
+        pageId,
+        versionId,
+        versionName
+      ),
+    onSuccess: () => {
+      setIsDeletePageFormDialogOpen(false);
+      window.location.reload();
+    },
+    onError: (e: Error) => {
+      console.log(e.message);
+    },
+  });
+
+  const oncloneVersionFormSubmit = ({
+    versionName,
+  }: {
+    versionName: string;
+  }) => {
+    cloneVersionMutation.mutate({
+      workspaceId,
+      projectId,
+      pageId,
+      versionId,
+      versionName,
+    });
+  };
+
+  return (
+    <Form {...cloneVersionForm}>
+      <form
+        onSubmit={cloneVersionForm.handleSubmit(oncloneVersionFormSubmit)}
+        className="space-y-4"
+      >
+        <FormField
+          control={cloneVersionForm.control}
+          name="versionName"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Version Name</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="Enter a version name"
+                  className={cn(
+                    cloneVersionForm.formState.errors["versionName"] &&
+                      "bg-red-50"
+                  )}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <div className="text-right">
+          <Button className="mt-2" type="submit">
+            Clone
+          </Button>
+        </div>
+      </form>
+    </Form>
+  );
+}
+
+function DeleteVersionForm({
+  workspaceId,
+  projectId,
+  pageId,
+  versionId,
+  setIsDeletePageFormDialogOpen,
+}: {
+  workspaceId: string;
+  projectId: string;
+  pageId: string;
+  versionId: string;
+  setIsDeletePageFormDialogOpen: Dispatch<SetStateAction<boolean>>;
+}) {
+  const deleteVersionMutation = useMutation({
+    mutationFn: async ({
+      workspaceId,
+      projectId,
+      pageId,
+      versionId,
+    }: {
+      workspaceId: string;
+      projectId: string;
+      pageId: string;
+      versionId: string;
+    }) =>
+      deleteVersionInProjectWorkspace(
+        workspaceId,
+        projectId,
+        pageId,
+        versionId
+      ),
+    onSuccess: () => {
+      setIsDeletePageFormDialogOpen(false);
+      window.location.reload();
+    },
+    onError: (e: Error) => {
+      console.log(e.message);
+    },
+  });
+
+  const handleDeleteConfirmation = () => {
+    deleteVersionMutation.mutate({ workspaceId, projectId, pageId, versionId });
   };
 
   return (

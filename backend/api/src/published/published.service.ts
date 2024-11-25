@@ -11,7 +11,7 @@ export class PublishedService {
         route: name,
         isUserWorkspace: false,
         versions: {
-          every: {
+          some: {
             name: parsedVersionName,
           },
         },
@@ -28,7 +28,11 @@ export class PublishedService {
                 name: true,
                 route: true,
                 versions: {
+                  // where: {
+                  //   name: parsedVersionName,
+                  // },
                   select: {
+                    name: true,
                     blocks: {
                       select: {
                         id: true,

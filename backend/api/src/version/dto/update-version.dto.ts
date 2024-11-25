@@ -1,5 +1,7 @@
+import { PageVersionStatus } from '@prisma/client';
 import { IsEnum, IsOptional, IsString } from 'class-validator';
-import { PageVersionStatus } from '@prisma/client'; // Assuming Prisma exports this
+
+// Assuming Prisma exports this
 
 export class UpdateVersionDto {
   @IsOptional()
@@ -9,4 +11,9 @@ export class UpdateVersionDto {
   @IsOptional()
   @IsString()
   name?: string;
+}
+
+export class CloneVersionDto {
+  @IsString()
+  versionName: string;
 }

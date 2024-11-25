@@ -1,21 +1,18 @@
+import { getPageVersionInProjectWorkspace } from "@/api";
+import { createBlockInPageVersion, CreateBlockRequestSchema } from "@/api/block";
+import { Skeleton } from "@/components/ui/skeleton";
 import { libraryElements } from "@/elements";
 import { blockToElement, cn } from "@/lib/utils";
 import useElementStore from "@/store/element-store";
-import { ComponentElementInstance, ComponentElementType } from "@/types";
-import { DragEndEvent, useDndMonitor, useDroppable } from "@dnd-kit/core";
-import { v4 as uuidv4 } from "uuid";
-
-import { getPageVersionInProjectWorkspace } from "@/api";
-import {
-  createBlockInPageVersion,
-  CreateBlockRequestSchema,
-} from "@/api/block";
-import { Skeleton } from "@/components/ui/skeleton";
 import useVersionStore from "@/store/page-store";
+import { ComponentElementInstance, ComponentElementType } from "@/types";
 import { BlockSchema } from "@/types/api/page";
+import { DragEndEvent, useDndMonitor, useDroppable } from "@dnd-kit/core";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { isNull } from "lodash";
 import { useEffect } from "react";
+import { v4 as uuidv4 } from "uuid";
+
 import DesignerElementWrapper from "./designer-element-wrapper";
 
 export default function Designer({

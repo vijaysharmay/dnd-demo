@@ -17,6 +17,7 @@ export type Page = {
 };
 
 export type Version = {
+  name: string;
   blocks: Block[];
 };
 

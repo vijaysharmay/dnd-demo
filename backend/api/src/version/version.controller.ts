@@ -1,16 +1,7 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Headers
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Headers, Param, Patch, Post } from '@nestjs/common';
 
 import { CreateVersionDto } from './dto/create-version.dto';
-import { UpdateVersionDto } from './dto/update-version.dto';
+import { CloneVersionDto, UpdateVersionDto } from './dto/update-version.dto';
 import { VersionService } from './version.service';
 
 @Controller()
@@ -64,6 +55,28 @@ export class VersionController {
       pageId,
       versionId,
       updateVersionDto,
+    );
+  }
+
+  @Patch(':versionId/clone')
+  cloneVersion(
+    @Param('workspaceId') workspaceId: string,
+    @Param('projectId') projectId: string,
+    @Param('pageId') pageId: string,
+    @Param('versionId') versionId: string,
+    @Body() cloneVersionDto: CloneVersionDto,
+    @Headers('Authorization') authorizationHeader?: string,
+  ) {
+    if (!authorizationHeader)
+      throw new Error('Couldnt find access token in header');
+    const accessToken = authorizationHeader.split(' ')[1];
+    return this.versionService.cloneVersion(
+      accessToken,
+      workspaceId,
+      projectId,
+      pageId,
+      versionId,
+      cloneVersionDto,
     );
   }
 

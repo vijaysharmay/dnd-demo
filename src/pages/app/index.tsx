@@ -14,11 +14,14 @@ import {
 import { libraryElements } from "@/elements";
 import { blockToElement } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
-import { Link, Route, useParams, useRoute } from "wouter";
+import { Link, Route, useParams, useRoute, useSearch } from "wouter";
 import { Block, Page, Project } from "./published-apps";
 
 export default function AppRenderer() {
   const { appId: name } = useParams();
+  const searchString = useSearch();
+  const searchParams = new URLSearchParams(searchString);
+  const versionName = searchParams.get("versionName") || "main";
 
   const { isPending, error, data } = useQuery({
     queryKey: ["getPublishedAppByRoute", name],
@@ -36,13 +39,20 @@ export default function AppRenderer() {
         {data.projects.map((project: Project) => {
           return project.pages.map((page: Page) => {
             const pageRoute = `/${project.route}/${page.route}`;
+            let blocks = [];
+            const version = page.versions.filter((x) => x.name === versionName);
+            if (version && version.length > 0) {
+              blocks = version[0].blocks;
+            } else {
+              blocks = page.versions.filter((x) => x.name === "main")[0].blocks;
+            }
             return (
               <PageRenderer
                 key={page.route}
                 pageRoute={pageRoute}
                 pageName={page.name}
                 projectName={project.name}
-                blocks={page.versions[0].blocks} //expects only one version
+                blocks={blocks} //expects only one version
               />
             );
           });
