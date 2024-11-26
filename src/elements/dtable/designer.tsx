@@ -17,19 +17,18 @@ export const DTableDesignerComponent: React.FC<{
   elementInstance: ComponentElementInstance;
 }> = ({ elementInstance }) => {
   const { props } = elementInstance;
-  const { dTableHeightInPx, accordId } = props as DTablePropsSchema;
-  const { getAccordById } = useAccordStore();
+  const { dTableHeightInPx, accord } = props as DTablePropsSchema;
   const [data, setData] = useState<unknown>([]);
   const [schema, setSchema] = useState<unknown>(null);
-
+  
   useEffect(() => {
-    if (!accordId) {
+    if (!accord) {
       setSchema(undefined);
       setData([]);
       return;
     }
 
-    const schemaString = getAccordById(accordId)?.accordSchema;
+    const schemaString = accord?.accordSchema;
     if (schemaString) {
       try {
         const parsedSchema = JSON.parse(schemaString) as JSONSchema7;
@@ -43,7 +42,7 @@ export const DTableDesignerComponent: React.FC<{
       setSchema(undefined);
       setData([]);
     }
-  }, [accordId, getAccordById]); // Removed 'schema' from the dependency array
+  }, [accord]); // Removed 'schema' from the dependency array
 
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);

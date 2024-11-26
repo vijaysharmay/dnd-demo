@@ -152,13 +152,7 @@ function NodeOptions({
   workspaceId: string;
   children: React.ReactElement;
 }) {
-  const [isCreatePageDialogOpen, setIsCreatePageDialogOpen] =
-    useState<boolean>(false);
-  const [isMoveProjectDialogOpen, setIsMoveProjectDialogOpen] =
-    useState<boolean>(false);
-  const [isDeletePageFormDialogOpen, setIsDeletePageFormDialogOpen] =
-    useState<boolean>(false);
-  const [isDeleteProjectFormDialogOpen, setIsDeleteProjectFormDialogOpen] =
+  const [isDialogOpen, setIsDialogOpen] =
     useState<boolean>(false);
 
   return (
@@ -174,11 +168,11 @@ function NodeOptions({
                 <AddPageForm
                   workspaceId={workspaceId}
                   projectId={node.id}
-                  setIsCreatePageDialogOpen={setIsCreatePageDialogOpen}
+                  setIsDialogOpen={setIsDialogOpen}
                 />
               }
-              open={isCreatePageDialogOpen}
-              onOpenChange={setIsCreatePageDialogOpen}
+              open={isDialogOpen}
+              onOpenChange={setIsDialogOpen}
             />
             <NodeOptionsItem
               name="Move Project"
@@ -187,11 +181,11 @@ function NodeOptions({
                 <MoveProjectForm
                   workspaceId={workspaceId}
                   projectId={node.id}
-                  setIsMoveProjectDialogOpen={setIsMoveProjectDialogOpen}
+                  setIsDialogOpen={setIsDialogOpen}
                 />
               }
-              open={isMoveProjectDialogOpen}
-              onOpenChange={setIsMoveProjectDialogOpen}
+              open={isDialogOpen}
+              onOpenChange={setIsDialogOpen}
             />
             <NodeOptionsItem
               name="Delete Project"
@@ -200,13 +194,13 @@ function NodeOptions({
                 <DeleteProjectForm
                   workspaceId={workspaceId}
                   projectId={node.id}
-                  setIsDeleteProjectFormDialogOpen={
-                    setIsDeleteProjectFormDialogOpen
+                  setIsDialogOpen={
+                    setIsDialogOpen
                   }
                 />
               }
-              open={isDeleteProjectFormDialogOpen}
-              onOpenChange={setIsDeleteProjectFormDialogOpen}
+              open={isDialogOpen}
+              onOpenChange={setIsDialogOpen}
             />
           </>
         )}
@@ -220,11 +214,11 @@ function NodeOptions({
                   workspaceId={workspaceId}
                   projectId={node.parentId}
                   pageId={node.id}
-                  setIsDeletePageFormDialogOpen={setIsDeletePageFormDialogOpen}
+                  setIsDialogOpen={setIsDialogOpen}
                 />
               }
-              open={isDeletePageFormDialogOpen}
-              onOpenChange={setIsDeletePageFormDialogOpen}
+              open={isDialogOpen}
+              onOpenChange={setIsDialogOpen}
             />
           </>
         )}
@@ -239,11 +233,11 @@ function NodeOptions({
                   projectId={node.parentId.split("|")[1]}
                   pageId={node.parentId.split("|")[0]}
                   versionId={node.id}
-                  setIsDeletePageFormDialogOpen={setIsDeletePageFormDialogOpen}
+                  setIsDialogOpen={setIsDialogOpen}
                 />
               }
-              open={isDeletePageFormDialogOpen}
-              onOpenChange={setIsDeletePageFormDialogOpen}
+              open={isDialogOpen}
+              onOpenChange={setIsDialogOpen}
             />
           </>
         )}
@@ -258,11 +252,11 @@ function NodeOptions({
                   projectId={node.parentId.split("|")[1]}
                   pageId={node.parentId.split("|")[0]}
                   versionId={node.id}
-                  setIsDeletePageFormDialogOpen={setIsDeletePageFormDialogOpen}
+                  setIsDialogOpen={setIsDialogOpen}
                 />
               }
-              open={isDeletePageFormDialogOpen}
-              onOpenChange={setIsDeletePageFormDialogOpen}
+              open={isDialogOpen}
+              onOpenChange={setIsDialogOpen}
             />
           </>
         )}
@@ -274,11 +268,11 @@ function NodeOptions({
 function AddPageForm({
   workspaceId,
   projectId,
-  setIsCreatePageDialogOpen,
+  setIsDialogOpen,
 }: {
   workspaceId: string;
   projectId: string;
-  setIsCreatePageDialogOpen: Dispatch<SetStateAction<boolean>>;
+  setIsDialogOpen: Dispatch<SetStateAction<boolean>>;
 }) {
   const createPageForm = useForm<CreatePageRequestSchema>({
     resolver: zodResolver(CreatePageRequestZSchema),
@@ -299,7 +293,7 @@ function AddPageForm({
       values: CreatePageRequestSchema;
     }) => createPageInProjectWorkspace(workspaceId, projectId, values),
     onSuccess: () => {
-      setIsCreatePageDialogOpen(false);
+      setIsDialogOpen(false);
       window.location.reload();
     },
     onError: (e: Error) => {
@@ -368,11 +362,11 @@ function AddPageForm({
 function MoveProjectForm({
   workspaceId,
   projectId,
-  setIsMoveProjectDialogOpen,
+  setIsDialogOpen,
 }: {
   workspaceId: string;
   projectId: string;
-  setIsMoveProjectDialogOpen: Dispatch<SetStateAction<boolean>>;
+  setIsDialogOpen: Dispatch<SetStateAction<boolean>>;
 }) {
   const { workspaces } = useWorkspaceStore();
   const MoveProjectRequestZSchema = z.object({
@@ -398,7 +392,7 @@ function MoveProjectForm({
       newWorkspaceId: string;
     }) => moveProjectToNewWorkspace(workspaceId, projectId, newWorkspaceId),
     onSuccess: () => {
-      setIsMoveProjectDialogOpen(false);
+      setIsDialogOpen(false);
       window.location.reload();
     },
     onError: (e: Error) => {
@@ -461,11 +455,11 @@ function MoveProjectForm({
 function DeleteProjectForm({
   workspaceId,
   projectId,
-  setIsDeleteProjectFormDialogOpen,
+  setIsDialogOpen,
 }: {
   workspaceId: string;
   projectId: string;
-  setIsDeleteProjectFormDialogOpen: Dispatch<SetStateAction<boolean>>;
+  setIsDialogOpen: Dispatch<SetStateAction<boolean>>;
 }) {
   const createAccordMutation = useMutation({
     mutationFn: async ({
@@ -476,7 +470,7 @@ function DeleteProjectForm({
       projectId: string;
     }) => deleteProjectInWorkspace(workspaceId, projectId),
     onSuccess: () => {
-      setIsDeleteProjectFormDialogOpen(false);
+      setIsDialogOpen(false);
       window.location.reload();
     },
     onError: (e: Error) => {
@@ -495,7 +489,7 @@ function DeleteProjectForm({
         <Button
           variant="outline"
           onClick={() => {
-            setIsDeleteProjectFormDialogOpen(false);
+            setIsDialogOpen(false);
           }}
         >
           Cancel
@@ -512,12 +506,12 @@ function DeletePageForm({
   workspaceId,
   projectId,
   pageId,
-  setIsDeletePageFormDialogOpen,
+  setIsDialogOpen,
 }: {
   workspaceId: string;
   projectId: string;
   pageId: string;
-  setIsDeletePageFormDialogOpen: Dispatch<SetStateAction<boolean>>;
+  setIsDialogOpen: Dispatch<SetStateAction<boolean>>;
 }) {
   const createAccordMutation = useMutation({
     mutationFn: async ({
@@ -529,7 +523,7 @@ function DeletePageForm({
       pageId: string;
     }) => deletePageInProjectWorkspace(workspaceId, projectId, pageId),
     onSuccess: () => {
-      setIsDeletePageFormDialogOpen(false);
+      setIsDialogOpen(false);
       window.location.reload();
     },
     onError: (e: Error) => {
@@ -548,7 +542,7 @@ function DeletePageForm({
         <Button
           variant="outline"
           onClick={() => {
-            setIsDeletePageFormDialogOpen(false);
+            setIsDialogOpen(false);
           }}
         >
           Cancel
@@ -566,13 +560,13 @@ function CloneVersionForm({
   projectId,
   pageId,
   versionId,
-  setIsDeletePageFormDialogOpen,
+  setIsDialogOpen,
 }: {
   workspaceId: string;
   projectId: string;
   pageId: string;
   versionId: string;
-  setIsDeletePageFormDialogOpen: Dispatch<SetStateAction<boolean>>;
+  setIsDialogOpen: Dispatch<SetStateAction<boolean>>;
 }) {
   const CloneVersionRequestZSchema = z.object({
     versionName: z.string().min(1, "New workspace needs to be selected"),
@@ -608,7 +602,7 @@ function CloneVersionForm({
         versionName
       ),
     onSuccess: () => {
-      setIsDeletePageFormDialogOpen(false);
+      setIsDialogOpen(false);
       window.location.reload();
     },
     onError: (e: Error) => {
@@ -671,13 +665,13 @@ function DeleteVersionForm({
   projectId,
   pageId,
   versionId,
-  setIsDeletePageFormDialogOpen,
+  setIsDialogOpen,
 }: {
   workspaceId: string;
   projectId: string;
   pageId: string;
   versionId: string;
-  setIsDeletePageFormDialogOpen: Dispatch<SetStateAction<boolean>>;
+  setIsDialogOpen: Dispatch<SetStateAction<boolean>>;
 }) {
   const deleteVersionMutation = useMutation({
     mutationFn: async ({
@@ -698,7 +692,7 @@ function DeleteVersionForm({
         versionId
       ),
     onSuccess: () => {
-      setIsDeletePageFormDialogOpen(false);
+      setIsDialogOpen(false);
       window.location.reload();
     },
     onError: (e: Error) => {
@@ -717,7 +711,7 @@ function DeleteVersionForm({
         <Button
           variant="outline"
           onClick={() => {
-            setIsDeletePageFormDialogOpen(false);
+            setIsDialogOpen(false);
           }}
         >
           Cancel

@@ -13,6 +13,7 @@ export const DTableComponentElement: ComponentElement = {
     type: DTable,
     props: {
       dTableId: `dTable-${randInt()}`,
+      accordId: null,
       accord: null,
       dTableHeightInPx: "200px",
     },

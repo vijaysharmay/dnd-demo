@@ -1,19 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { PageVersionStatus, VersionStatusLogApprovalStatus } from '@prisma/client';
+import { first } from 'lodash';
 import { PrismaService } from 'src/prisma.service';
 import { v4 } from 'uuid';
 
-import {
-  PageVersionStatus,
-  VersionStatusLogApprovalStatus,
-} from '@prisma/client';
-import { first } from 'lodash';
 import { CreateVersionDto } from './dto/create-version.dto';
-import {
-  AddReviewersDto,
-  CloneVersionDto,
-  UpdateVersionDto,
-} from './dto/update-version.dto';
+import { AddReviewersDto, CloneVersionDto, UpdateVersionDto } from './dto/update-version.dto';
 
 @Injectable()
 export class VersionService {
@@ -319,6 +312,23 @@ export class VersionService {
       },
       select: {
         id: true,
+      },
+    });
+
+    await this.prisma.versionStatusLog.create({
+      data: {
+        id: v4(),
+        version: {
+          connect: {
+            id,
+          },
+        },
+        changeOwner: {
+          connect: {
+            id: ownerId,
+          },
+        },
+        status: PageVersionStatus.DRAFT,
       },
     });
 

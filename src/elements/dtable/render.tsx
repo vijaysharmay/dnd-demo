@@ -16,18 +16,17 @@ export const DTableRenderComponent: React.FC<{
   elementInstance: ComponentElementInstance;
 }> = ({ elementInstance }) => {
   const { props } = elementInstance;
-  const { dTableHeightInPx, accordId } = props as DTablePropsSchema;
+  const { dTableHeightInPx, accord } = props as DTablePropsSchema;
   const { getAccordById } = useAccordStore();
   const [data, setData] = useState<unknown>([]);
   const [schema, setSchema] = useState<unknown>(null);
 
   useEffect(() => {
-    if (!accordId) {
+    if (!accord) {
       setSchema(undefined);
       setData([]);
       return;
     }
-    const accord = getAccordById(accordId);
     const schemaString = accord?.accordSchema;
     if (schemaString) {
       try {
@@ -52,7 +51,7 @@ export const DTableRenderComponent: React.FC<{
       setSchema(undefined);
       setData([]);
     }
-  }, [accordId, getAccordById, setData]);
+  }, [accord, setData]);
 
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);

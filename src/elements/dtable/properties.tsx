@@ -63,8 +63,8 @@ export const DTablePropertiesComponent: React.FC<{
             name="accordId"
             render={({ field }) => (
               <FormFieldRender
-                name="Response Schema"
-                tooltip="Schema of the expected response from the data URL"
+                name="Accord"
+                tooltip="Accord established at a project level"
                 children={
                   <Select
                     onValueChange={field.onChange}
