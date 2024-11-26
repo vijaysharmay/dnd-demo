@@ -1,13 +1,12 @@
-import { CreateAccordRequestSchema, deleteAccordInProjectWorkspace } from "@/api/accord";
+import { AccordSchema, deleteAccordInProjectWorkspace } from "@/api/accord";
 import DataTable from "@/components/ui/data-table";
 import { SheetDescription, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import useAccordStore from "@/store/accord-store";
-import { AccordSchema } from "@/types/api/accord";
 import { ColumnMapping } from "@/types/datatable";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 
-import CreateAccordForm from "./create-accord-form";
+import AccordForm from "./accord-form";
 
 export default function ShowAccordsTable({
   workspaceId,
@@ -33,27 +32,9 @@ export default function ShowAccordsTable({
       removeAccordById(id);
     },
     onError: (e: Error) => {
-      console.log(e.message);
+      console.error(e.message);
     },
   });
-
-  // const deleteBulkAccordMutation = useMutation({
-  //   mutationFn: async ({
-  //     workspaceId,
-  //     projectId,
-  //     accordIds,
-  //   }: {
-  //     workspaceId: string;
-  //     projectId: string;
-  //     accordIds: string[];
-  //   }) => deleteBulkAccordInProjectWorkspace(workspaceId, projectId, accordIds),
-  //   onSuccess: () => {
-  //     window.location.reload();
-  //   },
-  //   onError: (e: Error) => {
-  //     console.log(e.message);
-  //   },
-  // });
 
   useEffect(() => {
     if (accords) {
@@ -68,7 +49,6 @@ export default function ShowAccordsTable({
 
   const handleRowDelete = (accordId: string) => {
     deleteAccordMutation.mutate({ workspaceId, projectId, accordId });
-    window.location.reload();
   };
 
   return (
@@ -79,7 +59,8 @@ export default function ShowAccordsTable({
             data={accords}
             columnMapping={columns}
             rowForm={(initialValues?: AccordSchema) => (
-              <AddRowForm
+              <AccordRowForm
+                mode={initialValues ? "update" : "create"}
                 workspaceId={workspaceId}
                 projectId={projectId}
                 initialValues={initialValues}
@@ -93,27 +74,37 @@ export default function ShowAccordsTable({
   );
 }
 
-function AddRowForm({
+function AccordRowForm({
+  mode,
   workspaceId,
   projectId,
   initialValues,
 }: {
+  mode: "create" | "update";
   workspaceId: string;
   projectId: string;
-  initialValues: CreateAccordRequestSchema | undefined;
+  initialValues?: AccordSchema;
 }) {
   return (
     <>
       <SheetHeader>
-        <SheetTitle>Add Accord</SheetTitle>
-        <SheetDescription></SheetDescription>
+        <SheetTitle>
+          {mode === "create" ? "Add Accord" : "Edit Accord"}
+        </SheetTitle>
+        <SheetDescription>
+          {mode === "create"
+            ? "Create a new Accord for the project."
+            : "Edit the selected Accord details."}
+        </SheetDescription>
       </SheetHeader>
-      <CreateAccordForm
+      <AccordForm
+        mode={mode}
         workspaceId={workspaceId}
         projectId={projectId}
+        accordId={initialValues?.id}
         initialValues={initialValues}
       />
-      <SheetFooter></SheetFooter>
+      <SheetFooter />
     </>
   );
 }

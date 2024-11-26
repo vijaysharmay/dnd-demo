@@ -13,10 +13,11 @@ export const FormComponentElement: ComponentElement = {
     type: Form,
     props: {
       formId: `form-${randInt()}`,
+      accordId: null,
       accord: null,
       formHeightInPx: "200px",
     },
-    children: initFormChildren("JSONPlaceholderPosts"),
+    children: [], //initFormChildren("JSONPlaceholderPosts")
     parentId: null,
   }),
   componentLibraryListItem: {

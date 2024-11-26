@@ -1,30 +1,13 @@
 import { ContextMenuItem } from "@/components/ui/context-menu";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { libraryElements } from "@/elements";
 import { Block } from "@/pages/app/published-apps";
 import { ComponentElementInstance, ComponentElementType } from "@/types";
 import { BlockSchema, VersionSchema } from "@/types/api/page";
-import {
-  SidebarPageSchema,
-  SidebarProjectSchema,
-  SidebarVersionSchema,
-  SidebarWorkspaceSchema,
-} from "@/types/api/user";
+import { SidebarPageSchema, SidebarProjectSchema, SidebarVersionSchema, SidebarWorkspaceSchema } from "@/types/api/user";
 import { CustomPropsSchema, InputPropsSchema } from "@/types/properties";
 import { ClassValue, clsx } from "clsx";
-import {
-  JSONSchema4TypeName,
-  JSONSchema7,
-  JSONSchema7Definition,
-  JSONSchema7TypeName,
-} from "json-schema";
+import { JSONSchema4TypeName, JSONSchema7, JSONSchema7Definition, JSONSchema7TypeName } from "json-schema";
 import { capitalize, includes, isNull, keys } from "lodash";
 import { Dispatch, SetStateAction } from "react";
 import { twMerge } from "tailwind-merge";
@@ -95,12 +78,12 @@ export function createEmptyObjectFromSchema(schema: JSONSchema7) {
 }
 
 export function initFormChildren(
-  schemaName: string
+  schemaAsString: string
 ): (ComponentElementInstance | null)[] {
   const schemaStore = localStorage["schemaStore"];
   if (isNull(schemaStore)) return [];
   const schema: JSONSchema7 =
-    JSON.parse(schemaStore).state.schemas[schemaName].schema;
+    JSON.parse(schemaAsString);
 
   if (isNull(schema.properties)) return [];
 

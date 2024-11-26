@@ -89,7 +89,7 @@ export default function DataTable<T>({
                 </AlertDialogContent>
               </AlertDialog>
 
-              <SheetContent className="min-w-[500px]">
+              <SheetContent className="min-w-[600px] overflow-y-scroll">
                 {rowForm(row.original)}
               </SheetContent>
             </Sheet>

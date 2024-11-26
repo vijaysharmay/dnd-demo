@@ -1,4 +1,4 @@
-import { createAccordInProjectWorkspace, CreateAccordRequestSchema, CreateAccordRequestZSchema, JSONSCHEMA, OPENAPI } from "@/api/accord";
+import { createAccordInProjectWorkspace, CreateAccordRequestSchema, CreateAccordRequestZSchema, JSONSCHEMA, OPENAPI, updateAccordInProjectWorkspace } from "@/api/accord";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -8,19 +8,22 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Monaco, Editor as SchemaEditor } from "@monaco-editor/react";
 import { useMutation } from "@tanstack/react-query";
 import Ajv from "ajv";
-import { isNull } from "lodash";
 import { editor } from "monaco-editor";
 import { useRef } from "react";
 import { useForm } from "react-hook-form";
 
-export default function CreateAccordForm({
+export default function AccordForm({
+  mode = "create",
   workspaceId,
   projectId,
+  accordId,
   initialValues,
 }: {
+  mode: "create" | "update";
   workspaceId: string;
   projectId: string;
-  initialValues: CreateAccordRequestSchema | undefined;
+  accordId?: string; // Only required for update
+  initialValues?: CreateAccordRequestSchema;
 }) {
   const ajv = new Ajv();
   ajv.addVocabulary([
@@ -34,17 +37,17 @@ export default function CreateAccordForm({
     "content",
   ]);
 
-  const createAccordForm = useForm<CreateAccordRequestSchema>({
+  const formDefaults: CreateAccordRequestSchema = {
+    accordName: "",
+    accordType: "JSONSCHEMA",
+    accordSchema: "",
+    accordVersion: "",
+    accordAPIUrl: "",
+  };
+
+  const formMethods = useForm<CreateAccordRequestSchema>({
     resolver: zodResolver(CreateAccordRequestZSchema),
-    values: isNull(initialValues)
-      ? {
-          accordName: "",
-          accordType: "JSONSCHEMA",
-          accordSchema: "",
-          accordVersion: "",
-          accordAPIUrl: "",
-        }
-      : initialValues,
+    values: initialValues || formDefaults,
   });
 
   const createAccordMutation = useMutation({
@@ -61,12 +64,38 @@ export default function CreateAccordForm({
       window.location.reload();
     },
     onError: (e: Error) => {
-      console.log(e.message);
+      console.error(e.message);
     },
   });
 
-  const onCreateAccordFormSubmit = (values: CreateAccordRequestSchema) => {
-    createAccordMutation.mutate({ workspaceId, projectId, values });
+  const updateAccordMutation = useMutation({
+    mutationFn: async ({
+      workspaceId,
+      projectId,
+      accordId,
+      values,
+    }: {
+      workspaceId: string;
+      projectId: string;
+      accordId: string;
+      values: CreateAccordRequestSchema;
+    }) => updateAccordInProjectWorkspace(workspaceId, projectId, accordId, values),
+    onSuccess: () => {
+      window.location.reload();
+    },
+    onError: (e: Error) => {
+      console.error(e.message);
+    },
+  });
+
+  const handleFormSubmit = (values: CreateAccordRequestSchema) => {
+    if (mode === "create") {
+      createAccordMutation.mutate({ workspaceId, projectId, values });
+    } else if (mode === "update" && accordId) {
+      updateAccordMutation.mutate({ workspaceId, projectId, accordId, values });
+    } else {
+      console.error("Accord ID is required for update mode.");
+    }
   };
 
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
@@ -75,7 +104,6 @@ export default function CreateAccordForm({
   const schemaEditorOptions: editor.IStandaloneEditorConstructionOptions = {
     readOnly: false,
     minimap: { enabled: false },
-    // lineNumbers: "off",
   };
 
   const handleEditorDidMount = (
@@ -87,13 +115,13 @@ export default function CreateAccordForm({
   };
 
   return (
-    <Form {...createAccordForm}>
+    <Form {...formMethods}>
       <form
-        onSubmit={createAccordForm.handleSubmit(onCreateAccordFormSubmit)}
+        onSubmit={formMethods.handleSubmit(handleFormSubmit)}
         className="space-y-4"
       >
         <FormField
-          control={createAccordForm.control}
+          control={formMethods.control}
           name="accordName"
           render={({ field }) => (
             <FormItem>
@@ -102,8 +130,7 @@ export default function CreateAccordForm({
                 <Input
                   placeholder="Enter a Accord name"
                   className={cn(
-                    createAccordForm.formState.errors["accordName"] &&
-                      "bg-red-50"
+                    formMethods.formState.errors["accordName"] && "bg-red-50"
                   )}
                   {...field}
                 />
@@ -113,7 +140,7 @@ export default function CreateAccordForm({
           )}
         />
         <FormField
-          control={createAccordForm.control}
+          control={formMethods.control}
           name="accordType"
           render={({ field }) => (
             <FormItem>
@@ -121,8 +148,7 @@ export default function CreateAccordForm({
               <FormControl>
                 <RadioGroup
                   className={cn(
-                    createAccordForm.formState.errors["accordType"] &&
-                      "bg-red-50"
+                    formMethods.formState.errors["accordType"] && "bg-red-50"
                   )}
                   onValueChange={field.onChange}
                   defaultValue={field.value}
@@ -146,7 +172,7 @@ export default function CreateAccordForm({
           )}
         />
         <FormField
-          control={createAccordForm.control}
+          control={formMethods.control}
           name="accordSchema"
           render={({ field }) => (
             <FormItem>
@@ -155,7 +181,7 @@ export default function CreateAccordForm({
                 <div
                   className={cn(
                     "border border-gray-200 rounded",
-                    createAccordForm.formState.errors["accordVersion"] &&
+                    formMethods.formState.errors["accordSchema"] &&
                       "border-red-200"
                   )}
                 >
@@ -167,7 +193,6 @@ export default function CreateAccordForm({
                     options={schemaEditorOptions}
                     onChange={field.onChange}
                     onMount={handleEditorDidMount}
-                    // beforeMount={handleEditorWillMount}
                   />
                 </div>
               </FormControl>
@@ -176,7 +201,7 @@ export default function CreateAccordForm({
           )}
         />
         <FormField
-          control={createAccordForm.control}
+          control={formMethods.control}
           name="accordVersion"
           render={({ field }) => (
             <FormItem>
@@ -185,7 +210,7 @@ export default function CreateAccordForm({
                 <Input
                   placeholder="Enter a Accord version"
                   className={cn(
-                    createAccordForm.formState.errors["accordVersion"] &&
+                    formMethods.formState.errors["accordVersion"] &&
                       "bg-red-50"
                   )}
                   {...field}
@@ -196,7 +221,7 @@ export default function CreateAccordForm({
           )}
         />
         <FormField
-          control={createAccordForm.control}
+          control={formMethods.control}
           name="accordAPIUrl"
           render={({ field }) => (
             <FormItem>
@@ -205,7 +230,7 @@ export default function CreateAccordForm({
                 <Input
                   placeholder="Enter a Accord API URL"
                   className={cn(
-                    createAccordForm.formState.errors["accordVersion"] &&
+                    formMethods.formState.errors["accordAPIUrl"] &&
                       "bg-red-50"
                   )}
                   {...field}
@@ -217,7 +242,7 @@ export default function CreateAccordForm({
         />
         <div className="text-center">
           <Button className="mt-2 w-full" type="submit" variant="default">
-            Save
+            {mode === "create" ? "Create" : "Update"} Accord
           </Button>
         </div>
       </form>

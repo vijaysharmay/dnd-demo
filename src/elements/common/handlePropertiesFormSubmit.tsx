@@ -67,7 +67,9 @@ export const usePropertiesFormSubmit = ({
     } = useElementStore.getState();
 
     const { getAccordById } = useAccordStore.getState();
-    let updatedProps = {};
+    let updatedProps = activeElementProps;
+    let updatedChildren = { children: activeElement.children };
+    const hasParent: boolean = !isNull(activeElement.parentId);
 
     if (activeElement.type === DTable) {
       const { accordId } = activeElementProps as DTablePropsSchema;
@@ -77,23 +79,24 @@ export const usePropertiesFormSubmit = ({
           ...activeElementProps,
           accord,
         };
-      } else {
-        updatedProps = activeElementProps;
       }
-    } else {
-      updatedProps = activeElementProps;
     }
 
-    const hasParent: boolean = !isNull(activeElement.parentId);
-
-    const updatedChildren =
-      activeElement.type === Form
-        ? {
-            children: initFormChildren(
-              (updatedProps as FormPropsSchema).responseSchemaMapping
-            ),
-          }
-        : { children: activeElement.children };
+    if (activeElement.type === Form) {
+      const { accordId } = activeElementProps as FormPropsSchema;
+      if (accordId) {
+        const accord = getAccordById(accordId);
+        if (accord) {
+          updatedProps = {
+            ...activeElementProps,
+            accord,
+          };
+          updatedChildren = {
+            children: initFormChildren(accord.accordSchema),
+          };
+        }
+      }
+    }
 
     const updatedElement: ComponentElementInstance = {
       ...activeElement,
