@@ -3,11 +3,12 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import useSchemaStore from "@/store/schema-store";
+import useAccordStore from "@/store/accord-store";
 import { ComponentElementInstance } from "@/types";
 import { DTablePropsSchema } from "@/types/properties";
 import { CaretSortIcon, ChevronDownIcon } from "@radix-ui/react-icons";
 import { ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
+import { JSONSchema7 } from "json-schema";
 import { capitalize } from "lodash";
 import { useEffect, useState } from "react";
 
@@ -15,52 +16,76 @@ export const DTableRenderComponent: React.FC<{
   elementInstance: ComponentElementInstance;
 }> = ({ elementInstance }) => {
   const { props } = elementInstance;
-  const { schemas } = useSchemaStore();
-  const { dTableHeightInPx, dataUrl, responseSchemaMapping } =
-    props as DTablePropsSchema;
-  const [data, setData] = useState([]);
+  const { dTableHeightInPx, accordId } = props as DTablePropsSchema;
+  const { getAccordById } = useAccordStore();
+  const [data, setData] = useState<unknown>([]);
+  const [schema, setSchema] = useState<unknown>(null);
 
   useEffect(() => {
-    fetch(dataUrl, {
-      headers: new Headers({
-        "ngrok-skip-browser-warning": "ok",
-      }),
-    })
-      .then((res) => {
-        return res.json();
-      })
-      .then((data) => {
-        setData(data);
-      });
-  }, [dataUrl]);
+    if (!accordId) {
+      setSchema(undefined);
+      setData([]);
+      return;
+    }
+    const accord = getAccordById(accordId);
+    const schemaString = accord?.accordSchema;
+    if (schemaString) {
+      try {
+        const parsedSchema = JSON.parse(schemaString) as JSONSchema7;
+        setSchema(parsedSchema);
+        fetch(accord?.accordAPIUrl, {
+          headers: new Headers({
+            "ngrok-skip-browser-warning": "ok",
+          }),
+        })
+          .then((res) => {
+            return res.json();
+          })
+          .then((data) => {
+            setData(data);
+          });
+      } catch (error) {
+        console.error("Error parsing schema:", error);
+        setSchema(undefined);
+      }
+    } else {
+      setSchema(undefined);
+      setData([]);
+    }
+  }, [accordId, getAccordById, setData]);
 
-  const dataSchema = schemas[responseSchemaMapping].schema;
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
 
-  const schemaProperties = dataSchema.items.properties;
-  const tableColumns = Object.keys(schemaProperties).map((prop: string) => {
-    return {
-      accessorKey: prop,
-      header: ({ column }) => {
-        const propType = schemaProperties[prop].type;
-        return propType === "string" ? (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            {capitalize(prop)}
-            <CaretSortIcon className="ml-2 h-4 w-4" />
-          </Button>
-        ) : (
-          capitalize(prop)
-        );
-      },
-      cell: ({ row }) => <div className="lowercase">{row.getValue(prop)}</div>,
-    };
-  });
+  const schemaProperties = schema?.items?.properties;
+  const tableColumns = schema
+    ? Object.keys(schemaProperties).map((prop: string) => {
+        return {
+          accessorKey: prop,
+          header: ({ column }) => {
+            const propType = schemaProperties[prop].type;
+            return propType === "string" ? (
+              <Button
+                variant="ghost"
+                onClick={() =>
+                  column.toggleSorting(column.getIsSorted() === "asc")
+                }
+              >
+                {capitalize(prop)}
+                <CaretSortIcon className="ml-2 h-4 w-4" />
+              </Button>
+            ) : (
+              capitalize(prop)
+            );
+          },
+          cell: ({ row }) => (
+            <div className="lowercase">{row.getValue(prop)}</div>
+          ),
+        };
+      })
+    : [];
 
   const columns = [
     {

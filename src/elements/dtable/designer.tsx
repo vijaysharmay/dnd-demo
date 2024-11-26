@@ -3,49 +3,80 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import useSchemaStore from "@/store/schema-store";
+import useAccordStore from "@/store/accord-store";
 import { ComponentElementInstance } from "@/types";
 import { DTablePropsSchema } from "@/types/properties";
 import { CaretSortIcon, ChevronDownIcon } from "@radix-ui/react-icons";
 import { ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
+import { JSONSchema7 } from "json-schema";
+import { JSONSchemaFaker } from "json-schema-faker";
 import { capitalize } from "lodash";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export const DTableDesignerComponent: React.FC<{
   elementInstance: ComponentElementInstance;
 }> = ({ elementInstance }) => {
   const { props } = elementInstance;
-  const { schemas } = useSchemaStore();
-  const { dTableHeightInPx, responseSchemaMapping } =
-    props as DTablePropsSchema;
-  const data = schemas[responseSchemaMapping].sampleData;
-  const dataSchema = schemas[responseSchemaMapping].schema;
+  const { dTableHeightInPx, accordId } = props as DTablePropsSchema;
+  const { getAccordById } = useAccordStore();
+  const [data, setData] = useState<unknown>([]);
+  const [schema, setSchema] = useState<unknown>(null);
+
+  useEffect(() => {
+    if (!accordId) {
+      setSchema(undefined);
+      setData([]);
+      return;
+    }
+
+    const schemaString = getAccordById(accordId)?.accordSchema;
+    if (schemaString) {
+      try {
+        const parsedSchema = JSON.parse(schemaString) as JSONSchema7;
+        setSchema(parsedSchema);
+        setData(JSONSchemaFaker.generate(parsedSchema),); // Replace this with actual data generation if needed
+      } catch (error) {
+        console.error("Error parsing schema:", error);
+        setSchema(undefined);
+      }
+    } else {
+      setSchema(undefined);
+      setData([]);
+    }
+  }, [accordId, getAccordById]); // Removed 'schema' from the dependency array
+
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
 
-  const schemaProperties = dataSchema.items.properties;
-  const tableColumns = Object.keys(schemaProperties).map((prop: string) => {
-    return {
-      accessorKey: prop,
-      header: ({ column }) => {
-        const propType = schemaProperties[prop].type;
-        return propType === "string" ? (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            {capitalize(prop)}
-            <CaretSortIcon className="ml-2 h-4 w-4" />
-          </Button>
-        ) : (
-          capitalize(prop)
-        );
-      },
-      cell: ({ row }) => <div className="lowercase">{row.getValue(prop)}</div>,
-    };
-  });
+  const schemaProperties = schema?.items?.properties;
+  const tableColumns = schema
+    ? Object.keys(schemaProperties).map((prop: string) => {
+        return {
+          accessorKey: prop,
+          header: ({ column }) => {
+            const propType = schemaProperties[prop].type;
+            return propType === "string" ? (
+              <Button
+                variant="ghost"
+                onClick={() =>
+                  column.toggleSorting(column.getIsSorted() === "asc")
+                }
+              >
+                {capitalize(prop)}
+                <CaretSortIcon className="ml-2 h-4 w-4" />
+              </Button>
+            ) : (
+              capitalize(prop)
+            );
+          },
+          cell: ({ row }) => (
+            <div className="lowercase">{row.getValue(prop)}</div>
+          ),
+        };
+      })
+    : [];
 
   const columns = [
     {

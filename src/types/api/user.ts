@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { AccordZSchema } from "./accord";
+
 export const UserZSchema = z.object({
   id: z.string(),
   fullName: z.string(),
@@ -44,6 +46,7 @@ export const SidebarProjectZSchema = ProjectWithoutPagesZSchema.extend({
 
 export const SidebarWorkspaceZSchema = WorkspaceWithOutProjectsZSchema.extend({
   projects: z.array(SidebarProjectZSchema),
+  accords: z.array(AccordZSchema)
 });
 
 export type SidebarWorkspaceSchema = z.infer<typeof SidebarWorkspaceZSchema>;

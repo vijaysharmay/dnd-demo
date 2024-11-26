@@ -1,68 +1,26 @@
-import { Check, ChevronsUpDown, Plus, Trash2 } from "lucide-react";
-
-import {
-  createProjectInWorkspace,
-  CreateProjectRequestSchema,
-  CreateProjectRequestZSchema,
-  createWorkspace,
-  CreateWorkspaceRequestSchema,
-  CreateWorkspaceRequestZSchema,
-} from "@/api";
+import { createProjectInWorkspace, CreateProjectRequestSchema, CreateProjectRequestZSchema, createWorkspace, CreateWorkspaceRequestSchema, CreateWorkspaceRequestZSchema } from "@/api";
 import { getUser, getUsers } from "@/api/user";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  useSidebar,
-} from "@/components/ui/sidebar";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import useAccordStore from "@/store/accord-store";
 import useWorkspaceStore from "@/store/workspace-store";
 import { SidebarWorkspaceSchema } from "@/types/api/user";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { find, findIndex, map } from "lodash";
+import { Check, ChevronsUpDown, Plus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useParams } from "wouter";
 import { navigate } from "wouter/use-browser-location";
+
 import { AutoComplete } from "./autocomplete";
 
 export function WorkspaceSwitcher() {
@@ -115,6 +73,8 @@ export function WorkspaceSwitcher() {
     setIsWorkspaceDataLoading,
   } = useWorkspaceStore();
 
+  const { setAccords } = useAccordStore();
+
   useEffect(() => {
     if (data) {
       setCurrentUser({
@@ -132,11 +92,14 @@ export function WorkspaceSwitcher() {
         ]);
         if (currentWorkspaceFromRouteParams) {
           setCurrentWorkspace(currentWorkspaceFromRouteParams.workspace);
+          setAccords(currentWorkspaceFromRouteParams.workspace.accords);
         }
       } else if (currentWorkspace) {
         setCurrentWorkspace(currentWorkspace);
+        setAccords(currentWorkspace.accords);
       } else {
         setCurrentWorkspace(data.userWorkspace);
+        setAccords(data.userWorkspace.accords);
       }
 
       if (users) {
@@ -155,6 +118,8 @@ export function WorkspaceSwitcher() {
     currentWorkspace,
     data,
     isPending,
+    setAccords,
+    setCurrentUser,
     setCurrentWorkspace,
     setIsWorkspaceDataLoading,
     setWorkspaces,

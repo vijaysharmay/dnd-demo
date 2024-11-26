@@ -75,8 +75,7 @@ export const DTablePropsZSchema = z.object({
     .string({ required_error: "Required dTableId" })
     .min(9)
     .startsWith("dTable-", "ID must start with the prefix `dTable-`"),
-  dataUrl: z.string().url(),
-  responseSchemaMapping: z.string(),
+  accordId: z.string().nullable(),
   dTableHeightInPx: z
     .string()
     .max(5)
@@ -88,8 +87,7 @@ export const FormPropsZSchema = z.object({
     .string({ required_error: "Required formId" })
     .min(8)
     .startsWith("form-", "ID must start with the prefix `form-`"),
-  onSubmitUrl: z.string().url(),
-  responseSchemaMapping: z.string(),
+  accordId: z.string().nullable(),
   formHeightInPx: z
     .string()
     .max(5)

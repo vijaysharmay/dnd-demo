@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { pbkdf2Sync, randomBytes } from 'crypto';
+import { forEach } from 'lodash';
 import { DIGEST, ITERATIONS, KEYLEN } from 'src/auth/constants';
 import { PrismaService } from 'src/prisma.service';
 import { v4 } from 'uuid';
 
-import { forEach } from 'lodash';
 import { CreateUserDto } from '../auth/dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
@@ -176,6 +176,16 @@ export class UserService {
                     ownerId: true,
                   },
                 },
+                accords: {
+                  select: {
+                    id: true,
+                    accordName: true,
+                    accordType: true,
+                    accordSchema: true,
+                    accordVersion: true,
+                    accordAPIUrl: true,
+                  },
+                },
               },
               omit: {
                 ownerId: true,
@@ -229,6 +239,16 @@ export class UserService {
               omit: {
                 workspaceId: true,
                 ownerId: true,
+              },
+            },
+            accords: {
+              select: {
+                id: true,
+                accordName: true,
+                accordType: true,
+                accordSchema: true,
+                accordVersion: true,
+                accordAPIUrl: true,
               },
             },
           },
