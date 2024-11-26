@@ -1,19 +1,6 @@
-import {
-  createAccordInProjectWorkspace,
-  CreateAccordRequestSchema,
-  CreateAccordRequestZSchema,
-  JSONSCHEMA,
-  OPENAPI,
-} from "@/api/accord";
+import { createAccordInProjectWorkspace, CreateAccordRequestSchema, CreateAccordRequestZSchema, JSONSCHEMA, OPENAPI } from "@/api/accord";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { cn } from "@/lib/utils";
@@ -33,7 +20,7 @@ export default function CreateAccordForm({
 }: {
   workspaceId: string;
   projectId: string;
-  initialValues: CreateAccordRequestSchema | null;
+  initialValues: CreateAccordRequestSchema | undefined;
 }) {
   const ajv = new Ajv();
   ajv.addVocabulary([

@@ -1,76 +1,32 @@
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import { ColumnMapping } from "@/types/datatable";
 import { CaretSortIcon, ChevronDownIcon } from "@radix-ui/react-icons";
-import { UseMutationResult } from "@tanstack/react-query";
-import {
-  ColumnFiltersState,
-  flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  SortingState,
-  useReactTable,
-  VisibilityState,
-} from "@tanstack/react-table";
+import { ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
 import { upperCase } from "lodash";
 import { useState } from "react";
-import { useParams } from "wouter";
 
-export default function DataTable({
+export default function DataTable<T>({
   columnMapping,
   data,
-  addRowForm,
-  updateMutation,
-  deleteMutation,
-  deleteBulkMutation,
+  rowForm,
+  handleRowDelete,
 }: {
   columnMapping: ColumnMapping[];
-  data: any[];
-  addRowForm: (initialValues) => React.ReactElement;
-  updateMutation: UseMutationResult<any, Error, any, any>;
-  deleteMutation: UseMutationResult<any, Error, any, any>;
-  deleteBulkMutation: UseMutationResult<any, Error, any, any>;
+  data: T[];
+  rowForm?: (initialValues?: T) => React.ReactElement;
+  handleRowDelete?: (id: string) => void;
 }) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
-
-  const { workspaceId, projectId } = useParams();
-  const handleRowDelete = (accordId: string) => {
-    deleteMutation.mutate({ workspaceId, projectId, accordId });
-    window.location.reload();
-  };
 
   const tableColumns = columnMapping.map((prop: ColumnMapping) => {
     return {
@@ -91,6 +47,58 @@ export default function DataTable({
       ),
     };
   });
+
+  const editColumns = rowForm
+    ? [
+        {
+          id: "edit",
+          header: ({ table }) => <></>,
+          cell: ({ row }) => (
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="link">Edit</Button>
+              </SheetTrigger>
+
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="link">Delete</Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      Are you absolutely sure?
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This action cannot be undone. This will permanently delete
+                      the record.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction asChild>
+                      <Button
+                        variant="destructive"
+                        onClick={() =>
+                          handleRowDelete && handleRowDelete(row.original.id)
+                        }
+                      >
+                        Delete
+                      </Button>
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+
+              <SheetContent className="min-w-[500px]">
+                {rowForm(row.original)}
+              </SheetContent>
+            </Sheet>
+          ),
+          enableSorting: false,
+          enableHiding: false,
+        },
+      ]
+    : [];
 
   const columns = [
     {
@@ -116,49 +124,7 @@ export default function DataTable({
       enableHiding: false,
     },
     ...tableColumns,
-    {
-      id: "edit",
-      header: ({ table }) => <></>,
-      cell: ({ row }) => (
-        <Sheet>
-          <SheetTrigger asChild>
-            <Button variant="link">Edit</Button>
-          </SheetTrigger>
-
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button variant="link">Delete</Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This action cannot be undone. This will permanently delete the
-                  record.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction asChild>
-                  <Button
-                    variant="destructive"
-                    onClick={() => handleRowDelete(row.original.id)}
-                  >
-                    Delete
-                  </Button>
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-
-          <SheetContent className="min-w-[500px]">
-            {addRowForm(row.original)}
-          </SheetContent>
-        </Sheet>
-      ),
-      enableSorting: false,
-      enableHiding: false,
-    },
+    ...editColumns,
   ];
 
   const table = useReactTable({
@@ -193,16 +159,20 @@ export default function DataTable({
           }
           className="max-w-sm"
         /> */}
-        <Sheet>
-          <SheetTrigger asChild>
-            <Button variant="outline" className="bg-green-500">
-              Add Row
-            </Button>
-          </SheetTrigger>
-          <SheetContent className="min-w-[600px] overflow-y-scroll">
-            {addRowForm(null)}
-          </SheetContent>
-        </Sheet>
+        {rowForm && (
+          <>
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="outline" className="bg-green-500">
+                  Add Row
+                </Button>
+              </SheetTrigger>
+              <SheetContent className="min-w-[600px] overflow-y-scroll">
+                {rowForm()}
+              </SheetContent>
+            </Sheet>
+          </>
+        )}
         {(table.getIsSomeRowsSelected() || table.getIsAllRowsSelected()) && (
           <Button
             className={cn(

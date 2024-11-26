@@ -1,29 +1,24 @@
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import PropertiesElementWrapper from "@/pages/version/properties-element.wrapper";
-import useSchemaStore from "@/store/schema-store";
+import useAccordStore from "@/store/accord-store";
+import useVersionStore from "@/store/version-store";
 import { ComponentElementInstance } from "@/types";
+import { AccordSchema } from "@/types/api/accord";
 import { DTablePropsSchema, DTablePropsZSchema } from "@/types/properties";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { isEmpty } from "lodash";
+import { isEmpty, isNull } from "lodash";
 import { SubmitHandler, useForm } from "react-hook-form";
 
-import useVersionStore from "@/store/version-store";
 import { FormFieldRender } from "../common/form-fields";
 import { usePropertiesFormSubmit } from "../common/handlePropertiesFormSubmit";
 
 export const DTablePropertiesComponent: React.FC<{
   elementInstance: ComponentElementInstance;
 }> = ({ elementInstance }) => {
-  const { schemas } = useSchemaStore();
+  const { accords } = useAccordStore();
   const form = useForm<DTablePropsSchema>({
     resolver: zodResolver(DTablePropsZSchema),
     values: elementInstance.props as DTablePropsSchema,
@@ -65,19 +60,7 @@ export const DTablePropertiesComponent: React.FC<{
 
           <FormField
             control={form.control}
-            name="dataUrl"
-            render={({ field }) => (
-              <FormFieldRender
-                name="Data URL"
-                tooltip="A GET API Endpoint for rendering the data table"
-                children={<Input type="text" {...field} />}
-              />
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="responseSchemaMapping"
+            name="accordId"
             render={({ field }) => (
               <FormFieldRender
                 name="Response Schema"
@@ -85,7 +68,7 @@ export const DTablePropertiesComponent: React.FC<{
                 children={
                   <Select
                     onValueChange={field.onChange}
-                    defaultValue={field.value}
+                    defaultValue={isNull(field.value) ? "" : field.value}
                   >
                     <FormControl>
                       <SelectTrigger>
@@ -93,10 +76,10 @@ export const DTablePropertiesComponent: React.FC<{
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {Object.keys(schemas).map((variant: string) => {
+                      {accords.map((accord: AccordSchema) => {
                         return (
-                          <SelectItem key={variant} value={variant}>
-                            {variant}
+                          <SelectItem key={accord.id} value={accord.id}>
+                            {accord.accordName}
                           </SelectItem>
                         );
                       })}

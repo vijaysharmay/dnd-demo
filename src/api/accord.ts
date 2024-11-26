@@ -1,3 +1,4 @@
+import { GetAccordResponseSchema, GetAccordZResponseSchema } from "@/types/api/accord";
 import Ajv from "ajv";
 import { z } from "zod";
 
@@ -41,19 +42,6 @@ const CreateAccordZResponseSchema = z.object({
 export type CreateAccordResponseSchema = z.infer<
   typeof CreateAccordZResponseSchema
 >;
-
-const AccordZSchema = z.object({
-  id: z.string(),
-  accordName: z.string(),
-  accordType: z.string(),
-  accordSchema: z.string(),
-  accordVersion: z.string(),
-  accordAPIUrl: z.string(),
-});
-
-const GetAccordZResponseSchema = z.array(AccordZSchema);
-export type GetAccordResponseSchema = z.infer<typeof GetAccordZResponseSchema>;
-export type AccordSchema = z.infer<typeof AccordZSchema>;
 
 // FUNCTIONS BEGIN
 
@@ -134,7 +122,7 @@ export const deleteAccordInProjectWorkspace = async (
   workspaceId: string,
   projecctId: string,
   accordId: string
-): Promise<boolean> => {
+): Promise<CreateAccordResponseSchema> => {
   const accessToken = sessionStorage.getItem("accessToken");
 
   if (!accessToken) {
@@ -155,8 +143,7 @@ export const deleteAccordInProjectWorkspace = async (
     throw new Error(`Server Error: ${JSON.stringify(response.text())}`);
   }
 
-  const data = await response.json();
-  return data;
+  return { id: accordId };
 };
 
 export const deleteBulkAccordInProjectWorkspace = async (

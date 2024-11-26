@@ -13,8 +13,7 @@ export const FormComponentElement: ComponentElement = {
     type: Form,
     props: {
       formId: `form-${randInt()}`,
-      onSubmitUrl: "https://jsonplaceholder.typicode.com/posts",
-      responseSchemaMapping: "JSONPlaceholderPosts",
+      accord: null,
       formHeightInPx: "200px",
     },
     children: initFormChildren("JSONPlaceholderPosts"),
