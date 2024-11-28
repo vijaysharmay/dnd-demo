@@ -1,6 +1,6 @@
 import { Toaster } from "@/components/ui/toaster";
 import AppContainer from "@/containers/app-container";
-import Messages from "@/containers/messages";
+import Messages from "@/pages/version/messages";
 import { cn } from "@/lib/utils";
 import { ComponentLibrary } from "@/pages/version/component-library";
 import Designer from "@/pages/version/designer";
