@@ -136,25 +136,27 @@ export function WorkspaceSwitcher() {
         ]);
         if (currentWorkspaceFromRouteParams) {
           setCurrentWorkspace(currentWorkspaceFromRouteParams.workspace);
-          if (projectId) {
-            const currentProjectFromRouteParams = find(
-              currentWorkspaceFromRouteParams.workspace.projects,
-              ["id", projectId]
-            );
-            if (currentProjectFromRouteParams) {
-              setCurrentProjectName(
-                currentProjectFromRouteParams.name
-              );
-              setAccords(
-                currentProjectFromRouteParams.accords
-              );
-            }
-          }
+          
         }
       } else if (currentWorkspace) {
         setCurrentWorkspace(currentWorkspace);
       } else {
         setCurrentWorkspace(data.userWorkspace);
+      }
+
+      if (projectId && currentWorkspace) {
+        const currentProjectFromRouteParams = find(
+          currentWorkspace.projects,
+          ["id", projectId]
+        );
+        if (currentProjectFromRouteParams) {
+          setCurrentProjectName(
+            currentProjectFromRouteParams.name
+          );
+          setAccords(
+            currentProjectFromRouteParams.accords
+          );
+        }
       }
 
       if (users) {

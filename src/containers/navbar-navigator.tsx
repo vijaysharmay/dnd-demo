@@ -45,11 +45,12 @@ import {
 } from "@/components/ui/sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn, convertToTree, NodeOptionsItem, Tree } from "@/lib/utils";
+import useAccordStore from "@/store/accord-store";
 import useWorkspaceStore from "@/store/workspace-store";
 import { SidebarWorkspaceSchema } from "@/types/api/user";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { startsWith } from "lodash";
+import { find, startsWith } from "lodash";
 import {
   ChevronRight,
   File,
@@ -60,7 +61,7 @@ import {
 } from "lucide-react";
 import { Dispatch, SetStateAction, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useLocation } from "wouter";
+import { useLocation, useParams } from "wouter";
 import { z } from "zod";
 
 export function ConcordSidebarNavigator() {
@@ -99,8 +100,10 @@ export function ConcordSidebarNavigator() {
 }
 
 function NavTree({ workspaceId, item }: { workspaceId: string; item: Tree }) {
-  const { setCurrentProjectName } = useWorkspaceStore();
+  const { setCurrentProjectName, currentWorkspace } = useWorkspaceStore();
+  const { setAccords } = useAccordStore();
   const [location, navigate] = useLocation();
+  const { projectId } = useParams();
   if (!item.children || item.children.length === 0) {
     return (
       <SidebarMenuItem className="cursor-pointer hover:bg-sidebar-accent rounded">
@@ -108,11 +111,7 @@ function NavTree({ workspaceId, item }: { workspaceId: string; item: Tree }) {
           <SidebarMenuButton
             isActive={location === item.url}
             onClick={() => {
-              if (item.type === "project") {
-                setCurrentProjectName(item.name);
-              }
-
-              navigate(item.url, { replace: true });
+              window.location.href = item.url;
             }}
           >
             {item.type === "project" && <Folder />}
@@ -150,10 +149,7 @@ function NavTree({ workspaceId, item }: { workspaceId: string; item: Tree }) {
                   className="w-full"
                   onClick={(e) => {
                     e.preventDefault();
-                    if (item.type === "project") {
-                      setCurrentProjectName(item.name);
-                    }
-                    navigate(item.url, { replace: true });
+                    window.location.href = item.url;
                   }}
                 >
                   {item.name}
