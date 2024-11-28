@@ -122,7 +122,8 @@ export type ComponentElementInstance = {
 export type ComponentElement = {
   create: (
     id: string,
-    customProps?: CustomPropsSchema
+    customProps?: CustomPropsSchema,
+    parentId?: string,
   ) => ComponentElementInstance;
   type: ComponentElementType;
   componentLibraryListItem: ComponentLibraryListItem;

@@ -1,10 +1,20 @@
-import { updateBlockPropsInPageVersion } from "@/api/block";
+import {
+  addChildrenToBlock,
+  CreateBlockRequestSchema,
+  updateBlockPropsInPageVersion,
+} from "@/api/block";
 import { initFormChildren } from "@/lib/utils";
 import useAccordStore from "@/store/accord-store";
 import useElementStore from "@/store/element-store";
 import { ComponentElementInstance, DTable, Form, HContainer } from "@/types";
 import { JSONZType } from "@/types/api/common";
-import { colsIntRec, DTablePropsSchema, FormPropsSchema, HContainerPropsSchema, PropsSchema } from "@/types/properties";
+import {
+  colsIntRec,
+  DTablePropsSchema,
+  FormPropsSchema,
+  HContainerPropsSchema,
+  PropsSchema,
+} from "@/types/properties";
 import { useMutation } from "@tanstack/react-query";
 import { drop, dropRight, fill, isNull } from "lodash";
 import { z } from "zod";
@@ -54,6 +64,38 @@ export const usePropertiesFormSubmit = ({
     },
   });
 
+  const addChildrenToBlockMutation = useMutation({
+    mutationFn: async ({
+      workspaceId,
+      projectId,
+      pageId,
+      versionId,
+      blockId,
+      values,
+    }: {
+      workspaceId: string;
+      projectId: string;
+      pageId: string;
+      versionId: string;
+      blockId: string;
+      values: CreateBlockRequestSchema[];
+    }) =>
+      addChildrenToBlock(
+        workspaceId,
+        projectId,
+        pageId,
+        versionId,
+        blockId,
+        values
+      ),
+    onSuccess: () => {
+      console.log("added");
+    },
+    onError: (e: Error) => {
+      console.log(e.message);
+    },
+  });
+
   const handlePropertiesFormSubmit = (
     activeElementProps: PropsSchema,
     activeElement: ComponentElementInstance
@@ -92,7 +134,7 @@ export const usePropertiesFormSubmit = ({
             accord,
           };
           updatedChildren = {
-            children: initFormChildren(accord.accordSchema),
+            children: initFormChildren(activeElement.id, accord.accordSchema),
           };
         }
       }
@@ -103,6 +145,7 @@ export const usePropertiesFormSubmit = ({
       ...updatedChildren,
       props: updatedProps,
     };
+    console.log(updatedElement);
 
     const childCount = updatedElement.children.length;
 
@@ -140,6 +183,28 @@ export const usePropertiesFormSubmit = ({
       updateElementInParent(activeElement.parentId as string, updatedElement);
     } else {
       updateElement(activeElement.id, updatedElement);
+    }
+
+    if (activeElement.type === Form) {
+      addChildrenToBlockMutation.mutate({
+        workspaceId,
+        projectId,
+        pageId,
+        versionId,
+        blockId,
+        values: updatedElement.children
+          .filter((x) => !isNull(x))
+          .map((child: ComponentElementInstance, index: number) => {
+            const block: CreateBlockRequestSchema = {
+              id: child.id,
+              blockType: child.type,
+              props: child.props,
+              depth: 1,
+              position: index,
+            };
+            return block;
+          }),
+      });
     }
 
     updateBlockPropsMutation.mutate({

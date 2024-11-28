@@ -78,6 +78,7 @@ export function createEmptyObjectFromSchema(schema: JSONSchema7) {
 }
 
 export function initFormChildren(
+  parentId: string,
   schemaAsString: string
 ): (ComponentElementInstance | null)[] {
   const schemaStore = localStorage["schemaStore"];
@@ -106,7 +107,8 @@ export function initFormChildren(
       };
       return libraryElements.Input.create(
         v4(),
-        inputInstanceProps as CustomPropsSchema
+        inputInstanceProps as CustomPropsSchema,
+        parentId
       );
     } else {
       return null;

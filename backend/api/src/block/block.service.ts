@@ -151,11 +151,13 @@ export class BlockService {
       data: {
         children: {
           create: createBlocksDto.map((block) => ({
-            connect: {
-              id: versionId,
-              workspaceId,
-              projectId,
-              pageId,
+            version: {
+              connect: {
+                id: versionId,
+                workspaceId,
+                projectId,
+                pageId,
+              },
             },
             id: block.id,
             blockType: block.blockType,

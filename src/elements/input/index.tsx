@@ -10,7 +10,7 @@ import { InputRenderComponent } from "./render";
 
 export const InputComponentElement: ComponentElement = {
   type: InputType,
-  create: (id: string, customProps?: InputPropsSchema) => ({
+  create: (id: string, customProps?: InputPropsSchema, parentId?: string) => ({
     id,
     type: InputType,
     props: customProps
@@ -24,7 +24,7 @@ export const InputComponentElement: ComponentElement = {
           isFormElement: false,
         },
     children: [],
-    parentId: null,
+    parentId: parentId ? parentId : null,
   }),
   componentLibraryListItem: {
     icon: <InputIcon />,

@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { initFormChildren } from "@/lib/utils";
 import DesignerElementWrapper from "@/pages/version/designer-element-wrapper";
 import { ComponentElementInstance } from "@/types";
 import { FormPropsSchema } from "@/types/properties";
@@ -7,9 +6,8 @@ import { FormPropsSchema } from "@/types/properties";
 export const FormDesignerComponent: React.FC<{
   elementInstance: ComponentElementInstance;
 }> = ({ elementInstance }) => {
-  const { props } = elementInstance;
-  const { formHeightInPx, accord } = props as FormPropsSchema;
-  const children = accord ? initFormChildren(accord.accordSchema) : [];
+  const { props, children } = elementInstance;
+  const { formHeightInPx } = props as FormPropsSchema;
   return (
     <div className="w-full" style={{ minHeight: formHeightInPx }}>
       {children.length === 0 && (

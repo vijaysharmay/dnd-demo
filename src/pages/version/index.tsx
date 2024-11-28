@@ -3,7 +3,7 @@ import AppContainer from "@/containers/app-container";
 import Messages from "@/pages/version/messages";
 import { cn } from "@/lib/utils";
 import { ComponentLibrary } from "@/pages/version/component-library";
-import Designer from "@/pages/version/designer";
+import Designer from "@/pages/version/version-designer";
 import DragOverlayWrapper from "@/pages/version/drag-overlay-wrapper";
 import Properties from "@/pages/version/properties";
 import {

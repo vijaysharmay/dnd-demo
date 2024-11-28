@@ -1,8 +1,17 @@
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { convertJSONSchemaToZod, createEmptyObjectFromSchema, initFormChildren } from "@/lib/utils";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  convertJSONSchemaToZod,
+  createEmptyObjectFromSchema,
+} from "@/lib/utils";
 import { ComponentElementInstance } from "@/types";
 import { FormPropsSchema, InputPropsSchema } from "@/types/properties";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -15,10 +24,9 @@ import { FormFieldRender } from "../common/form-fields";
 export const FormRenderComponent: React.FC<{
   elementInstance: ComponentElementInstance;
 }> = ({ elementInstance }) => {
-  const { props } = elementInstance;
+  const { props, children } = elementInstance;
   const { formHeightInPx, accord } = props as FormPropsSchema;
   const dataSchema: JSONSchema7 = accord ? JSON.parse(accord.accordSchema) : {};
-  const children = accord ? initFormChildren(accord.accordSchema) : [];
   const zDataSchema = convertJSONSchemaToZod(dataSchema);
   type FormSchema = z.infer<typeof zDataSchema>;
   const form = useForm<FormSchema>({

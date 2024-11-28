@@ -128,7 +128,6 @@ export default function DesignerElementWrapper({
     <div
       onClick={(e) => {
         e.stopPropagation();
-
         if (
           (e.target as HTMLDivElement).getAttribute("data-id") !==
           getDesignerElementDeleteId()
