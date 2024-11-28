@@ -1,7 +1,6 @@
 import { randInt } from "@/lib/utils";
 import { ComponentElement, Input as InputType } from "@/types";
 import { InputPropsSchema } from "@/types/properties";
-import { faker } from "@faker-js/faker";
 import { InputIcon } from "@radix-ui/react-icons";
 
 import { InputDesignerComponent, InputDragOverlayComponent } from "./designer";
@@ -17,9 +16,9 @@ export const InputComponentElement: ComponentElement = {
       ? customProps
       : {
           inputId: `input-${randInt()}`,
-          inputLabel: faker.string.alpha({ length: { min: 5, max: 10 } }),
-          placeHolder: faker.string.alpha({ length: { min: 5, max: 10 } }),
-          helperText: faker.string.alpha({ length: { min: 5, max: 10 } }),
+          inputLabel: "Input Label",
+          placeHolder: "This is a placeholder",
+          helperText: "This is a helper text",
           inputType: "text",
           isFormElement: false,
         },

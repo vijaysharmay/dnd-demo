@@ -202,11 +202,8 @@ export default function RequestReview({
       <DialogTrigger asChild>
         {!workspace.isUserWorkspace && (
           <Button
-            variant="ghost"
-            className={cn(
-              !workspace.isUserWorkspace ? "mr-2" : "mr-0",
-              "bg-orange-400"
-            )}
+            variant="default"
+            className={cn(!workspace.isUserWorkspace ? "mr-2" : "mr-0")}
             onClick={() => setIsAddReviewersDialogOpen(true)}
           >
             Review Status

@@ -11,7 +11,7 @@ export const InputDesignerComponent: React.FC<{
     props as InputPropsSchema;
 
   return (
-    <div className="w-full">
+    <div className="w-full text-muted-foreground">
       <Label htmlFor={inputId}>{inputLabel}</Label>
       <Input
         type={inputType}
@@ -19,7 +19,7 @@ export const InputDesignerComponent: React.FC<{
         placeholder={placeHolder}
         readOnly={true}
       />
-      <p className="text-muted-foreground text-xs">{helperText}</p>
+      <p className=" text-xs">{helperText}</p>
     </div>
   );
 };
