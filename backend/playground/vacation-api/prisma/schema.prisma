@@ -1,0 +1,74 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["omitApi"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Employee {
+  id              String           @id @default(cuid())
+  email           String           @unique
+  password        String
+  name            String
+  role            Role
+  location        String
+  designation     String
+  gender          Gender
+  departmentId    String?
+  department      Department?      @relation(fields: [departmentId], references: [id], name: "departmentOfEmployee")
+  timeOffRequests TimeOffRequest[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+}
+
+model Department {
+  id              String           @id @default(cuid())
+  name            String           @unique
+  employees       Employee[]       @relation(name: "departmentOfEmployee")
+  timeOffRequests TimeOffRequest[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+}
+
+model TimeOffRequest {
+  id           String        @id @default(cuid())
+  employeeId   String
+  employee     Employee      @relation(fields: [employeeId], references: [id])
+  departmentId String
+  department   Department    @relation(fields: [departmentId], references: [id])
+  status       RequestStatus @default(PENDING)
+  startDate    DateTime
+  endDate      DateTime
+  reason       String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model Holiday {
+  id          String   @id @default(cuid())
+  date        DateTime @unique
+  description String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+enum Role {
+  EMPLOYEE
+  MANAGER
+  ADMIN
+}
+
+enum RequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}

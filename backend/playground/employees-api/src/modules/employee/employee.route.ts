@@ -1,6 +1,9 @@
 import { FastifyInstance } from "fastify";
 
-import { createEmployeeHandler, getEmployeesHandler } from "./employee.controller";
+import {
+  createEmployeeHandler,
+  getEmployeesHandler,
+} from "./employee.controller";
 import { $ref } from "./employee.schema";
 
 async function EmployeeRoutes(server: FastifyInstance) {
