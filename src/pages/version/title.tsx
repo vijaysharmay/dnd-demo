@@ -28,8 +28,6 @@ export default function VersionTitle() {
     (x: Reviewer) => x.approver.id
   );
 
-  console.log(currentStatus);
-
   return (
     <>
       <div>{name}</div>

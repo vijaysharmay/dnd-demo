@@ -30,8 +30,8 @@ export const getPageVersionInProjectWorkspace = async (
 
   const data = await response.json();
   const result = VersionZSchema.safeParse(data);
-  // console.log(data);
-  console.log(result.error, data);
+
+  // console.log(result.error, data);
   if (!result.success) {
     throw new Error("Error fetching version - response schema mismatch");
   }
