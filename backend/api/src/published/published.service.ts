@@ -14,6 +14,7 @@ export class PublishedService {
         versions: {
           some: {
             name: parsedVersionName,
+            currentStatus: PageVersionStatus.PUBLISHED,
           },
         },
       },
@@ -30,11 +31,8 @@ export class PublishedService {
                 route: true,
                 versions: {
                   where: {
-                    currentStatus: PageVersionStatus.PUBLISHED,
+                    name: parsedVersionName,
                   },
-                  // where: {
-                  //   name: parsedVersionName,
-                  // },
                   select: {
                     name: true,
                     blocks: {

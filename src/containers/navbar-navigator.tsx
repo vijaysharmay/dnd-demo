@@ -152,8 +152,18 @@ function NodeOptions({
   workspaceId: string;
   children: React.ReactElement;
 }) {
-  const [isDialogOpen, setIsDialogOpen] =
-    useState<boolean>(false);
+  const [isAddPageDialogOpen, setIsAddPageDialogOpen] =
+  useState<boolean>(false);
+const [isMoveProjectDialogOpen, setIsMoveProjectDialogOpen] =
+  useState<boolean>(false);
+const [isDeletePageFormDialogOpen, setIsDeletePageFormDialogOpen] =
+  useState<boolean>(false);
+const [isDeleteProjectFormDialogOpen, setIsDeleteProjectFormDialogOpen] =
+  useState<boolean>(false);
+  const [isDeleteVersionFormDialogOpen, setIsDeleteVersionFormDialogOpen] =
+  useState<boolean>(false);
+const [isCloneVersionFormDialogOpen, setIsCloneVersionFormDialogOpen] =
+  useState<boolean>(false);
 
   return (
     <ContextMenu>
@@ -168,11 +178,11 @@ function NodeOptions({
                 <AddPageForm
                   workspaceId={workspaceId}
                   projectId={node.id}
-                  setIsDialogOpen={setIsDialogOpen}
+                  setIsDialogOpen={setIsAddPageDialogOpen}
                 />
               }
-              open={isDialogOpen}
-              onOpenChange={setIsDialogOpen}
+              open={isAddPageDialogOpen}
+              onOpenChange={setIsAddPageDialogOpen}
             />
             <NodeOptionsItem
               name="Move Project"
@@ -181,11 +191,11 @@ function NodeOptions({
                 <MoveProjectForm
                   workspaceId={workspaceId}
                   projectId={node.id}
-                  setIsDialogOpen={setIsDialogOpen}
+                  setIsDialogOpen={setIsMoveProjectDialogOpen}
                 />
               }
-              open={isDialogOpen}
-              onOpenChange={setIsDialogOpen}
+              open={isMoveProjectDialogOpen}
+              onOpenChange={setIsMoveProjectDialogOpen}
             />
             <NodeOptionsItem
               name="Delete Project"
@@ -195,12 +205,12 @@ function NodeOptions({
                   workspaceId={workspaceId}
                   projectId={node.id}
                   setIsDialogOpen={
-                    setIsDialogOpen
+                    setIsDeleteProjectFormDialogOpen
                   }
                 />
               }
-              open={isDialogOpen}
-              onOpenChange={setIsDialogOpen}
+              open={isDeleteProjectFormDialogOpen}
+              onOpenChange={setIsDeleteProjectFormDialogOpen}
             />
           </>
         )}
@@ -214,11 +224,11 @@ function NodeOptions({
                   workspaceId={workspaceId}
                   projectId={node.parentId}
                   pageId={node.id}
-                  setIsDialogOpen={setIsDialogOpen}
+                  setIsDialogOpen={setIsDeletePageFormDialogOpen}
                 />
               }
-              open={isDialogOpen}
-              onOpenChange={setIsDialogOpen}
+              open={isDeletePageFormDialogOpen}
+              onOpenChange={setIsDeletePageFormDialogOpen}
             />
           </>
         )}
@@ -233,11 +243,11 @@ function NodeOptions({
                   projectId={node.parentId.split("|")[1]}
                   pageId={node.parentId.split("|")[0]}
                   versionId={node.id}
-                  setIsDialogOpen={setIsDialogOpen}
+                  setIsDialogOpen={setIsCloneVersionFormDialogOpen}
                 />
               }
-              open={isDialogOpen}
-              onOpenChange={setIsDialogOpen}
+              open={isCloneVersionFormDialogOpen}
+              onOpenChange={setIsCloneVersionFormDialogOpen}
             />
           </>
         )}
@@ -252,11 +262,11 @@ function NodeOptions({
                   projectId={node.parentId.split("|")[1]}
                   pageId={node.parentId.split("|")[0]}
                   versionId={node.id}
-                  setIsDialogOpen={setIsDialogOpen}
+                  setIsDialogOpen={setIsDeleteVersionFormDialogOpen}
                 />
               }
-              open={isDialogOpen}
-              onOpenChange={setIsDialogOpen}
+              open={isDeleteVersionFormDialogOpen}
+              onOpenChange={setIsDeleteVersionFormDialogOpen}
             />
           </>
         )}

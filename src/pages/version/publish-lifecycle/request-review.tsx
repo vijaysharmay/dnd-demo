@@ -1,19 +1,7 @@
-import {
-  getExistingReviewersForVersion,
-  setReviewersToUnpublishedVersion,
-} from "@/api";
+import { getExistingReviewersForVersion, setReviewersToUnpublishedVersion } from "@/api";
 import { getUsers } from "@/api/user";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AutoComplete } from "@/containers/autocomplete";
 import { cn } from "@/lib/utils";
 import useVersionStore from "@/store/version-store";
@@ -203,9 +191,6 @@ export default function RequestReview({
           </Button>
         )}
       </DialogTrigger>
-      <DialogClose
-        onClick={() => setIsAddReviewersDialogOpen(false)}
-      ></DialogClose>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Manage Reviewers</DialogTitle>
