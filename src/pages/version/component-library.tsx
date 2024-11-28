@@ -38,7 +38,7 @@ function LibraryListDraggableItem({ element }: { element: ComponentElement }) {
   return (
     <Button
       ref={draggable.setNodeRef}
-      variant="secondary"
+      variant="default"
       className={cn(
         "flex-row cursor-grab",
         draggable.isDragging && "ring-2 ring-slate-200"
