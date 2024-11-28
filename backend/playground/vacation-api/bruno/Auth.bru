@@ -1,0 +1,36 @@
+meta {
+  name: Auth - Register User
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:3000/auth/register
+  body: {
+    "email": "john.doe@example.com",
+    "password": "StrongP@ssw0rd",
+    "name": "John Doe",
+    "role": "EMPLOYEE",
+    "location": "New York",
+    "designation": "Software Engineer",
+    "gender": "MALE"
+  }
+  auth: none
+}
+
+---
+
+meta {
+  name: Auth - Login User
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:3000/auth/login
+  body: {
+    "email": "john.doe@example.com",
+    "password": "StrongP@ssw0rd"
+  }
+  auth: none
+}

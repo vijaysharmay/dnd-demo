@@ -1,9 +1,11 @@
 import { Module } from '@nestjs/common';
-import { TimeoffService } from './timeoff.service';
-import { TimeoffController } from './timeoff.controller';
+import { PrismaModule } from 'src/prisma.module';
+import { TimeOffController } from './timeoff.controller';
+import { TimeOffService } from './timeoff.service';
 
 @Module({
-  controllers: [TimeoffController],
-  providers: [TimeoffService],
+  controllers: [TimeOffController],
+  providers: [TimeOffService],
+  imports: [PrismaModule],
 })
 export class TimeoffModule {}

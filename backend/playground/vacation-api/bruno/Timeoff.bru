@@ -1,0 +1,47 @@
+meta {
+  name: TimeOff - Request Time Off
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:3000/timeoff/request
+  body: {
+    "employeeId": "emp123",
+    "startDate": "2024-01-01T09:00:00Z",
+    "endDate": "2024-01-05T18:00:00Z",
+    "reason": "Family vacation"
+  }
+  auth: none
+}
+
+---
+
+meta {
+  name: TimeOff - Get Time Off Status
+  type: http
+  seq: 2
+}
+
+get {
+  url: http://localhost:3000/timeoff/status/emp123
+  body: none
+  auth: none
+}
+
+---
+
+meta {
+  name: TimeOff - Approve Time Off
+  type: http
+  seq: 3
+}
+
+patch {
+  url: http://localhost:3000/timeoff/approve
+  body: {
+    "requestId": "req456",
+    "status": "APPROVED"
+  }
+  auth: none
+}

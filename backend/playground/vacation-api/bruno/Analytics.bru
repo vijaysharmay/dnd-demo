@@ -1,0 +1,25 @@
+meta {
+  name: Analytics - Get Department Metrics
+  type: http
+  seq: 1
+}
+
+get {
+  url: http://localhost:3000/analytics?departmentId=dept789&interval=week
+  body: none
+  auth: none
+}
+
+---
+
+meta {
+  name: Analytics - Get Company-Wide Metrics
+  type: http
+  seq: 2
+}
+
+get {
+  url: http://localhost:3000/analytics?startDate=2024-01-01T00:00:00Z&endDate=2024-01-31T23:59:59Z&interval=month
+  body: none
+  auth: none
+}

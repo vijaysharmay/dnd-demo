@@ -52,11 +52,4 @@ export class TimeOffController {
   async addHoliday(@Body() holidayDto: any) {
     return this.timeOffService.addHoliday(holidayDto);
   }
-
-  @Get('analytics/:departmentId')
-  @Roles('ADMIN')
-  @UseGuards(RolesGuard)
-  async getDepartmentAnalytics(@Param('departmentId') departmentId: string) {
-    return this.timeOffService.getDepartmentAnalytics(departmentId);
-  }
 }
