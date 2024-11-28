@@ -1,12 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { PageVersionStatus, VersionStatusLogApprovalStatus } from '@prisma/client';
+import {
+  PageVersionStatus,
+  VersionStatusLogApprovalStatus,
+} from '@prisma/client';
 import { first } from 'lodash';
 import { PrismaService } from 'src/prisma.service';
 import { v4 } from 'uuid';
 
 import { CreateVersionDto } from './dto/create-version.dto';
-import { AddReviewersDto, CloneVersionDto, UpdateVersionDto } from './dto/update-version.dto';
+import {
+  AddReviewersDto,
+  CloneVersionDto,
+  PublishDto,
+  UpdateVersionDto,
+} from './dto/update-version.dto';
 
 @Injectable()
 export class VersionService {
@@ -23,10 +31,10 @@ export class VersionService {
   ) {
     const { sub: ownerId } = this.jwtService.decode(accessToken);
     const { name } = createVersionDto;
-    const VersionId = v4();
+    const versionId = v4();
     const { id } = await this.prisma.version.create({
       data: {
-        id: VersionId,
+        id: versionId,
         name,
         owner: {
           connect: {
@@ -194,6 +202,55 @@ export class VersionService {
             children: true,
           },
         },
+        changeLog: {
+          include: {
+            changeOwner: {
+              omit: {
+                passwd: true,
+                salt: true,
+                userWorkspaceId: true,
+              },
+            },
+          },
+          omit: {
+            changeOwnerId: true,
+          },
+        },
+        statusLog: {
+          where: {
+            versionId,
+          },
+          orderBy: {
+            changesMadeOn: 'desc',
+          },
+          take: 1,
+          include: {
+            changeOwner: {
+              omit: {
+                passwd: true,
+                salt: true,
+                userWorkspaceId: true,
+              },
+            },
+          },
+          omit: {
+            changeOwnerId: true,
+          },
+        },
+        releases: {
+          include: {
+            releasedBy: {
+              omit: {
+                passwd: true,
+                salt: true,
+                userWorkspaceId: true,
+              },
+            },
+          },
+          omit: {
+            releasedById: true,
+          },
+        },
       },
       omit: {
         ownerId: true,
@@ -359,6 +416,7 @@ export class VersionService {
     projectId: string,
     pageId: string,
     versionId: string,
+    versionStatusLogId: string,
   ) {
     const { statusLog } = await this.prisma.version.findFirst({
       where: {
@@ -370,6 +428,7 @@ export class VersionService {
       select: {
         statusLog: {
           where: {
+            id: versionStatusLogId,
             status: PageVersionStatus.PENDING_REVIEW,
           },
           orderBy: {
@@ -401,22 +460,14 @@ export class VersionService {
   }
 
   async addReviewers(
+    accessToken: string,
     workspaceId: string,
     projectId: string,
     pageId: string,
     versionId: string,
     addReviewersDto: AddReviewersDto,
   ) {
-    const versionStatusLog =
-      await this.prisma.versionStatusLog.findFirstOrThrow({
-        where: {
-          versionId,
-          status: {
-            in: [PageVersionStatus.DRAFT, PageVersionStatus.PENDING_REVIEW],
-          },
-        },
-      });
-
+    const { sub: ownerId } = this.jwtService.decode(accessToken);
     await this.prisma.version.update({
       where: {
         workspaceId,
@@ -429,11 +480,19 @@ export class VersionService {
       },
     });
 
-    await this.prisma.versionStatusLog.update({
-      where: {
-        id: versionStatusLog.id,
-      },
+    const { id } = await this.prisma.versionStatusLog.create({
       data: {
+        id: v4(),
+        version: {
+          connect: {
+            id: versionId,
+          },
+        },
+        changeOwner: {
+          connect: {
+            id: ownerId,
+          },
+        },
         status: PageVersionStatus.PENDING_REVIEW,
       },
     });
@@ -449,7 +508,7 @@ export class VersionService {
           },
           versionStatusLog: {
             connect: {
-              id: versionStatusLog.id,
+              id,
             },
           },
           status: VersionStatusLogApprovalStatus.PENDING,
@@ -547,7 +606,12 @@ export class VersionService {
     const statusLog = await this.prisma.versionStatusLog.findFirst({
       where: {
         versionId: id,
+        status: PageVersionStatus.PENDING_REVIEW,
       },
+      orderBy: {
+        changesMadeOn: 'desc',
+      },
+      take: 1,
     });
 
     const approver = await this.prisma.versionStatusLogApprovers.findFirst({
@@ -602,23 +666,85 @@ export class VersionService {
     projectId: string,
     pageId: string,
     versionId: string,
+    publishDto: PublishDto,
   ) {
     const { sub: ownerId } = this.jwtService.decode(accessToken);
-    const { id } = await this.prisma.version.findFirst({
+    const parentVersion = await this.prisma.version.findFirst({
       where: {
         workspaceId,
         projectId,
         pageId,
         id: versionId,
       },
+      include: {
+        blocks: true,
+      },
     });
 
     await this.prisma.version.update({
       where: {
-        id,
+        id: parentVersion.id,
       },
       data: {
         currentStatus: PageVersionStatus.PUBLISHED,
+      },
+    });
+
+    await this.prisma.versionRelease.create({
+      data: {
+        id: v4(),
+        parentVersion: {
+          connect: {
+            id: parentVersion.id,
+          },
+        },
+        isCurrentRelease: true,
+        releasedBy: {
+          connect: {
+            id: ownerId,
+          },
+        },
+        pointInTimeVersion: {
+          create: {
+            id: v4(),
+            isReleaseVersion: true,
+            owner: {
+              connect: {
+                id: ownerId,
+              },
+            },
+            page: {
+              connect: {
+                id: pageId,
+              },
+            },
+            project: {
+              connect: {
+                id: projectId,
+              },
+            },
+            workspace: {
+              connect: {
+                id: workspaceId,
+              },
+            },
+            currentStatus: PageVersionStatus.PUBLISHED,
+            blocks: {
+              createMany: {
+                data: parentVersion.blocks.map(
+                  ({ blockType, props, depth, position }) => ({
+                    blockType,
+                    props,
+                    depth,
+                    position,
+                    id: v4(),
+                  }),
+                ),
+              },
+            },
+          },
+        },
+        releaseName: publishDto.releaseName,
       },
     });
 
@@ -627,7 +753,7 @@ export class VersionService {
         id: v4(),
         version: {
           connect: {
-            id,
+            id: parentVersion.id,
           },
         },
         changeOwner: {

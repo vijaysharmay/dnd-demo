@@ -22,15 +22,26 @@ export default function VersionTitle() {
     window.open(baseUrl, "_blank");
   };
 
+  const handlePreview = () => {};
+
   const currentVersionReviewerIds = currentVersionReviewers.map(
     (x: Reviewer) => x.approver.id
   );
+
+  console.log(currentStatus);
 
   return (
     <>
       <div>{name}</div>
       <div className="grow"></div>
       <div className="ml-auto">
+        <Button
+          variant="default"
+          className={cn(!workspace.isUserWorkspace ? "mr-2" : "mr-0")}
+          onClick={handlePreview}
+        >
+          Preview
+        </Button>
         {!workspace.isUserWorkspace && currentStatus === "PUBLISHED" && (
           <Button
             variant="default"
@@ -40,11 +51,11 @@ export default function VersionTitle() {
             View Published Page
           </Button>
         )}
-        {currentStatus === "DRAFT" && (
+        {!workspace.isUserWorkspace && currentStatus === "DRAFT" && (
           <RequestReview version={currentVersion} editMode={true} />
         )}
 
-        {currentStatus === "PENDING_REVIEW" && (
+        {!workspace.isUserWorkspace && currentStatus === "PENDING_REVIEW" && (
           <>
             {!includes(currentVersionReviewerIds, currentUser.id) ? (
               <RequestReview version={currentVersion} editMode={false} />
@@ -54,7 +65,7 @@ export default function VersionTitle() {
           </>
         )}
 
-        {currentStatus === "APPROVED" && (
+        {!workspace.isUserWorkspace && currentStatus === "APPROVED" && (
           <>
             {includes(owner.id, currentUser.id) && (
               <>
@@ -65,8 +76,8 @@ export default function VersionTitle() {
           </>
         )}
 
-        {currentStatus === "PUBLISHED" && (
-          <Button variant="ghost" className="bg-blue-600 text-white" disabled>
+        {!workspace.isUserWorkspace && currentStatus === "PUBLISHED" && (
+          <Button variant="ghost" className="bg-blue-600 text-white">
             <Check /> PUBLISHED
           </Button>
         )}

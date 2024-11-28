@@ -31,6 +31,7 @@ export const getUser = async (): Promise<CurrentUserResponse> => {
   const data = await response.json();
   const result = CurrentUserZResponse.safeParse(data);
 
+  // console.log(result.error, data);
   if (!result.success) {
     throw new Error("Error fetching current user details");
   }

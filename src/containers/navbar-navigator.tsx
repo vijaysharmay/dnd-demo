@@ -45,12 +45,11 @@ import {
 } from "@/components/ui/sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn, convertToTree, NodeOptionsItem, Tree } from "@/lib/utils";
-import useAccordStore from "@/store/accord-store";
 import useWorkspaceStore from "@/store/workspace-store";
 import { SidebarWorkspaceSchema } from "@/types/api/user";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { find, startsWith } from "lodash";
+import { startsWith } from "lodash";
 import {
   ChevronRight,
   File,
@@ -61,7 +60,7 @@ import {
 } from "lucide-react";
 import { Dispatch, SetStateAction, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useLocation, useParams } from "wouter";
+import { useLocation } from "wouter";
 import { z } from "zod";
 
 export function ConcordSidebarNavigator() {
@@ -100,10 +99,7 @@ export function ConcordSidebarNavigator() {
 }
 
 function NavTree({ workspaceId, item }: { workspaceId: string; item: Tree }) {
-  const { setCurrentProjectName, currentWorkspace } = useWorkspaceStore();
-  const { setAccords } = useAccordStore();
   const [location, navigate] = useLocation();
-  const { projectId } = useParams();
   if (!item.children || item.children.length === 0) {
     return (
       <SidebarMenuItem className="cursor-pointer hover:bg-sidebar-accent rounded">
@@ -569,7 +565,7 @@ function DeletePageForm({
   pageId: string;
   setIsDialogOpen: Dispatch<SetStateAction<boolean>>;
 }) {
-  const createAccordMutation = useMutation({
+  const deletePageMutation = useMutation({
     mutationFn: async ({
       workspaceId,
       projectId,
@@ -588,7 +584,7 @@ function DeletePageForm({
   });
 
   const handleDeleteConfirmation = () => {
-    createAccordMutation.mutate({ workspaceId, projectId, pageId });
+    deletePageMutation.mutate({ workspaceId, projectId, pageId });
   };
 
   return (

@@ -30,8 +30,8 @@ export const getPageVersionInProjectWorkspace = async (
 
   const data = await response.json();
   const result = VersionZSchema.safeParse(data);
-
-  // console.log(result.error, data);
+  // console.log(data);
+  console.log(result.error, data);
   if (!result.success) {
     throw new Error("Error fetching version - response schema mismatch");
   }
@@ -136,7 +136,8 @@ export const getExistingReviewersForVersion = async (
   workspaceId: string,
   projectId: string,
   pageId: string,
-  versionId: string
+  versionId: string,
+  versionStatusLogId: string
 ) => {
   const accessToken = sessionStorage.getItem("accessToken");
 
@@ -144,7 +145,7 @@ export const getExistingReviewersForVersion = async (
     throw new Error("Couldnt find access token");
   }
 
-  const url = `http://localhost:3000/workspace/${workspaceId}/project/${projectId}/page/${pageId}/version/${versionId}/reviewers`;
+  const url = `http://localhost:3000/workspace/${workspaceId}/project/${projectId}/page/${pageId}/version/${versionId}/reviewers?versionStatusLogId=${versionStatusLogId}`;
   const response = await fetch(url, {
     headers: new Headers({
       "Content-Type": "application/json",
@@ -226,7 +227,8 @@ export const publishUnpublishedVersion = async (
   workspaceId: string,
   projectId: string,
   pageId: string,
-  versionId: string
+  versionId: string,
+  releaseName: string
 ): Promise<boolean> => {
   const accessToken = sessionStorage.getItem("accessToken");
 
@@ -237,7 +239,7 @@ export const publishUnpublishedVersion = async (
   const url = `http://localhost:3000/workspace/${workspaceId}/project/${projectId}/page/${pageId}/version/${versionId}/publish`;
   const response = await fetch(url, {
     method: "PATCH",
-    body: JSON.stringify({}),
+    body: JSON.stringify({ releaseName }),
     headers: new Headers({
       "Content-Type": "application/json",
       Accept: "application/json",

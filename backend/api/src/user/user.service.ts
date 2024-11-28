@@ -133,6 +133,9 @@ export class UserService {
                     pages: {
                       include: {
                         versions: {
+                          where: {
+                            isReleaseVersion: false,
+                          },
                           include: {
                             owner: {
                               omit: {
@@ -235,20 +238,20 @@ export class UserService {
                     userWorkspaceId: true,
                   },
                 },
+                accords: {
+                  select: {
+                    id: true,
+                    accordName: true,
+                    accordType: true,
+                    accordSchema: true,
+                    accordVersion: true,
+                    accordAPIUrl: true,
+                  },
+                },
               },
               omit: {
                 workspaceId: true,
                 ownerId: true,
-              },
-            },
-            accords: {
-              select: {
-                id: true,
-                accordName: true,
-                accordType: true,
-                accordSchema: true,
-                accordVersion: true,
-                accordAPIUrl: true,
               },
             },
           },

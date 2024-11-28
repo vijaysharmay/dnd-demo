@@ -19,7 +19,7 @@ export type CreatePageResponseSchema = z.infer<
 
 export const createPageInProjectWorkspace = async (
   workspaceId: string,
-  projecctId: string,
+  projectId: string,
   values: CreatePageRequestSchema
 ): Promise<CreatePageResponseSchema> => {
   const accessToken = sessionStorage.getItem("accessToken");
@@ -28,7 +28,7 @@ export const createPageInProjectWorkspace = async (
     throw new Error("Couldnt find access token");
   }
 
-  const url = `http://localhost:3000/workspace/${workspaceId}/project/${projecctId}/page`;
+  const url = `http://localhost:3000/workspace/${workspaceId}/project/${projectId}/page`;
   const response = await fetch(url, {
     method: "POST",
     body: JSON.stringify(values),
@@ -74,13 +74,11 @@ export const deletePageInProjectWorkspace = async (
     }),
   });
 
-  if (response.status !== 201) {
+  if (response.status !== 200) {
     throw new Error(`Server Error: ${JSON.stringify(response.text())}`);
   }
 
-  const data = await response.json();
-
-  return data;
+  return true;
 };
 
 export const updatePageInProjectWorkspace = async (

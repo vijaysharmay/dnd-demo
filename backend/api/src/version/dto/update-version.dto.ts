@@ -22,3 +22,8 @@ export class AddReviewersDto {
   @IsString()
   reviewers: string[];
 }
+
+export class PublishDto {
+  @IsString()
+  releaseName: string;
+}

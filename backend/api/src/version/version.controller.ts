@@ -8,12 +8,14 @@ import {
   Patch,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 
 import { CreateVersionDto } from './dto/create-version.dto';
 import {
   AddReviewersDto,
   CloneVersionDto,
+  PublishDto,
   UpdateVersionDto,
 } from './dto/update-version.dto';
 import { VersionService } from './version.service';
@@ -111,12 +113,14 @@ export class VersionController {
     @Param('projectId') projectId: string,
     @Param('pageId') pageId: string,
     @Param('versionId') versionId: string,
+    @Query('versionStatusLogId') versionStatusLogId: string,
   ) {
     return this.versionService.getReviewers(
       workspaceId,
       projectId,
       pageId,
       versionId,
+      versionStatusLogId,
     );
   }
 
@@ -127,8 +131,13 @@ export class VersionController {
     @Param('pageId') pageId: string,
     @Param('versionId') versionId: string,
     @Body() addReviewersDto: AddReviewersDto,
+    @Headers('Authorization') authorizationHeader?: string,
   ) {
+    if (!authorizationHeader)
+      throw new Error('Couldnt find access token in header');
+    const accessToken = authorizationHeader.split(' ')[1];
     return this.versionService.addReviewers(
+      accessToken,
       workspaceId,
       projectId,
       pageId,
@@ -183,6 +192,7 @@ export class VersionController {
     @Param('projectId') projectId: string,
     @Param('pageId') pageId: string,
     @Param('versionId') versionId: string,
+    @Body() publishDto: PublishDto,
     @Headers('Authorization') authorizationHeader?: string,
   ) {
     if (!authorizationHeader)
@@ -194,6 +204,7 @@ export class VersionController {
       projectId,
       pageId,
       versionId,
+      publishDto,
     );
   }
 

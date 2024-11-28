@@ -37,12 +37,13 @@ model User {
   ownerOfAccord    Accord[]                    @relation(name: "ownerOfAccord")
   ownerOfPage      Page[]                      @relation(name: "ownerOfPage")
   workspaces       UserWorkspaceRole[]         @relation(name: "userOfWorkspace")
-  userWorkspace    Workspace?                  @relation(fields: [userWorkspaceId], references: [id], name: "userWorkspace")
+  userWorkspace    Workspace?                  @relation(fields: [userWorkspaceId], references: [id], name: "userWorkspace", onDelete: Cascade, onUpdate: Cascade)
   userWorkspaceId  String?                     @unique @map("user_workspace_id")
   changes          VersionChangeLog[]          @relation(name: "madeChangesToVersion")
   statusChanges    VersionStatusLog[]          @relation(name: "madeStatusChangesToVersion")
   approverFor      VersionStatusLogApprovers[] @relation(name: "approverForStatusChangesToVersion")
   versions         Version[]                   @relation(name: "ownerOfVersion")
+  releases         VersionRelease[]            @relation(name: "releasedByUser")
 
   @@map("users")
 }
@@ -50,7 +51,7 @@ model User {
 model Workspace {
   id                     String              @id @map("id")
   name                   String              @unique @map("workspace_name")
-  owner                  User                @relation(fields: [ownerId], references: [id], name: "ownerOfWorkspace")
+  owner                  User                @relation(fields: [ownerId], references: [id], name: "ownerOfWorkspace", onDelete: Cascade, onUpdate: Cascade)
   ownerId                String
   isUserWorkspace        Boolean             @map("is_user_workspace")
   route                  String?             @unique @map("workspace_route")
@@ -78,9 +79,9 @@ model UserWorkspaceRole {
 model Project {
   id          String    @id @map("id")
   name        String    @map("name")
-  owner       User      @relation(fields: [ownerId], references: [id], name: "ownerOfProject")
+  owner       User      @relation(fields: [ownerId], references: [id], name: "ownerOfProject", onDelete: Cascade, onUpdate: Cascade)
   ownerId     String
-  workspace   Workspace @relation(fields: [workspaceId], references: [id], name: "projectsInWorkspace")
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], name: "projectsInWorkspace", onDelete: Cascade, onUpdate: Cascade)
   workspaceId String
   route       String    @unique @map("route")
   pages       Page[]    @relation(name: "pagesInProject")
@@ -97,11 +98,11 @@ model Accord {
   accordSchema  Json       @map("accord_schema")
   accordVersion String     @map("accord_version")
   accordAPIUrl  String?    @map("accord_apiurl")
-  owner         User       @relation(fields: [ownerId], references: [id], name: "ownerOfAccord")
+  owner         User       @relation(fields: [ownerId], references: [id], name: "ownerOfAccord", onDelete: Cascade, onUpdate: Cascade)
   ownerId       String
-  project       Project    @relation(fields: [projectId], references: [id], name: "accordsInProject")
+  project       Project    @relation(fields: [projectId], references: [id], name: "accordsInProject", onDelete: Cascade, onUpdate: Cascade)
   projectId     String
-  workspace     Workspace  @relation(fields: [workspaceId], references: [id], name: "accordsInWorkspace")
+  workspace     Workspace  @relation(fields: [workspaceId], references: [id], name: "accordsInWorkspace", onDelete: Cascade, onUpdate: Cascade)
   workspaceId   String
 
   @@unique([workspaceId, projectId, accordName])
@@ -120,11 +121,11 @@ model Page {
   id          String    @id @map("id")
   name        String    @map("name")
   route       String    @unique @map("route")
-  owner       User      @relation(fields: [ownerId], references: [id], name: "ownerOfPage")
+  owner       User      @relation(fields: [ownerId], references: [id], name: "ownerOfPage", onDelete: Cascade, onUpdate: Cascade)
   ownerId     String
   project     Project   @relation(fields: [projectId], references: [id], name: "pagesInProject", onDelete: Cascade, onUpdate: Cascade)
   projectId   String
-  workspace   Workspace @relation(fields: [workspaceId], references: [id], name: "pagesInWorkspace")
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], name: "pagesInWorkspace", onDelete: Cascade, onUpdate: Cascade)
   workspaceId String
   versions    Version[] @relation(name: "versionsInPage")
 
@@ -139,30 +140,34 @@ model Block {
   depth     Int      @default(0)
   position  Float    @default(1)
   children  Block[]  @relation("nestedBlocks")
-  parent    Block?   @relation("nestedBlocks", fields: [parentId], references: [id])
+  parent    Block?   @relation("nestedBlocks", fields: [parentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   parentId  String?
   flows     Flow[]   @relation(name: "flowsInBlock")
-  version   Version? @relation(fields: [versionId], references: [id], name: "blocksInVersion")
+  version   Version? @relation(fields: [versionId], references: [id], name: "blocksInVersion", onDelete: Cascade, onUpdate: Cascade)
   versionId String?
 
   @@map("blocks")
 }
 
 model Version {
-  id            String             @id @map("id")
-  name          String             @default("main") @map("version_name")
-  currentStatus PageVersionStatus  @default(value: DRAFT)
-  blocks        Block[]            @relation(name: "blocksInVersion")
-  owner         User               @relation(fields: [ownerId], references: [id], name: "ownerOfVersion")
-  ownerId       String
-  page          Page?              @relation(fields: [pageId], references: [id], name: "versionsInPage", onDelete: Cascade, onUpdate: Cascade)
-  pageId        String?
-  project       Project            @relation(fields: [projectId], references: [id], name: "versionsInProject", onDelete: Cascade, onUpdate: Cascade)
-  projectId     String
-  workspace     Workspace          @relation(fields: [workspaceId], references: [id], name: "versionsInWorkspace", onDelete: Cascade, onUpdate: Cascade)
-  workspaceId   String
-  changeLog     VersionChangeLog[] @relation(name: "changesMadeToVersion")
-  statusLog     VersionStatusLog[] @relation(name: "statusChangesMadeToVersion")
+  id               String             @id @map("id")
+  name             String             @default("main") @map("version_name")
+  currentStatus    PageVersionStatus  @default(value: DRAFT)
+  blocks           Block[]            @relation(name: "blocksInVersion")
+  internalState    Json?              @map("internal_state")
+  isReleaseVersion Boolean            @default(false)
+  owner            User               @relation(fields: [ownerId], references: [id], name: "ownerOfVersion", onDelete: Cascade, onUpdate: Cascade)
+  ownerId          String
+  page             Page?              @relation(fields: [pageId], references: [id], name: "versionsInPage", onDelete: Cascade, onUpdate: Cascade)
+  pageId           String?
+  project          Project            @relation(fields: [projectId], references: [id], name: "versionsInProject", onDelete: Cascade, onUpdate: Cascade)
+  projectId        String
+  workspace        Workspace          @relation(fields: [workspaceId], references: [id], name: "versionsInWorkspace", onDelete: Cascade, onUpdate: Cascade)
+  workspaceId      String
+  changeLog        VersionChangeLog[] @relation(name: "changesMadeToVersion")
+  statusLog        VersionStatusLog[] @relation(name: "statusChangesMadeToVersion")
+  releases         VersionRelease[]   @relation(name: "releaseForVersion")
+  parentOf         VersionRelease[]   @relation(name: "releaseOfParentVersion")
 
   @@map("versions")
 }
@@ -170,14 +175,14 @@ model Version {
 model VersionStatusLog {
   id            String                      @id @map("id")
   status        PageVersionStatus
-  changeOwner   User                        @relation(fields: [changeOwnerId], references: [id], name: "madeStatusChangesToVersion")
+  changeOwner   User                        @relation(fields: [changeOwnerId], references: [id], name: "madeStatusChangesToVersion", onDelete: Cascade, onUpdate: Cascade)
   changeOwnerId String
   approvers     VersionStatusLogApprovers[] @relation(name: "requestedApprovalForStatusChangesToVersion")
-  version       Version?                    @relation(fields: [versionId], references: [id], name: "statusChangesMadeToVersion", onDelete: Cascade, onUpdate: Cascade)
-  versionId     String?
+  version       Version                     @relation(fields: [versionId], references: [id], name: "statusChangesMadeToVersion", onDelete: Cascade, onUpdate: Cascade)
+  versionId     String
   changesMadeOn DateTime                    @default(now())
 
-  @@map("version_status_log")
+  @@map("version_status_logs")
 }
 
 enum VersionStatusLogApprovalStatus {
@@ -189,10 +194,10 @@ enum VersionStatusLogApprovalStatus {
 model VersionStatusLogApprovers {
   id                 String                         @id @map("id")
   comment            String?
-  approver           User                           @relation(fields: [approverId], references: [id], name: "approverForStatusChangesToVersion")
+  approver           User                           @relation(fields: [approverId], references: [id], name: "approverForStatusChangesToVersion", onDelete: Cascade, onUpdate: Cascade)
   approverId         String
-  versionStatusLog   VersionStatusLog?              @relation(fields: [versionStatusLogId], references: [id], name: "requestedApprovalForStatusChangesToVersion", onDelete: Cascade, onUpdate: Cascade)
-  versionStatusLogId String?
+  versionStatusLog   VersionStatusLog               @relation(fields: [versionStatusLogId], references: [id], name: "requestedApprovalForStatusChangesToVersion", onDelete: Cascade, onUpdate: Cascade)
+  versionStatusLogId String
   status             VersionStatusLogApprovalStatus
 
   @@map("version_status_log_approvers")
@@ -201,13 +206,28 @@ model VersionStatusLogApprovers {
 model VersionChangeLog {
   id            String   @id @map("id")
   changeLog     String
-  changeOwner   User     @relation(fields: [changeOwnerId], references: [id], name: "madeChangesToVersion")
+  changeOwner   User     @relation(fields: [changeOwnerId], references: [id], name: "madeChangesToVersion", onDelete: Cascade, onUpdate: Cascade)
   changeOwnerId String
-  version       Version? @relation(fields: [versionId], references: [id], name: "changesMadeToVersion")
-  versionId     String?
+  version       Version  @relation(fields: [versionId], references: [id], name: "changesMadeToVersion", onDelete: Cascade, onUpdate: Cascade)
+  versionId     String
   changesMadeOn DateTime @default(now())
 
-  @@map("version_change_log")
+  @@map("version_change_logs")
+}
+
+model VersionRelease {
+  id                   String   @id @map("id")
+  releaseName          String
+  isCurrentRelease     Boolean
+  releasedBy           User     @relation(fields: [releasedById], references: [id], name: "releasedByUser", onDelete: Cascade, onUpdate: Cascade)
+  releasedById         String
+  parentVersion        Version  @relation(fields: [parentVersionId], references: [id], name: "releaseOfParentVersion", onDelete: Cascade, onUpdate: Cascade)
+  parentVersionId      String
+  pointInTimeVersion   Version  @relation(fields: [pointInTimeVersionId], references: [id], name: "releaseForVersion", onDelete: Cascade, onUpdate: Cascade)
+  pointInTimeVersionId String
+  releasedOn           DateTime @default(now())
+
+  @@map("version_releases")
 }
 
 model Flow {

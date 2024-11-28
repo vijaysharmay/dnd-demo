@@ -1,12 +1,55 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 
+import { PageVersionStatus } from '@prisma/client';
+import { isNull } from 'lodash';
 import { CreateBlockDto, RemoveChildrenDto } from './dto/create-block.dto';
 import { UpdateBlockDto } from './dto/update-block.dto';
 
 @Injectable()
 export class BlockService {
   constructor(private prisma: PrismaService) {}
+
+  async setStatusLogToDraft(
+    workspaceId: string,
+    projectId: string,
+    pageId: string,
+    versionId: string,
+  ) {
+    const versionStatusLog = await this.prisma.versionStatusLog.findFirst({
+      where: {
+        versionId,
+        status: PageVersionStatus.PUBLISHED,
+      },
+      orderBy: {
+        changesMadeOn: 'desc', // Ensures the latest log is retrieved
+      },
+    });
+
+    if (!isNull(versionStatusLog)) {
+      await this.prisma.version.update({
+        where: {
+          workspaceId,
+          projectId,
+          pageId,
+          id: versionId,
+        },
+        data: {
+          currentStatus: PageVersionStatus.DRAFT,
+        },
+      });
+
+      await this.prisma.versionStatusLog.update({
+        where: {
+          id: versionStatusLog.id,
+        },
+        data: {
+          status: PageVersionStatus.DRAFT,
+        },
+      });
+    }
+  }
+
   async create(
     workspaceId: string,
     projectId: string,
@@ -15,6 +58,8 @@ export class BlockService {
     createBlockDto: CreateBlockDto,
   ) {
     const { id, blockType, props } = createBlockDto;
+
+    this.setStatusLogToDraft(workspaceId, projectId, pageId, versionId);
     return this.prisma.block.create({
       data: {
         id,
@@ -107,6 +152,7 @@ export class BlockService {
     createBlockDto: CreateBlockDto,
   ) {
     const { id, blockType, props, depth, position } = createBlockDto;
+    this.setStatusLogToDraft(workspaceId, projectId, pageId, versionId);
     return this.prisma.block.update({
       data: {
         children: {
@@ -147,6 +193,7 @@ export class BlockService {
     parentBlockId: string,
     createBlocksDto: CreateBlockDto[],
   ) {
+    this.setStatusLogToDraft(workspaceId, projectId, pageId, versionId);
     return this.prisma.block.update({
       data: {
         children: {
@@ -187,6 +234,7 @@ export class BlockService {
     parentBlockId: string,
     blockIds: RemoveChildrenDto,
   ) {
+    this.setStatusLogToDraft(workspaceId, projectId, pageId, versionId);
     return this.prisma.block.update({
       data: {
         children: {
@@ -215,6 +263,7 @@ export class BlockService {
     parentBlockId: string,
     blockId: string,
   ) {
+    this.setStatusLogToDraft(workspaceId, projectId, pageId, versionId);
     return this.prisma.block.update({
       data: {
         children: {
@@ -242,6 +291,7 @@ export class BlockService {
     versionId: string,
     blockId: string,
   ) {
+    this.setStatusLogToDraft(workspaceId, projectId, pageId, versionId);
     const children = await this.prisma.block.findMany({
       where: {
         parentId: blockId,

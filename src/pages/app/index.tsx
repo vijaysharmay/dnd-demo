@@ -1,11 +1,22 @@
-import { Block, Page, Project } from "./published-apps";
 import { getPublishedAppByRoute } from "@/api";
-import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider } from "@/components/ui/sidebar";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+} from "@/components/ui/sidebar";
 import { libraryElements } from "@/elements";
 import { blockToElement, buildBlockHierarchy } from "@/lib/utils";
 import { BlockSchema } from "@/types/api/page";
 import { useQuery } from "@tanstack/react-query";
 import { Link, Route, useParams, useRoute, useSearch } from "wouter";
+import { Block, Page, Project } from "./published-apps";
 
 export default function AppRenderer() {
   const { appId: name } = useParams();
@@ -29,7 +40,7 @@ export default function AppRenderer() {
         {data.projects.map((project: Project) => {
           return project.pages.map((page: Page) => {
             const pageRoute = `/${project.route}/${page.route}`;
-            let blocks = [];
+            let blocks: Block[] = [];
             const version = page.versions.filter((x) => x.name === versionName);
             if (version && version.length > 0) {
               blocks = version[0].blocks;
@@ -65,7 +76,7 @@ function PageRenderer({
   projectName: string;
   blocks: Block[];
 }) {
-  const [match, params] = useRoute(pageRoute);
+  const [match] = useRoute(pageRoute);
 
   if (match) {
     return (
@@ -77,7 +88,8 @@ function PageRenderer({
         {blocks.length === 0 && (
           <p className="text-amber-900 font-bold">
             Oops ! looks like there is no content to display. Please check if
-            you have added content and <span className="underline">published</span> it !
+            you have added content and{" "}
+            <span className="underline">published</span> it !
           </p>
         )}
         {buildBlockHierarchy(blocks).map((block: BlockSchema) => {

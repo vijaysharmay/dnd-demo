@@ -26,12 +26,39 @@ export const BlockZSchema: z.ZodType<BlockSchema> =
     children: z.lazy(() => BlockZSchema.array()).optional(),
   });
 
+export const ChangeLogZSchema = z.object({
+  changeOwner: UserZSchema,
+  changesMadeOn: z.string(),
+  id: z.string(),
+  changeLog: z.string(),
+  versionId: z.string(),
+});
+
+export const StatusLogZSchema = z.object({
+  changeOwner: UserZSchema,
+  changesMadeOn: z.string(),
+  id: z.string(),
+  status: z.string(),
+  versionId: z.string(),
+});
+
+export const ReleaseZSchema = z.object({
+  id: z.string(),
+  releaseName: z.string(),
+  releasedBy: UserZSchema,
+  versionId: z.string(),
+  releasedOn: z.string(),
+});
+
 export const VersionZSchema = VersionWithoutBlocksZSchema.extend({
   owner: UserZSchema,
   project: ProjectWithoutPagesZSchema,
   workspace: WorkspaceWithOutProjectsZSchema,
   page: PageWithoutRootZSchema,
   blocks: z.array(BlockZSchema),
+  statusLog: z.array(StatusLogZSchema),
+  changeLog: z.array(ChangeLogZSchema),
+  releases: z.array(ReleaseZSchema),
 });
 
 export const PageZSchema = PageWithoutRootZSchema.extend({

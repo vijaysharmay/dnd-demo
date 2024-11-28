@@ -15,6 +15,7 @@ export class PublishedService {
           some: {
             name: parsedVersionName,
             currentStatus: PageVersionStatus.PUBLISHED,
+            isReleaseVersion: false,
           },
         },
       },
@@ -32,6 +33,8 @@ export class PublishedService {
                 versions: {
                   where: {
                     name: parsedVersionName,
+                    isReleaseVersion: false,
+                    currentStatus: PageVersionStatus.PUBLISHED,
                   },
                   select: {
                     name: true,

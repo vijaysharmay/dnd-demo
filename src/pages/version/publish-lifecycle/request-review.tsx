@@ -1,7 +1,19 @@
-import { getExistingReviewersForVersion, setReviewersToUnpublishedVersion } from "@/api";
+import {
+  getExistingReviewersForVersion,
+  setReviewersToUnpublishedVersion,
+} from "@/api";
 import { getUsers } from "@/api/user";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { AutoComplete } from "@/containers/autocomplete";
 import { cn } from "@/lib/utils";
 import useVersionStore from "@/store/version-store";
@@ -18,7 +30,7 @@ export default function RequestReview({
   version: VersionSchema;
   editMode: boolean;
 }) {
-  const { id, workspace, project, page } = version;
+  const { id, workspace, project, page, statusLog } = version;
   const { setCurrentVersionReviewers } = useVersionStore();
   const [searchValue, setSearchValue] = useState<string>("");
   const [selectedValue, setSelectedValue] = useState<string>("");
@@ -44,9 +56,16 @@ export default function RequestReview({
       project.id,
       page.id,
       id,
+      statusLog[0].id,
     ],
     queryFn: () =>
-      getExistingReviewersForVersion(workspace.id, project.id, page.id, id),
+      getExistingReviewersForVersion(
+        workspace.id,
+        project.id,
+        page.id,
+        id,
+        statusLog[0].id
+      ),
   });
 
   useEffect(() => {
@@ -149,7 +168,10 @@ export default function RequestReview({
 
   const ShowExistingReviewer = ({ reviewer }: { reviewer: Reviewer }) => {
     return (
-      <div key={reviewer.approver.id} className="flex flex-row border rounded bg-gray-50 p-2">
+      <div
+        key={reviewer.approver.id}
+        className="flex flex-row border rounded bg-gray-50 p-2"
+      >
         <div>
           <p className="text-sm">{reviewer.approver.fullName}</p>
           <p className="text-muted-foreground text-sm underline">
