@@ -42,11 +42,11 @@ export const SidebarPageZSchema = PageWithoutRootZSchema.extend({
 
 export const SidebarProjectZSchema = ProjectWithoutPagesZSchema.extend({
   pages: z.array(SidebarPageZSchema),
+  accords: z.array(AccordZSchema),
 });
 
 export const SidebarWorkspaceZSchema = WorkspaceWithOutProjectsZSchema.extend({
   projects: z.array(SidebarProjectZSchema),
-  accords: z.array(AccordZSchema)
 });
 
 export type SidebarWorkspaceSchema = z.infer<typeof SidebarWorkspaceZSchema>;

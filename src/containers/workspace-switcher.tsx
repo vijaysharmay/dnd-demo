@@ -1,12 +1,55 @@
-import { createProjectInWorkspace, CreateProjectRequestSchema, CreateProjectRequestZSchema, createWorkspace, CreateWorkspaceRequestSchema, CreateWorkspaceRequestZSchema } from "@/api";
+import {
+  createProjectInWorkspace,
+  CreateProjectRequestSchema,
+  CreateProjectRequestZSchema,
+  createWorkspace,
+  CreateWorkspaceRequestSchema,
+  CreateWorkspaceRequestZSchema,
+} from "@/api";
 import { getUser, getUsers } from "@/api/user";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  useSidebar,
+} from "@/components/ui/sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import useAccordStore from "@/store/accord-store";
@@ -32,7 +75,7 @@ export function WorkspaceSwitcher() {
   const [isCreateWorkspaceDialogOpen, setIsCreateWorkspaceDialogOpen] =
     useState(false);
 
-  const { workspaceId } = useParams();
+  const { workspaceId, projectId } = useParams();
 
   const { isPending, error, data } = useQuery({
     queryKey: ["getCurrentUser"],
@@ -71,6 +114,7 @@ export function WorkspaceSwitcher() {
     setCurrentWorkspace,
     isWorkspaceDataLoading,
     setIsWorkspaceDataLoading,
+    setCurrentProjectName,
   } = useWorkspaceStore();
 
   const { setAccords } = useAccordStore();
@@ -92,14 +136,25 @@ export function WorkspaceSwitcher() {
         ]);
         if (currentWorkspaceFromRouteParams) {
           setCurrentWorkspace(currentWorkspaceFromRouteParams.workspace);
-          setAccords(currentWorkspaceFromRouteParams.workspace.accords);
+          if (projectId) {
+            const currentProjectFromRouteParams = find(
+              currentWorkspaceFromRouteParams.workspace.projects,
+              ["id", projectId]
+            );
+            if (currentProjectFromRouteParams) {
+              setCurrentProjectName(
+                currentProjectFromRouteParams.name
+              );
+              setAccords(
+                currentProjectFromRouteParams.accords
+              );
+            }
+          }
         }
       } else if (currentWorkspace) {
         setCurrentWorkspace(currentWorkspace);
-        setAccords(currentWorkspace.accords);
       } else {
         setCurrentWorkspace(data.userWorkspace);
-        setAccords(data.userWorkspace.accords);
       }
 
       if (users) {

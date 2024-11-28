@@ -1,11 +1,48 @@
-import { cloneVersionInProjectWorkspace, createPageInProjectWorkspace, CreatePageRequestSchema, CreatePageRequestZSchema, deletePageInProjectWorkspace, deleteProjectInWorkspace, deleteVersionInProjectWorkspace, moveProjectToNewWorkspace } from "@/api";
+import {
+  cloneVersionInProjectWorkspace,
+  createPageInProjectWorkspace,
+  CreatePageRequestSchema,
+  CreatePageRequestZSchema,
+  deletePageInProjectWorkspace,
+  deleteProjectInWorkspace,
+  deleteVersionInProjectWorkspace,
+  moveProjectToNewWorkspace,
+} from "@/api";
 import { Button } from "@/components/ui/button";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { ContextMenu, ContextMenuContent, ContextMenuTrigger } from "@/components/ui/context-menu";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarMenuSub } from "@/components/ui/sidebar";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarMenuSub,
+} from "@/components/ui/sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn, convertToTree, NodeOptionsItem, Tree } from "@/lib/utils";
 import useWorkspaceStore from "@/store/workspace-store";
@@ -13,7 +50,14 @@ import { SidebarWorkspaceSchema } from "@/types/api/user";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { startsWith } from "lodash";
-import { ChevronRight, File, Folder, GitFork, Plus, Trash2 } from "lucide-react";
+import {
+  ChevronRight,
+  File,
+  Folder,
+  GitFork,
+  Plus,
+  Trash2,
+} from "lucide-react";
 import { Dispatch, SetStateAction, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useLocation } from "wouter";
@@ -55,6 +99,7 @@ export function ConcordSidebarNavigator() {
 }
 
 function NavTree({ workspaceId, item }: { workspaceId: string; item: Tree }) {
+  const { setCurrentProjectName } = useWorkspaceStore();
   const [location, navigate] = useLocation();
   if (!item.children || item.children.length === 0) {
     return (
@@ -63,6 +108,10 @@ function NavTree({ workspaceId, item }: { workspaceId: string; item: Tree }) {
           <SidebarMenuButton
             isActive={location === item.url}
             onClick={() => {
+              if (item.type === "project") {
+                setCurrentProjectName(item.name);
+              }
+
               navigate(item.url, { replace: true });
             }}
           >
@@ -101,6 +150,9 @@ function NavTree({ workspaceId, item }: { workspaceId: string; item: Tree }) {
                   className="w-full"
                   onClick={(e) => {
                     e.preventDefault();
+                    if (item.type === "project") {
+                      setCurrentProjectName(item.name);
+                    }
                     navigate(item.url, { replace: true });
                   }}
                 >
@@ -153,17 +205,17 @@ function NodeOptions({
   children: React.ReactElement;
 }) {
   const [isAddPageDialogOpen, setIsAddPageDialogOpen] =
-  useState<boolean>(false);
-const [isMoveProjectDialogOpen, setIsMoveProjectDialogOpen] =
-  useState<boolean>(false);
-const [isDeletePageFormDialogOpen, setIsDeletePageFormDialogOpen] =
-  useState<boolean>(false);
-const [isDeleteProjectFormDialogOpen, setIsDeleteProjectFormDialogOpen] =
-  useState<boolean>(false);
+    useState<boolean>(false);
+  const [isMoveProjectDialogOpen, setIsMoveProjectDialogOpen] =
+    useState<boolean>(false);
+  const [isDeletePageFormDialogOpen, setIsDeletePageFormDialogOpen] =
+    useState<boolean>(false);
+  const [isDeleteProjectFormDialogOpen, setIsDeleteProjectFormDialogOpen] =
+    useState<boolean>(false);
   const [isDeleteVersionFormDialogOpen, setIsDeleteVersionFormDialogOpen] =
-  useState<boolean>(false);
-const [isCloneVersionFormDialogOpen, setIsCloneVersionFormDialogOpen] =
-  useState<boolean>(false);
+    useState<boolean>(false);
+  const [isCloneVersionFormDialogOpen, setIsCloneVersionFormDialogOpen] =
+    useState<boolean>(false);
 
   return (
     <ContextMenu>
@@ -204,9 +256,7 @@ const [isCloneVersionFormDialogOpen, setIsCloneVersionFormDialogOpen] =
                 <DeleteProjectForm
                   workspaceId={workspaceId}
                   projectId={node.id}
-                  setIsDialogOpen={
-                    setIsDeleteProjectFormDialogOpen
-                  }
+                  setIsDialogOpen={setIsDeleteProjectFormDialogOpen}
                 />
               }
               open={isDeleteProjectFormDialogOpen}
