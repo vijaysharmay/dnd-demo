@@ -49,6 +49,8 @@ export const ToggleGroup = "ToggleGroup";
 export const Tooltip = "Tooltip";
 export const HContainer = "HContainer";
 export const DTable = "DTable";
+export const Barchart = "Barchart";
+export const TextBlock = "TextBlock";
 
 // export type ComponentElementType =
 //   | typeof Accordion
@@ -104,7 +106,9 @@ export type ComponentElementType =
   | typeof Button
   | typeof HContainer
   | typeof Form
-  | typeof DTable;
+  | typeof DTable
+  // | typeof Barchart
+  | typeof TextBlock;
 
 export type ComponentLibraryListItem = {
   icon: React.ReactElement;
@@ -123,7 +127,7 @@ export type ComponentElement = {
   create: (
     id: string,
     customProps?: CustomPropsSchema,
-    parentId?: string,
+    parentId?: string
   ) => ComponentElementInstance;
   type: ComponentElementType;
   componentLibraryListItem: ComponentLibraryListItem;

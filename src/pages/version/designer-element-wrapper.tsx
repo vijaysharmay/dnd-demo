@@ -176,7 +176,7 @@ export default function DesignerElementWrapper({
         {...designerDraggable.listeners}
         {...designerDraggable.attributes}
         className={cn(
-          "cursor-grab flex p-2 rounded-md",
+          "cursor-grab flex p-1 rounded-md",
           isHoveredOn && "border-gray-400 border opacity-80"
         )}
       >

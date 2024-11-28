@@ -164,6 +164,7 @@ model Version {
   projectId        String             @map("project_id")
   workspace        Workspace          @relation(fields: [workspaceId], references: [id], name: "versionsInWorkspace", onDelete: Cascade, onUpdate: Cascade)
   workspaceId      String             @map("workspace_id")
+  createdOn        DateTime           @default(now()) @map("created_on")
   changeLog        VersionChangeLog[] @relation(name: "changesMadeToVersion")
   statusLog        VersionStatusLog[] @relation(name: "statusChangesMadeToVersion")
   releases         VersionRelease[]   @relation(name: "releaseForVersion")

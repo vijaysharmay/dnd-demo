@@ -11,6 +11,24 @@ export const ButtonStyleVariants = [
   "ghost",
 ] as const;
 
+export const TextStyleVariants = [
+  "normal",
+  "bold",
+  "italic",
+  "underline",
+] as const;
+export const OrientationVariants = ["center", "left", "right"] as const;
+
+export const TextBlockTypeVariants = [
+  "H1",
+  "H2",
+  "H3",
+  "H4",
+  "H5",
+  "H6",
+  "Paragraph",
+] as const;
+
 export const ButtonTypeVariants = ["button", "submit", "reset"] as const;
 
 export const EventVariants = ["Do Nothing", "Redirect To Route"] as const;
@@ -28,6 +46,20 @@ export const colsIntRec: Record<string, number> = {
   Three: 3,
   Four: 4,
 };
+
+export const BarchartPropsZSchema = z.object({});
+
+export const TextBlockPropsZSchema = z.object({
+  textBlockId: z
+    .string({ required_error: "Required textBlockId" })
+    .min(8)
+    .startsWith("textBlock-", "ID must start with the prefix `textBlock-`"),
+  textBlockText: z.string().min(1),
+  textBlockType: z.enum(TextBlockTypeVariants),
+  textBlockStyle: z.enum(TextStyleVariants),
+  textBlockOrientation: z.enum(OrientationVariants),
+  isFormElement: z.boolean().default(false),
+});
 
 export const ButtonPropsZSchema = z.object({
   buttonId: z
@@ -104,22 +136,31 @@ export type HContainerPropsSchema = z.infer<typeof HContainerPropsZSchema>;
 export type InputPropsSchema = z.infer<typeof InputPropsZSchema>;
 export type DTablePropsSchema = z.infer<typeof DTablePropsZSchema>;
 export type FormPropsSchema = z.infer<typeof FormPropsZSchema>;
+export type TextBlockPropsSchema = z.infer<typeof TextBlockPropsZSchema>;
+export type BarchartPropsSchema = z.infer<typeof BarchartPropsZSchema>;
 
 export type PropsSchema =
   | ButtonPropsSchema
   | HContainerPropsSchema
   | DTablePropsSchema
   | FormPropsSchema
+  | TextBlockPropsSchema
+  | BarchartPropsSchema
   | InputPropsSchema;
 
 export type CustomPropsSchema = ButtonPropsSchema &
   HContainerPropsSchema &
   DTablePropsSchema &
   FormPropsSchema &
+  TextBlockPropsSchema &
+  BarchartPropsSchema &
   InputPropsSchema;
 
 export type VariantsSchema =
   | typeof ButtonStyleVariants
+  | typeof TextBlockTypeVariants
+  | typeof OrientationVariants
+  | typeof TextStyleVariants
   | typeof ButtonTypeVariants
   | typeof EventVariants
   | typeof HContainerColumnVariants

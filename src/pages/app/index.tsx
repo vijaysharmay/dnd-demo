@@ -35,45 +35,58 @@ export default function AppRenderer() {
 
   return (
     !isPending && (
-      <Layout name={data.name} projects={data.projects}>
-        <Route path="/">Welcome to {data.name} App</Route>
-        {data.projects.map((project: Project) => {
-          return project.pages.map((page: Page) => {
-            const pageRoute = `/${project.route}/${page.route}`;
-            let blocks: Block[] = [];
-            const version = page.versions.filter((x) => x.name === versionName);
-            if (version && version.length > 0) {
-              blocks = version[0].blocks;
-            } else if (version.length === 0) {
-              blocks = [];
-            } else {
-              blocks = page.versions.filter((x) => x.name === "main")[0].blocks;
-            }
-            return (
-              <PageRenderer
-                key={page.route}
-                pageRoute={pageRoute}
-                pageName={page.name}
-                projectName={project.name}
-                blocks={blocks} //expects only one version
-              />
-            );
-          });
-        })}
-      </Layout>
+      <>
+        {data && (
+          <Layout name={name} projects={data.projects}>
+            <Route path="/">Welcome to {data.name} App</Route>
+            {data.projects.map((project: Project) => {
+              return project.pages.map((page: Page) => {
+                const pageRoute = `/${project.route}/${page.route}`;
+                let blocks: Block[] = [];
+                const version = page.versions.filter(
+                  (x) => x.name === versionName
+                );
+                if (version && version.length > 0) {
+                  blocks = version[0].blocks;
+                } else if (version.length === 0) {
+                  blocks = [];
+                } else {
+                  blocks = page.versions.filter((x) => x.name === "main")[0]
+                    .blocks;
+                }
+                return (
+                  <PageRenderer
+                    key={page.route}
+                    pageRoute={pageRoute}
+                    // pageName={page.name}
+                    // projectName={project.name}
+                    blocks={blocks} //expects only one version
+                  />
+                );
+              });
+            })}
+          </Layout>
+        )}
+        {!data && (
+          <Layout name={name} projects={[]}>
+            Welcome to {name}. Looks like there are no{" "}
+            <span className="underline">published</span> pages to display
+          </Layout>
+        )}
+      </>
     )
   );
 }
 
 function PageRenderer({
   pageRoute,
-  pageName,
-  projectName,
+  // pageName,
+  // projectName,
   blocks,
 }: {
   pageRoute: string;
-  pageName: string;
-  projectName: string;
+  // pageName: string;
+  // projectName: string;
   blocks: Block[];
 }) {
   const [match] = useRoute(pageRoute);
@@ -81,10 +94,10 @@ function PageRenderer({
   if (match) {
     return (
       <div className="w-full">
-        <p>
+        {/* <p>
           Rendering page {pageName} in project {projectName}. They have the
           below blocks
-        </p>
+        </p> */}
         {blocks.length === 0 && (
           <p className="text-amber-900 font-bold">
             Oops ! looks like there is no content to display. Please check if
@@ -92,11 +105,16 @@ function PageRenderer({
             <span className="underline">published</span> it !
           </p>
         )}
-        {buildBlockHierarchy(blocks).map((block: BlockSchema) => {
-          const element = blockToElement(block);
-          const RenderComponent = libraryElements[element.type].renderComponent;
-          return <RenderComponent key={element.id} elementInstance={element} />;
-        })}
+        <div className="p-2 gap-4 h-full flex-col flex-1 m-auto overflow-y-auto justify-start gap-y-12">
+          {buildBlockHierarchy(blocks).map((block: BlockSchema) => {
+            const element = blockToElement(block);
+            const RenderComponent =
+              libraryElements[element.type].renderComponent;
+            return (
+              <RenderComponent key={element.id} elementInstance={element} />
+            );
+          })}
+        </div>
       </div>
     );
   } else {
