@@ -1,3 +1,4 @@
+import { Liveblocks } from '@liveblocks/node';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { pbkdf2Sync, timingSafeEqual } from 'crypto';
@@ -13,6 +14,32 @@ export class AuthService {
     private jwtService: JwtService,
     private userService: UserService,
   ) {}
+
+  async authLiveblocks(accessToken: string) {
+    const liveblocks = new Liveblocks({
+      secret:
+        'sk_dev_oiF9GToeuxyTnEr9INmx8YUQ_Q4nlLmn8nZbZDdJqxtOxx5bmuHw2qxw66H0l3_i',
+    });
+
+    // Get the current user from your database
+    const user = await this.getCurrentUser(accessToken);
+    const workspaces = user.workspaces.filter(
+      (x) => !x.workspace.isUserWorkspace,
+    );
+
+    // Start an auth session inside your endpoint
+    const session = liveblocks.prepareSession(user.fullName, {
+      userInfo: { email: user.email, name: user.fullName, id: user.id },
+    });
+
+    for (const workspace of workspaces) {
+      session.allow(`${workspace.workspace.id}:version:*`, session.FULL_ACCESS);
+    }
+
+    // Authorize the user and return the result
+    const { body } = await session.authorize();
+    return body;
+  }
 
   getCurrentUser(accessToken: string) {
     const { sub: id } = this.jwtService.decode(accessToken);

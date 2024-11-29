@@ -43,7 +43,7 @@ export const TextBlockDesignerComponent: React.FC<{
   const combinedClasses = `${textBlockTypeClasses[textBlockType]} ${orientationClass} ${styleClass}`;
 
   return (
-    <div className="place-content-center w-full h-fit">
+    <div className="place-content-center w-full h-fit text-black">
       <div id={textBlockId} className={`text-inherit ${combinedClasses}`}>
         {textBlockText}
       </div>

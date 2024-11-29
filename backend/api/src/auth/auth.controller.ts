@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Headers, Post } from '@nestjs/common';
-
 import { Public } from 'src/utils';
+
 import { AuthService } from './auth.service';
 import { AuthUserDto } from './dto/auth-user-dto';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -27,6 +27,14 @@ export class AuthController {
       throw new Error('Couldnt find access token in header');
     const accessToken = authorizationHeader.split(' ')[1];
     return this.authService.getCurrentUser(accessToken);
+  }
+
+  @Post('liveblocks-auth')
+  authLiveblocks(@Headers('Authorization') authorizationHeader?: string) {
+    if (!authorizationHeader)
+      throw new Error('Couldnt find access token in header');
+    const accessToken = authorizationHeader.split(' ')[1];
+    return this.authService.authLiveblocks(accessToken);
   }
 
   @Public()

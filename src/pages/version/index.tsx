@@ -1,24 +1,19 @@
 import { Toaster } from "@/components/ui/toaster";
 import AppContainer from "@/containers/app-container";
-import Messages from "@/pages/version/messages";
 import { cn } from "@/lib/utils";
 import { ComponentLibrary } from "@/pages/version/component-library";
-import Designer from "@/pages/version/version-designer";
 import DragOverlayWrapper from "@/pages/version/drag-overlay-wrapper";
+import Messages from "@/pages/version/messages";
 import Properties from "@/pages/version/properties";
-import {
-  DndContext,
-  KeyboardSensor,
-  MouseSensor,
-  TouchSensor,
-  useSensor,
-  useSensors,
-} from "@dnd-kit/core";
+import Designer from "@/pages/version/version-designer";
+import useWorkspaceStore from "@/store/workspace-store";
+import { DndContext, KeyboardSensor, MouseSensor, TouchSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { restrictToWindowEdges } from "@dnd-kit/modifiers";
 import { GitBranch, Info, MessageSquareText } from "lucide-react";
 import { useState } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { useParams } from "wouter";
+
 import History from "./history";
 import VersionTitle from "./title";
 
@@ -37,6 +32,7 @@ export default function Version() {
   const [showHistory, setShowHistory] = useState<boolean>(false);
 
   const { workspaceId, projectId, pageId, versionId } = useParams();
+  const { currentWorkspace } = useWorkspaceStore();
 
   if (!workspaceId || !projectId || !pageId || !versionId) return;
 
@@ -94,26 +90,28 @@ export default function Version() {
             <div className="grid grid-col-1 justify-center pt-2 cursor-pointer">
               <div
                 className={cn(
-                  "p-2 hover:bg-gray-200 rounded-md",
-                  showProperties && "bg-gray-200"
+                  "p-2 hover:bg-primary/50 rounded-md",
+                  showProperties && "bg-primary/50"
                 )}
                 onClick={() => setShowProperties(!showProperties)}
               >
                 <Info />
               </div>
+              {!currentWorkspace?.isUserWorkspace && (
+                <div
+                  className={cn(
+                    "p-2 hover:bg-primary/50 rounded-md",
+                    showMessages && "bg-primary/50"
+                  )}
+                  onClick={() => setShowMessages(!showMessages)}
+                >
+                  <MessageSquareText />
+                </div>
+              )}
               <div
                 className={cn(
-                  "p-2 hover:bg-gray-200 rounded-md",
-                  showMessages && "bg-gray-200"
-                )}
-                onClick={() => setShowMessages(!showMessages)}
-              >
-                <MessageSquareText />
-              </div>
-              <div
-                className={cn(
-                  "p-2 hover:bg-gray-200 rounded-md",
-                  showHistory && "bg-gray-200"
+                  "p-2 hover:bg-primary/50 rounded-md",
+                  showHistory && "bg-primary/50"
                 )}
                 onClick={() => setShowHistory(!showHistory)}
               >

@@ -40,7 +40,7 @@ function LibraryListDraggableItem({ element }: { element: ComponentElement }) {
       ref={draggable.setNodeRef}
       variant="default"
       className={cn(
-        "flex-row cursor-grab",
+        "flex-row cursor-grab opacity-90 drop-shadow-lg",
         draggable.isDragging && "ring-2 ring-slate-200"
       )}
       {...draggable.listeners}

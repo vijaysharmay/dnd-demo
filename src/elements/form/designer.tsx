@@ -9,7 +9,7 @@ export const FormDesignerComponent: React.FC<{
   const { props, children } = elementInstance;
   const { formHeightInPx } = props as FormPropsSchema;
   return (
-    <div className="w-full" style={{ minHeight: formHeightInPx }}>
+    <div className="w-full text-black" style={{ minHeight: formHeightInPx }}>
       {children.length === 0 && (
         <div className="flex items-center justify-center h-full border rounded">
           <div className="p-4">

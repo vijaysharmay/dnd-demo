@@ -47,7 +47,11 @@ export const getUsers = async (searchValue: string): Promise<UserSchema[]> => {
   if (!accessToken) {
     throw new Error("Couldnt find access token");
   }
-  const url = `http://localhost:3000/user?search=${encodeURIComponent(searchValue)}`;
+
+  const url =
+    searchValue != ""
+      ? `http://localhost:3000/user?search=${encodeURIComponent(searchValue)}`
+      : "http://localhost:3000/user";
   const response = await fetch(url, {
     headers: new Headers({
       "Content-Type": "application/json",
