@@ -29,6 +29,7 @@ import { capitalize, includes, isNull, keys } from "lodash";
 import { Dispatch, SetStateAction } from "react";
 import { twMerge } from "tailwind-merge";
 import { v4 } from "uuid";
+import { DefaultParams } from "wouter";
 import { z, ZodTypeAny } from "zod";
 
 export function cn(...inputs: ClassValue[]) {
@@ -315,4 +316,26 @@ export function buildPreviewBlockHierarchy(
   });
 
   return rootBlocks;
+}
+
+export function getBaseNavigationUrl(params: DefaultParams): string | null {
+  const { workspaceId, projectId, pageId, versionId } = params;
+
+  if (workspaceId) {
+    if (projectId) {
+      if (pageId) {
+        if (versionId) {
+          return `/workspace/${workspaceId}/project/${projectId}/page/${pageId}/version/${versionId}`;
+        } else {
+          return `/workspace/${workspaceId}/project/${projectId}/page/${pageId}`;
+        }
+      } else {
+        return `/workspace/${workspaceId}/project/${projectId}`;
+      }
+    } else {
+      return `/workspace/${workspaceId}`;
+    }
+  } else {
+    return;
+  }
 }
