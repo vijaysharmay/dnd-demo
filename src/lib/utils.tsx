@@ -1,13 +1,30 @@
 import { ContextMenuItem } from "@/components/ui/context-menu";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { libraryElements } from "@/elements";
-import { Block } from "@/pages/app/published-apps";
+import { Block, PreviewBlock } from "@/pages/app/published-apps";
 import { ComponentElementInstance, ComponentElementType } from "@/types";
 import { BlockSchema, VersionSchema } from "@/types/api/page";
-import { SidebarPageSchema, SidebarProjectSchema, SidebarVersionSchema, SidebarWorkspaceSchema } from "@/types/api/user";
+import {
+  SidebarPageSchema,
+  SidebarProjectSchema,
+  SidebarVersionSchema,
+  SidebarWorkspaceSchema,
+} from "@/types/api/user";
 import { CustomPropsSchema, InputPropsSchema } from "@/types/properties";
 import { ClassValue, clsx } from "clsx";
-import { JSONSchema4TypeName, JSONSchema7, JSONSchema7Definition, JSONSchema7TypeName } from "json-schema";
+import {
+  JSONSchema4TypeName,
+  JSONSchema7,
+  JSONSchema7Definition,
+  JSONSchema7TypeName,
+} from "json-schema";
 import { capitalize, includes, isNull, keys } from "lodash";
 import { Dispatch, SetStateAction } from "react";
 import { twMerge } from "tailwind-merge";
@@ -83,8 +100,7 @@ export function initFormChildren(
 ): (ComponentElementInstance | null)[] {
   const schemaStore = localStorage["schemaStore"];
   if (isNull(schemaStore)) return [];
-  const schema: JSONSchema7 =
-    JSON.parse(schemaAsString);
+  const schema: JSONSchema7 = JSON.parse(schemaAsString);
 
   if (isNull(schema.properties)) return [];
 
@@ -233,6 +249,19 @@ export function blockToElement(block: Block | BlockSchema) {
   return element;
 }
 
+export function previewBlockToElement(block: PreviewBlock) {
+  const { id, type: blockType, parentId, children, props } = block;
+  const type: ComponentElementType = blockType as ComponentElementType;
+  const element: ComponentElementInstance = {
+    id,
+    type,
+    props,
+    parentId,
+    children: children?.map(previewBlockToElement) ?? [],
+  };
+  return element;
+}
+
 export function transformVersionSchema(version: VersionSchema): VersionSchema {
   return {
     ...version,
@@ -243,6 +272,31 @@ export function transformVersionSchema(version: VersionSchema): VersionSchema {
 export function buildBlockHierarchy(blocks: BlockSchema[]): BlockSchema[] {
   const blockMap: Record<string, BlockSchema> = {};
   const rootBlocks: BlockSchema[] = [];
+
+  // Populate the block map with empty children arrays
+  blocks.forEach((block) => {
+    blockMap[block.id] = { ...block, children: [] };
+  });
+
+  // Build hierarchy
+  blocks.forEach((block) => {
+    if (block.parentId) {
+      if (blockMap[block.parentId]) {
+        blockMap[block.parentId].children!.push(blockMap[block.id]);
+      }
+    } else {
+      rootBlocks.push(blockMap[block.id]);
+    }
+  });
+
+  return rootBlocks;
+}
+
+export function buildPreviewBlockHierarchy(
+  blocks: PreviewBlock[]
+): PreviewBlock[] {
+  const blockMap: Record<string, PreviewBlock> = {};
+  const rootBlocks: PreviewBlock[] = [];
 
   // Populate the block map with empty children arrays
   blocks.forEach((block) => {

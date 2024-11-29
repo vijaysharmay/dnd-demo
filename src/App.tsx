@@ -7,6 +7,7 @@ import Home from "./pages/home";
 import Page from "./pages/page";
 import Project from "./pages/project";
 import Version from "./pages/version";
+import Preview from "./pages/version/preview";
 import Workspace from "./pages/workspace";
 
 const ProtectedRoute = (props: RouteProps<undefined, PathPattern>) => {
@@ -40,10 +41,13 @@ export default function App() {
             component={Page}
           />
           <ProtectedRoute
+            path="/workspace/:workspaceId/project/:projectId/page/:pageId/version/:versionId/preview"
+            component={Preview}
+          />
+          <ProtectedRoute
             path="/workspace/:workspaceId/project/:projectId/page/:pageId/version/:versionId"
             component={Version}
           />
-          <Route>404: No such page!</Route>
         </ThemeProvider>
       </Switch>
     </>

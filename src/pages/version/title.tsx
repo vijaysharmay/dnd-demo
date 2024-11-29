@@ -1,11 +1,12 @@
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { blockToElement, cn } from "@/lib/utils";
 import useVersionStore from "@/store/version-store";
 import useWorkspaceStore from "@/store/workspace-store";
 import { Reviewer } from "@/types/api/page";
 import { includes } from "lodash";
 import { Check } from "lucide-react";
 
+import { ComponentElementInstance } from "@/types";
 import ApproveReject from "./publish-lifecycle/approve-reject";
 import PublishVersion from "./publish-lifecycle/publish";
 import RequestReview from "./publish-lifecycle/request-review";
@@ -22,7 +23,14 @@ export default function VersionTitle() {
     window.open(baseUrl, "_blank");
   };
 
-  const handlePreview = () => {};
+  // I dont like this
+  const handlePreview = () => {
+    const elements: ComponentElementInstance[] =
+      currentVersion.blocks.map(blockToElement);
+    sessionStorage.setItem("previewElements", JSON.stringify(elements));
+    const baseUrl = `/workspace/${workspace.id}/project/${project.id}/page/${page.id}/version/${currentVersion.id}/preview`;
+    window.open(baseUrl, "_blank");
+  };
 
   const currentVersionReviewerIds = currentVersionReviewers.map(
     (x: Reviewer) => x.approver.id

@@ -1,12 +1,17 @@
 import { libraryElements } from "@/elements";
-import useElementStore from "@/store/element-store";
+import { buildPreviewBlockHierarchy, previewBlockToElement } from "@/lib/utils";
 import { ComponentElementInstance } from "@/types";
+import { isNull } from "lodash";
+import { PreviewBlock } from "../app/published-apps";
 
 export default function Preview() {
-  const { elements } = useElementStore();
+  const previewElements = sessionStorage.getItem("previewElements");
+  if (isNull(previewElements)) return;
+  const blocks = JSON.parse(previewElements) as PreviewBlock[];
   return (
     <>
-      {elements.map((element: ComponentElementInstance) => {
+      {buildPreviewBlockHierarchy(blocks).map((block: PreviewBlock) => {
+        const element: ComponentElementInstance = previewBlockToElement(block);
         const RenderComponent = libraryElements[element.type].renderComponent;
         return <RenderComponent key={element.id} elementInstance={element} />;
       })}
