@@ -4,10 +4,11 @@ import {
   PageVersionStatus,
   VersionStatusLogApprovalStatus,
 } from '@prisma/client';
-import { first } from 'lodash';
+import { first, groupBy, has, mapKeys } from 'lodash';
 import { PrismaService } from 'src/prisma.service';
 import { v4 } from 'uuid';
 
+import { cloneBlocksWithChildren } from 'src/utils';
 import { CreateVersionDto } from './dto/create-version.dto';
 import {
   AddReviewersDto,
@@ -719,7 +720,7 @@ export class VersionService {
       },
     });
 
-    await this.prisma.versionRelease.create({
+    const { id: versionReleaseId } = await this.prisma.versionRelease.create({
       data: {
         id: v4(),
         parentVersion: {
@@ -758,24 +759,106 @@ export class VersionService {
               },
             },
             currentStatus: PageVersionStatus.PUBLISHED,
-            blocks: {
-              createMany: {
-                data: parentVersion.blocks.map(
-                  ({ blockType, props, depth, position }) => ({
-                    blockType,
-                    props,
-                    depth,
-                    position,
-                    id: v4(),
-                  }),
-                ),
-              },
-            },
           },
         },
         releaseName: publishDto.releaseName,
       },
     });
+
+    const clonedBlocks = cloneBlocksWithChildren(parentVersion.blocks);
+
+    const grouped = groupBy(clonedBlocks, 'parentId');
+    const groupedWithDefault = mapKeys(grouped, (value, key) =>
+      key === 'null' || key === null ? 'root' : key,
+    );
+
+    if (has(groupedWithDefault, 'root')) {
+      const parents = groupedWithDefault['root'];
+
+      for (const parent of parents) {
+        const { blockType, props, depth, position, parentId, id } = parent;
+        await this.prisma.versionRelease.update({
+          where: {
+            id: versionReleaseId,
+          },
+          data: {
+            pointInTimeVersion: {
+              update: {
+                blocks: {
+                  create: {
+                    blockType,
+                    props,
+                    depth,
+                    position,
+                    parentId,
+                    id,
+                  },
+                },
+              },
+            },
+          },
+        });
+
+        if (has(grouped, id)) {
+          const children = grouped[id];
+          for (const child of children) {
+            const { blockType, props, depth, position, parentId, id } = child;
+            await this.prisma.versionRelease.update({
+              where: {
+                id: versionReleaseId,
+              },
+              data: {
+                pointInTimeVersion: {
+                  update: {
+                    blocks: {
+                      create: {
+                        blockType,
+                        props,
+                        depth,
+                        position,
+                        parentId,
+                        id,
+                      },
+                    },
+                  },
+                },
+              },
+            });
+          }
+        }
+      }
+    } else {
+      throw new Error('No parents found');
+    }
+
+    // await this.prisma.versionRelease.update({
+    //   where: {
+    //     id
+    //   },
+    //   data: {
+    //     pointInTimeVersion: {
+    //       update: {
+    //         blocks: {
+    //           createMany:
+    //         }
+    //       }
+    //     }
+    //   }
+    // })
+    // blocks: {
+    //   createMany: {
+    //     data: parentVersion.blocks.map(
+    //       ({ blockType, props, depth, position, parentId }) => ({
+    //         blockType,
+    //         props,
+    //         depth,
+    //         position,
+    //         parentId,
+    //         id: v4(),
+    //       }),
+    //     ),
+    //   },
+    // },
 
     return this.prisma.versionStatusLog.create({
       data: {

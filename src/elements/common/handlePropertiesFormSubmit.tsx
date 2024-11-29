@@ -46,6 +46,7 @@ export const usePropertiesFormSubmit = ({
       versionId,
       blockId,
       props,
+      depth,
     }: {
       workspaceId: string;
       projectId: string;
@@ -53,6 +54,7 @@ export const usePropertiesFormSubmit = ({
       versionId: string;
       blockId: string;
       props: z.infer<typeof JSONZType>;
+      depth: number;
     }) =>
       updateBlockPropsInPageVersion(
         workspaceId,
@@ -60,7 +62,8 @@ export const usePropertiesFormSubmit = ({
         pageId,
         versionId,
         blockId,
-        props
+        props,
+        depth
       ),
     onSuccess: () => {
       console.log("updated props");
@@ -162,7 +165,6 @@ export const usePropertiesFormSubmit = ({
       ...updatedChildren,
       props: updatedProps,
     };
-    console.log(updatedElement);
 
     const childCount = updatedElement.children.length;
 
@@ -202,7 +204,7 @@ export const usePropertiesFormSubmit = ({
       updateElement(activeElement.id, updatedElement);
     }
 
-    if (activeElement.type === Form) {
+    if (activeElement.type === Form || activeElement.type === HContainer) {
       addChildrenToBlockMutation.mutate({
         workspaceId,
         projectId,
@@ -231,6 +233,7 @@ export const usePropertiesFormSubmit = ({
       versionId,
       blockId,
       props: updatedElement.props,
+      depth: hasParent ? 1 : 0,
     });
 
     setActiveElement(updatedElement);

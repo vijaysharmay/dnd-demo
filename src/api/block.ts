@@ -143,7 +143,7 @@ export const addChildrenToBlock = async (
   if (!accessToken) {
     throw new Error("Couldnt find access token");
   }
-
+  console.log(values);
   const url = `http://localhost:3000/workspace/${workspaceId}/project/${projecctId}/page/${pageId}/version/${versionId}/block/${blockId}/child/bulk`;
   const response = await fetch(url, {
     method: "PUT",
@@ -171,7 +171,8 @@ export const updateBlockPropsInPageVersion = async (
   pageId: string,
   versionId: string,
   blockId: string,
-  props: z.infer<typeof JSONZType>
+  props: z.infer<typeof JSONZType>,
+  depth: number
 ): Promise<CreateBlockResponseSchema> => {
   const accessToken = sessionStorage.getItem("accessToken");
 
@@ -182,7 +183,7 @@ export const updateBlockPropsInPageVersion = async (
   const url = `http://localhost:3000/workspace/${workspaceId}/project/${projecctId}/page/${pageId}/version/${versionId}/block/${blockId}`;
   const response = await fetch(url, {
     method: "PATCH",
-    body: JSON.stringify({ props }),
+    body: JSON.stringify({ props, depth }),
     headers: new Headers({
       "Content-Type": "application/json",
       Accept: "application/json",

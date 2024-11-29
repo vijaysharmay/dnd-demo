@@ -25,7 +25,7 @@ import {
   JSONSchema7Definition,
   JSONSchema7TypeName,
 } from "json-schema";
-import { capitalize, includes, isNull, keys } from "lodash";
+import { capitalize, includes, isNull, keys, sortBy } from "lodash";
 import { Dispatch, SetStateAction } from "react";
 import { twMerge } from "tailwind-merge";
 import { v4 } from "uuid";
@@ -250,14 +250,16 @@ export function blockToElement(block: Block | BlockSchema) {
   return element;
 }
 
-export function previewBlockToElement(block: PreviewBlock) {
-  const { id, type: blockType, parentId, children, props } = block;
+export function previewBlockToElement(block: BlockSchema) {
+  const { id, blockType, parentId, children, props, depth, position } = block;
   const type: ComponentElementType = blockType as ComponentElementType;
   const element: ComponentElementInstance = {
     id,
     type,
     props,
     parentId,
+    depth,
+    position,
     children: children?.map(previewBlockToElement) ?? [],
   };
   return element;
@@ -290,7 +292,18 @@ export function buildBlockHierarchy(blocks: BlockSchema[]): BlockSchema[] {
     }
   });
 
-  return rootBlocks;
+  const sortedRootBlocks = rootBlocks.map((block) => {
+    if (block.children && block.children?.length > 0) {
+      return {
+        ...block,
+        children: sortBy(block.children, "position"),
+      };
+    } else {
+      return block;
+    }
+  });
+
+  return sortedRootBlocks;
 }
 
 export function buildPreviewBlockHierarchy(
@@ -315,7 +328,18 @@ export function buildPreviewBlockHierarchy(
     }
   });
 
-  return rootBlocks;
+  const sortedRootBlocks = rootBlocks.map((block) => {
+    if (block.children && block.children?.length > 0) {
+      return {
+        ...block,
+        children: sortBy(block.children, "position"),
+      };
+    } else {
+      return block;
+    }
+  });
+
+  return sortedRootBlocks;
 }
 
 export function getBaseNavigationUrl(params: DefaultParams): string | null {

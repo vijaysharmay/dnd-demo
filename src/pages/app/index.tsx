@@ -90,7 +90,7 @@ function PageRenderer({
   blocks: Block[];
 }) {
   const [match] = useRoute(pageRoute);
-
+  console.log(blocks, buildBlockHierarchy(blocks));
   if (match) {
     return (
       <div className="w-full">
