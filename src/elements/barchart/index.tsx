@@ -1,39 +1,42 @@
+import { Barchart, ComponentElement } from "@/types";
+import { BarchartPropsSchema } from "@/types/properties";
+
 import { randInt } from "@/lib/utils";
-import { Button, ComponentElement } from "@/types";
-import { ButtonPropsSchema } from "@/types/properties";
-import { ButtonIcon } from "@radix-ui/react-icons";
-
+import { BarChart } from "lucide-react";
 import {
-  ButtonDesignerComponent,
-  ButtonDragOverlayComponent,
+  BarchartDesignerComponent,
+  BarchartDragOverlayComponent,
 } from "./designer";
-import { ButtonPropertiesComponent } from "./properties";
-import { ButtonRenderComponent } from "./render";
+import { BarchartPropertiesComponent } from "./properties";
+import { BarchartRenderComponent } from "./render";
 
-export const ButtonComponentElement: ComponentElement = {
-  type: Button,
-  create: (id: string, customProps?: ButtonPropsSchema) => ({
+export const BarchartComponentElement: ComponentElement = {
+  type: Barchart,
+  create: (id: string, customProps?: BarchartPropsSchema) => ({
     id,
-    type: Button,
+    type: Barchart,
     props: customProps
       ? customProps
       : {
-          buttonId: `button-${randInt()}`,
-          buttonText: "Button",
-          buttonVariant: "default",
-          buttonType: "button",
-          onClickHandler: "Do Nothing",
-          isFormElement: false,
+          barchartId: `barchart-${randInt()}`,
+          barchartTitle: "Sample",
+          barchartDescription: "This is a sample barchart",
+          accord: null,
+          accordId: null,
+          dataKey: "",
+          barchartInsightTitle: "Insight",
+          barchartInsightDescription: "This is a sample insight description",
+          barchartHeightInPx: "200px",
         },
     children: [],
     parentId: null,
   }),
   componentLibraryListItem: {
-    icon: <ButtonIcon />,
-    label: Button,
+    icon: <BarChart />,
+    label: Barchart,
   },
-  designerComponent: ButtonDesignerComponent,
-  dragOverlayComponent: ButtonDragOverlayComponent,
-  propertiesComponent: ButtonPropertiesComponent,
-  renderComponent: ButtonRenderComponent,
+  designerComponent: BarchartDesignerComponent,
+  dragOverlayComponent: BarchartDragOverlayComponent,
+  propertiesComponent: BarchartPropertiesComponent,
+  renderComponent: BarchartRenderComponent,
 };

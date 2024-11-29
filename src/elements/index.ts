@@ -1,4 +1,5 @@
 import {
+  Barchart,
   Button,
   ComponentElements,
   DTable,
@@ -8,6 +9,7 @@ import {
   TextBlock,
 } from "@/types";
 
+import { BarchartComponentElement } from "./barchart";
 import { ButtonComponentElement } from "./button";
 import { DTableComponentElement } from "./dtable";
 import { FormComponentElement } from "./form";
@@ -22,4 +24,5 @@ export const libraryElements: ComponentElements = {
   [HContainer]: HContainerComponentElement,
   [DTable]: DTableComponentElement,
   [Form]: FormComponentElement,
+  [Barchart]: BarchartComponentElement,
 };

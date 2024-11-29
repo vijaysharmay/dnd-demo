@@ -107,7 +107,7 @@ export type ComponentElementType =
   | typeof HContainer
   | typeof Form
   | typeof DTable
-  // | typeof Barchart
+  | typeof Barchart
   | typeof TextBlock;
 
 export type ComponentLibraryListItem = {

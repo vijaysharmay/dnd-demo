@@ -47,12 +47,28 @@ export const colsIntRec: Record<string, number> = {
   Four: 4,
 };
 
-export const BarchartPropsZSchema = z.object({});
+export const BarchartPropsZSchema = z.object({
+  barchartId: z
+    .string({ required_error: "Required barchartId" })
+    .min(10)
+    .startsWith("barchart-", "ID must start with the prefix `barchart-`"),
+  barchartTitle: z.string().min(1),
+  barchartDescription: z.string().min(1),
+  accord: AccordZSchema.nullable(),
+  accordId: z.string().nullable(),
+  dataKey: z.string(),
+  barchartInsightTitle: z.string().min(1),
+  barchartInsightDescription: z.string().min(1),
+  barchartHeightInPx: z
+    .string()
+    .max(5)
+    .endsWith("px", "Please enter a value in px, for example: 100px"),
+});
 
 export const TextBlockPropsZSchema = z.object({
   textBlockId: z
     .string({ required_error: "Required textBlockId" })
-    .min(8)
+    .min(11)
     .startsWith("textBlock-", "ID must start with the prefix `textBlock-`"),
   textBlockText: z.string().min(1),
   textBlockType: z.enum(TextBlockTypeVariants),

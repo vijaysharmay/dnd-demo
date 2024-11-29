@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
@@ -10,25 +9,24 @@ import {
 } from "@/components/ui/select";
 import useVersionStore from "@/store/version-store";
 import { ComponentElementInstance } from "@/types";
-import {
-  ButtonPropsSchema,
-  ButtonPropsZSchema,
-  ButtonStyleVariants,
-  EventVariants,
-} from "@/types/properties";
+import { BarchartPropsSchema, BarchartPropsZSchema } from "@/types/properties";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { isEmpty } from "lodash";
+import { isEmpty, isNull } from "lodash";
 import { SubmitHandler, useForm } from "react-hook-form";
 
+import { Button } from "@/components/ui/button";
+import useAccordStore from "@/store/accord-store";
+import { AccordSchema } from "@/types/api/accord";
 import { FormFieldRender } from "../common/form-fields";
 import { usePropertiesFormSubmit } from "../common/handlePropertiesFormSubmit";
 
-export const ButtonPropertiesComponent: React.FC<{
+export const BarchartPropertiesComponent: React.FC<{
   elementInstance: ComponentElementInstance;
 }> = ({ elementInstance }) => {
-  const form = useForm<ButtonPropsSchema>({
-    resolver: zodResolver(ButtonPropsZSchema),
-    values: elementInstance.props as ButtonPropsSchema,
+  const { accords } = useAccordStore();
+  const form = useForm<BarchartPropsSchema>({
+    resolver: zodResolver(BarchartPropsZSchema),
+    values: elementInstance.props as BarchartPropsSchema,
   });
 
   const { currentVersion } = useVersionStore();
@@ -43,7 +41,7 @@ export const ButtonPropertiesComponent: React.FC<{
     blockId: elementInstance.id,
   });
 
-  const onSubmit: SubmitHandler<ButtonPropsSchema> = (data) =>
+  const onSubmit: SubmitHandler<BarchartPropsSchema> = (data) =>
     handlePropertiesFormSubmit(data, elementInstance);
 
   return (
@@ -51,10 +49,10 @@ export const ButtonPropertiesComponent: React.FC<{
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 w-full">
         <FormField
           control={form.control}
-          name="buttonId"
+          name="barchartId"
           render={({ field }) => (
             <FormFieldRender
-              name="Button ID"
+              name="Barchart ID"
               tooltip="A unique identifier which is useful when crafting events"
               children={<Input type="text" {...field} />}
             />
@@ -63,11 +61,11 @@ export const ButtonPropertiesComponent: React.FC<{
 
         <FormField
           control={form.control}
-          name="buttonText"
+          name="barchartTitle"
           render={({ field }) => (
             <FormFieldRender
-              name="Button Text"
-              tooltip="Text inside the button"
+              name="Barchart Title"
+              tooltip="Title of the barchart"
               children={<Input type="text" {...field} />}
             />
           )}
@@ -75,15 +73,27 @@ export const ButtonPropertiesComponent: React.FC<{
 
         <FormField
           control={form.control}
-          name="buttonVariant"
+          name="barchartDescription"
           render={({ field }) => (
             <FormFieldRender
-              name="Button Variants"
-              tooltip="Variant of Button"
+              name="Barchart Description"
+              tooltip="Description of the barchart"
+              children={<Input type="text" {...field} />}
+            />
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="accordId"
+          render={({ field }) => (
+            <FormFieldRender
+              name="Barchart Data Accord"
+              tooltip="Accord representing the schema of the barchart data"
               children={
                 <Select
                   onValueChange={field.onChange}
-                  defaultValue={field.value}
+                  defaultValue={isNull(field.value) ? "" : field.value}
                 >
                   <FormControl>
                     <SelectTrigger>
@@ -91,10 +101,10 @@ export const ButtonPropertiesComponent: React.FC<{
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {ButtonStyleVariants.map((variant: string) => {
+                    {accords.map((accord: AccordSchema) => {
                       return (
-                        <SelectItem key={variant} value={variant}>
-                          {variant}
+                        <SelectItem key={accord.id} value={accord.id}>
+                          {accord.accordName}
                         </SelectItem>
                       );
                     })}
@@ -107,32 +117,47 @@ export const ButtonPropertiesComponent: React.FC<{
 
         <FormField
           control={form.control}
-          name="onClickHandler"
+          name="dataKey"
           render={({ field }) => (
             <FormFieldRender
-              name="On Click Workflow"
-              tooltip="Choose what to do when you click this button"
-              children={
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a variant" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {EventVariants.map((variant: string) => {
-                      return (
-                        <SelectItem key={variant} value={variant}>
-                          {variant}
-                        </SelectItem>
-                      );
-                    })}
-                  </SelectContent>
-                </Select>
-              }
+              name="Barchart Data Key"
+              tooltip="Data key of the barchart's categorical attribute"
+              children={<Input type="text" {...field} />}
+            />
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="barchartInsightTitle"
+          render={({ field }) => (
+            <FormFieldRender
+              name="Barchart Insight Title"
+              tooltip="Insight title of the barchart"
+              children={<Input type="text" {...field} />}
+            />
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="barchartInsightDescription"
+          render={({ field }) => (
+            <FormFieldRender
+              name="Barchart Insight Description"
+              tooltip="Insight description of the barchart"
+              children={<Input type="text" {...field} />}
+            />
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="barchartHeightInPx"
+          render={({ field }) => (
+            <FormFieldRender
+              name="Barchart Height"
+              tooltip="Height of the barchart"
+              children={<Input type="text" {...field} />}
             />
           )}
         />
