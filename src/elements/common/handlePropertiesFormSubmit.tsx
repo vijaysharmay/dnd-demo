@@ -6,7 +6,13 @@ import {
 import { initFormChildren } from "@/lib/utils";
 import useAccordStore from "@/store/accord-store";
 import useElementStore from "@/store/element-store";
-import { ComponentElementInstance, DTable, Form, HContainer } from "@/types";
+import {
+  Barchart,
+  ComponentElementInstance,
+  DTable,
+  Form,
+  HContainer,
+} from "@/types";
 import { JSONZType } from "@/types/api/common";
 import {
   colsIntRec,
@@ -114,6 +120,17 @@ export const usePropertiesFormSubmit = ({
     const hasParent: boolean = !isNull(activeElement.parentId);
 
     if (activeElement.type === DTable) {
+      const { accordId } = activeElementProps as DTablePropsSchema;
+      if (accordId) {
+        const accord = getAccordById(accordId) ?? null;
+        updatedProps = {
+          ...activeElementProps,
+          accord,
+        };
+      }
+    }
+
+    if (activeElement.type === Barchart) {
       const { accordId } = activeElementProps as DTablePropsSchema;
       if (accordId) {
         const accord = getAccordById(accordId) ?? null;
