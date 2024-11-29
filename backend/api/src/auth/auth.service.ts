@@ -57,7 +57,7 @@ export class AuthService {
       throw new UnauthorizedException('email not found');
     }
 
-    const { id, email, passwd, salt } = user;
+    const { id, email, fullName, passwd, salt } = user;
 
     // Hash the login password with the same parameters
     const encryptedHash = pbkdf2Sync(
@@ -83,7 +83,11 @@ export class AuthService {
     if (timingSafeEqual(storedPasswdBuffer, loginHashBuffer)) {
       return {
         id,
-        accessToken: await this.jwtService.signAsync({ sub: id, email: email }),
+        accessToken: await this.jwtService.signAsync({
+          sub: id,
+          email,
+          fullName,
+        }),
       };
     } else {
       throw new UnauthorizedException('incorrect password');

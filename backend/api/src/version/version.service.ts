@@ -22,6 +22,35 @@ export class VersionService {
     private prisma: PrismaService,
     private jwtService: JwtService,
   ) {}
+  async addChangeLog(
+    workspaceId: string,
+    projectId: string,
+    pageId: string,
+    versionId: string,
+    changeLog: string,
+    changeOwnerId: string,
+  ) {
+    return await this.prisma.versionChangeLog.create({
+      data: {
+        id: v4(),
+        changeLog,
+        version: {
+          connect: {
+            id: versionId,
+            workspaceId,
+            projectId,
+            pageId,
+          },
+        },
+        changeOwner: {
+          connect: {
+            id: changeOwnerId,
+          },
+        },
+      },
+    });
+  }
+
   async create(
     accessToken: string,
     workspaceId: string,
@@ -62,7 +91,7 @@ export class VersionService {
       },
     });
 
-    return this.prisma.versionStatusLog.create({
+    await this.prisma.versionStatusLog.create({
       data: {
         id: v4(),
         version: {
