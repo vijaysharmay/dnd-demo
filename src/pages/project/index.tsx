@@ -15,7 +15,7 @@ export default function Project() {
     <AppContainer title={<div>{currentProjectName}</div>}>
       <div className="p-2">
         <Tabs defaultValue="accords">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="">
             <TabsTrigger value="accords">Accords</TabsTrigger>
             <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>

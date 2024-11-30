@@ -163,7 +163,7 @@ export default function DataTable<T>({
           <>
             <Sheet>
               <SheetTrigger asChild>
-                <Button variant="outline" className="bg-green-500">
+                <Button variant="default">
                   Add Row
                 </Button>
               </SheetTrigger>
