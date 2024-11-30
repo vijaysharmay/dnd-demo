@@ -12,8 +12,8 @@ export default function AppContainer({
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset>
-        <header className="flex h-12 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 shadow-sm">
-          <div className="flex flex-row items-center gap-2 px-2 w-full">
+        <header className="flex h-12 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
+          <div className="flex flex-row items-center gap-2 py-2 pl-2 h-full w-full bg-foreground text-background/90">
             {title}
           </div>
         </header>

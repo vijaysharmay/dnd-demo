@@ -1,6 +1,11 @@
-import { ModeToggle } from "@/components/mode-toggle";
 import { Button } from "@/components/ui/button";
-import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail } from "@/components/ui/sidebar";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarHeader,
+  SidebarRail,
+} from "@/components/ui/sidebar";
 import useAuthStore from "@/store/auth-store";
 import useWorkspaceStore from "@/store/workspace-store";
 import * as React from "react";
@@ -18,7 +23,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   };
 
   return (
-    <Sidebar {...props} className="bg-foreground text-background">
+    <Sidebar {...props} className="bg-foreground text-background/90">
       <SidebarHeader>
         <div className="flex flex-row">
           <div
@@ -31,9 +36,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             Concord
           </div>
           <div className="grow"></div>
-          <div>
-            {/* <ModeToggle /> */}
-          </div>
+          <div>{/* <ModeToggle /> */}</div>
         </div>
         <WorkspaceSwitcher />
       </SidebarHeader>

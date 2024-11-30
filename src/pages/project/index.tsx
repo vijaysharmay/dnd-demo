@@ -12,7 +12,7 @@ export default function Project() {
   if (!workspaceId || !projectId) return;
 
   return (
-    <AppContainer title={<p>{currentProjectName}</p>}>
+    <AppContainer title={<div>{currentProjectName}</div>}>
       <div className="p-2">
         <Tabs defaultValue="accords">
           <TabsList className="grid w-full grid-cols-2">

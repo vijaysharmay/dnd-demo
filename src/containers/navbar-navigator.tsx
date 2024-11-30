@@ -113,7 +113,7 @@ function NavTree({ workspaceId, item }: { workspaceId: string; item: Tree }) {
             {item.type === "project" && <Folder />}
             {item.type === "page" && <File />}
             {item.type === "version" && <GitFork />}
-            <>{item.name}</>
+            <span>{item.name}</span>
           </SidebarMenuButton>
         </NodeOptions>
       </SidebarMenuItem>

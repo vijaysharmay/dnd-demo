@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { buildBlockHierarchy, cn } from "@/lib/utils";
+import { buildBlockHierarchy } from "@/lib/utils";
 import useVersionStore from "@/store/version-store";
 import useWorkspaceStore from "@/store/workspace-store";
 import { Reviewer } from "@/types/api/page";
@@ -41,17 +41,13 @@ export default function VersionTitle() {
       <div>{name}</div>
       <div className="grow"></div>
       <div className="ml-auto">
-        <Button
-          variant="default"
-          className={cn(!workspace.isUserWorkspace ? "mr-2" : "mr-0")}
-          onClick={handlePreview}
-        >
+        <Button variant="default" className="mr-2" onClick={handlePreview}>
           Preview
         </Button>
         {!workspace.isUserWorkspace && currentStatus === "PUBLISHED" && (
           <Button
             variant="default"
-            className={cn(!workspace.isUserWorkspace ? "mr-2" : "mr-0")}
+            className="mr-2"
             onClick={handleViewPublishedPage}
           >
             View Published Page
