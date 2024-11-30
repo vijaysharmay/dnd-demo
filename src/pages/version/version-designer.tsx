@@ -11,15 +11,28 @@ import useElementStore from "@/store/element-store";
 import useVersionStore from "@/store/version-store";
 import { ComponentElementInstance, ComponentElementType } from "@/types";
 import { BlockSchema } from "@/types/api/page";
-import { DragEndEvent, useDndMonitor, useDroppable } from "@dnd-kit/core";
+import {
+  DndContext,
+  DragEndEvent,
+  KeyboardSensor,
+  MouseSensor,
+  TouchSensor,
+  useDndMonitor,
+  useDroppable,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import { restrictToWindowEdges } from "@dnd-kit/modifiers";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { isNull } from "lodash";
 import { useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 
+import { ComponentLibrary } from "./component-library";
 import DesignerElementWrapper from "./designer-element-wrapper";
+import DragOverlayWrapper from "./drag-overlay-wrapper";
 
-export default function Designer({
+function Designer({
   workspaceId,
   projectId,
   pageId,
@@ -269,7 +282,7 @@ export default function Designer({
 
   return (
     <>
-      <div className="bg-gray-100 p-4 h-screen">
+      <div className="p-2 h-screen">
         <div className="bg-white shadow-md h-full w-full flex">
           <div
             ref={droppable.setNodeRef}
@@ -299,5 +312,44 @@ export default function Designer({
         </div>
       </div>
     </>
+  );
+}
+
+export default function DesignerContainer({
+  workspaceId,
+  projectId,
+  pageId,
+  versionId,
+}: {
+  workspaceId: string;
+  projectId: string;
+  pageId: string;
+  versionId: string;
+}) {
+  const mouseSensor = useSensor(MouseSensor, {
+    activationConstraint: {
+      distance: 10,
+    },
+  });
+  const touchSensor = useSensor(TouchSensor);
+  const keyboardSensor = useSensor(KeyboardSensor);
+  const sensors = useSensors(mouseSensor, touchSensor, keyboardSensor);
+  return (
+    <div className="flex flex-row">
+      <DndContext modifiers={[restrictToWindowEdges]} sensors={sensors}>
+        <div className="basis-1">
+          <ComponentLibrary />
+        </div>
+        <div className="grow">
+          <Designer
+            workspaceId={workspaceId}
+            projectId={projectId}
+            pageId={pageId}
+            versionId={versionId}
+          />
+          <DragOverlayWrapper />
+        </div>
+      </DndContext>
+    </div>
   );
 }

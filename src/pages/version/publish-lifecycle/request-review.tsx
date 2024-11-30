@@ -168,10 +168,7 @@ export default function RequestReview({
 
   const ShowExistingReviewer = ({ reviewer }: { reviewer: Reviewer }) => {
     return (
-      <div
-        key={reviewer.approver.id}
-        className="flex flex-row border rounded bg-gray-50 p-2"
-      >
+      <div key={reviewer.approver.id} className="flex flex-row rounded p-2">
         <div>
           <p className="text-sm">{reviewer.approver.fullName}</p>
           <p className="text-muted-foreground text-sm underline">
@@ -234,7 +231,6 @@ export default function RequestReview({
                   Add
                 </Button>
               </div>
-              <hr />
             </>
           )}
           {existingReviewers.map((reviewer: Reviewer) => (
@@ -245,7 +241,6 @@ export default function RequestReview({
           ))}
           {editMode && (
             <>
-              <hr />
               {reviewers.map((reviewer) => (
                 <ShowReviewer key={reviewer} reviewer={reviewer} />
               ))}

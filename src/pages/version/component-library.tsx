@@ -7,7 +7,7 @@ import { useDraggable } from "@dnd-kit/core";
 export function ComponentLibrary() {
   const elementKeys = Object.keys(libraryElements);
   return (
-    <div className="p-2 flex flex-wrap gap-2">
+    <div className="py-2 pl-2 flex flex-wrap gap-2">
       <div className="text-center w-full font-semibold text-muted-foreground">
         Library
       </div>
@@ -38,16 +38,16 @@ function LibraryListDraggableItem({ element }: { element: ComponentElement }) {
   return (
     <Button
       ref={draggable.setNodeRef}
-      variant="default"
+      variant="secondary"
       className={cn(
-        "flex-row cursor-grab opacity-90 drop-shadow-lg",
+        "flex-row cursor-grab",
         draggable.isDragging && "ring-2 ring-slate-200"
       )}
       {...draggable.listeners}
       {...draggable.attributes}
     >
       <div>{icon}</div>
-      <p className="text-xs">{label}</p>
+      {label}
     </Button>
   );
 }

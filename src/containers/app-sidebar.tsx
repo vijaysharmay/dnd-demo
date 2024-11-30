@@ -1,17 +1,11 @@
-import * as React from "react";
-
 import { ModeToggle } from "@/components/mode-toggle";
 import { Button } from "@/components/ui/button";
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarHeader,
-  SidebarRail,
-} from "@/components/ui/sidebar";
+import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail } from "@/components/ui/sidebar";
 import useAuthStore from "@/store/auth-store";
 import useWorkspaceStore from "@/store/workspace-store";
+import * as React from "react";
 import { navigate } from "wouter/use-browser-location";
+
 import { ConcordSidebarNavigator } from "./navbar-navigator";
 import { WorkspaceSwitcher } from "./workspace-switcher";
 
@@ -38,7 +32,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </div>
           <div className="grow"></div>
           <div>
-            <ModeToggle />
+            {/* <ModeToggle /> */}
           </div>
         </div>
         <WorkspaceSwitcher />

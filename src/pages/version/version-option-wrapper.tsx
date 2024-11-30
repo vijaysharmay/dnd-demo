@@ -6,8 +6,8 @@ export default function VersionOptionWrapper({
   children: React.ReactElement;
 }) {
   return (
-    <div className="px-4 py-2 flex flex-wrap gap-2">
-      <div className="text-center w-full font-semibold text-muted-foreground mb-4">
+    <div className="p-2 flex flex-wrap gap-2">
+      <div className="text-center w-full font-semibold text-muted-foreground mb-2">
         {title}
       </div>
       {children}

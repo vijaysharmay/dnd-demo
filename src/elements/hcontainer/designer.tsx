@@ -65,7 +65,7 @@ const HContainerDroppable = ({
       ref={dropRegion.setNodeRef}
       className={cn(
         "w-full bg-white rounded-md border-gray-500 border border-dashed",
-        dropRegion.isOver && "bg-gray-400"
+        dropRegion.isOver && "bg-secondary"
       )}
     ></div>
   );

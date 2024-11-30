@@ -26,7 +26,7 @@ export const InputDesignerComponent: React.FC<{
 
 export const InputDragOverlayComponent = () => {
   return (
-    <div className="bg-gray-50 text-black p-4 w-full">
+    <div className="text-black p-4 w-full">
       <Label>Label</Label>
       <Input type="text" placeholder="Placeholder" readOnly={true} />
       <p className="text-muted-foreground text-xs"></p>

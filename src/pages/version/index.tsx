@@ -1,35 +1,19 @@
 import { Toaster } from "@/components/ui/toaster";
 import AppContainer from "@/containers/app-container";
 import { cn } from "@/lib/utils";
-import { ComponentLibrary } from "@/pages/version/component-library";
-import DragOverlayWrapper from "@/pages/version/drag-overlay-wrapper";
 import Messages from "@/pages/version/messages";
 import Properties from "@/pages/version/properties";
-import Designer from "@/pages/version/version-designer";
 import useWorkspaceStore from "@/store/workspace-store";
-import { DndContext, KeyboardSensor, MouseSensor, TouchSensor, useSensor, useSensors } from "@dnd-kit/core";
-import { restrictToWindowEdges } from "@dnd-kit/modifiers";
 import { GitBranch, Info, MessageSquareText } from "lucide-react";
 import { useState } from "react";
-import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { useParams } from "wouter";
 
+import DesignerContainer from "@/pages/version/version-designer";
 import History from "./history";
 import VersionTitle from "./title";
 
 export default function Version() {
-  const mouseSensor = useSensor(MouseSensor, {
-    activationConstraint: {
-      distance: 10,
-    },
-  });
-  const touchSensor = useSensor(TouchSensor);
-  const keyboardSensor = useSensor(KeyboardSensor);
-  const sensors = useSensors(mouseSensor, touchSensor, keyboardSensor);
-
-  const [showProperties, setShowProperties] = useState<boolean>(false);
-  const [showMessages, setShowMessages] = useState<boolean>(false);
-  const [showHistory, setShowHistory] = useState<boolean>(false);
+  const [activeTab, setActiveTab] = useState<"properties" | "messages" | "history" | null>(null);
 
   const { workspaceId, projectId, pageId, versionId } = useParams();
   const { currentWorkspace } = useWorkspaceStore();
@@ -39,61 +23,41 @@ export default function Version() {
   return (
     <AppContainer title={<VersionTitle />}>
       <>
-        <PanelGroup direction="horizontal">
-          <DndContext modifiers={[restrictToWindowEdges]} sensors={sensors}>
-            <Panel maxSize={15} className="shadow-md">
-              <ComponentLibrary />
-            </Panel>
-            <PanelResizeHandle />
-            <Panel>
-              <Designer
-                workspaceId={workspaceId}
-                projectId={projectId}
-                pageId={pageId}
-                versionId={versionId}
-              />
-            </Panel>
-            <DragOverlayWrapper />
-          </DndContext>
-          {showProperties && (
-            <Panel
-              collapsible={true}
-              minSize={20}
-              maxSize={20}
-              className="shadow-md"
-            >
+        <div className="flex flex-row">
+          <div className="grow">
+            <DesignerContainer
+              workspaceId={workspaceId}
+              projectId={projectId}
+              pageId={pageId}
+              versionId={versionId}
+            />
+          </div>
+          {/* Conditionally render the active tab */}
+          {activeTab === "properties" && (
+            <div className="shadow-md w-72">
               <Properties />
-            </Panel>
+            </div>
           )}
-          {showMessages && (
-            <Panel
-              collapsible={true}
-              minSize={20}
-              maxSize={20}
-              className="shadow-md"
-            >
+          {activeTab === "messages" && (
+            <div className="shadow-md w-72">
               <Messages />
-            </Panel>
+            </div>
           )}
-          {showHistory && (
-            <Panel
-              collapsible={true}
-              minSize={20}
-              maxSize={20}
-              className="shadow-md"
-            >
+          {activeTab === "history" && (
+            <div className="shadow-md w-72">
               <History />
-            </Panel>
+            </div>
           )}
-          <PanelResizeHandle />
-          <Panel collapsible={true} maxSize={5} className="shadow-md">
-            <div className="grid grid-col-1 justify-center pt-2 cursor-pointer">
+
+          {/* Sidebar with tab controls */}
+          <div className="shadow-md p-2">
+            <div className="flex flex-col justify-center pt-2 cursor-pointer">
               <div
                 className={cn(
                   "p-2 hover:bg-primary/50 rounded-md",
-                  showProperties && "bg-primary/50"
+                  activeTab === "properties" && "bg-primary/50"
                 )}
-                onClick={() => setShowProperties(!showProperties)}
+                onClick={() => setActiveTab(activeTab === "properties" ? null : "properties")}
               >
                 <Info />
               </div>
@@ -101,9 +65,9 @@ export default function Version() {
                 <div
                   className={cn(
                     "p-2 hover:bg-primary/50 rounded-md",
-                    showMessages && "bg-primary/50"
+                    activeTab === "messages" && "bg-primary/50"
                   )}
-                  onClick={() => setShowMessages(!showMessages)}
+                  onClick={() => setActiveTab(activeTab === "messages" ? null : "messages")}
                 >
                   <MessageSquareText />
                 </div>
@@ -111,15 +75,15 @@ export default function Version() {
               <div
                 className={cn(
                   "p-2 hover:bg-primary/50 rounded-md",
-                  showHistory && "bg-primary/50"
+                  activeTab === "history" && "bg-primary/50"
                 )}
-                onClick={() => setShowHistory(!showHistory)}
+                onClick={() => setActiveTab(activeTab === "history" ? null : "history")}
               >
                 <GitBranch />
               </div>
             </div>
-          </Panel>
-        </PanelGroup>
+          </div>
+        </div>
 
         <Toaster />
       </>

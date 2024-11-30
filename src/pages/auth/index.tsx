@@ -9,7 +9,7 @@ export default function Auth() {
   }
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-white">
       <div className="m-auto">
         <div className="text-5xl text-center font-pacifico">Concord</div>
         <div className="py-4 text-md text-center text-muted-foreground">

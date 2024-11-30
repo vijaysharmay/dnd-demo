@@ -11,13 +11,14 @@ import VersionOptionWrapper from "./version-option-wrapper";
 import { getLiveblocksProps } from "@/api/messages";
 import { BaseMetadata, ThreadData } from "@liveblocks/client";
 import "@liveblocks/react-ui/styles.css";
+import { orderBy } from "lodash";
 import { useEffect, useState } from "react";
 import { useParams } from "wouter";
 
 export default function Messages() {
   return (
     <VersionOptionWrapper title="Messages">
-      <div className="w-full p-1 rounded-lg border-2">
+      <div className="w-full flex flex-col text-xs">
         <LiveBlocksContainer />
       </div>
     </VersionOptionWrapper>
@@ -56,16 +57,25 @@ export function Room({ id }: { id: string }) {
   }, [leave, room]);
 
   return (
-    <div>
-      {threads.map((thread) => (
-        <Thread
-          key={thread.id}
-          thread={thread}
-          showAttachments={false}
-          showActions={true}
-        />
-      ))}
-      <Composer />
-    </div>
+    <>
+      <div className="sticky bg-white mb-4">
+        <Composer />
+      </div>
+      <div className="flex flex-col h-[calc(100vh-9rem)]">
+        {/* Threads content */}
+        <div className="flex-1 overflow-y-scroll">
+          {orderBy(threads, ["createdAt"], "desc").map((thread) => (
+            <Thread
+              key={thread.id}
+              thread={thread}
+              showAttachments={false}
+              showActions={true}
+              showReactions={false}
+            />
+          ))}
+        </div>
+        {/* Composer pinned at the bottom */}
+      </div>
+    </>
   );
 }
