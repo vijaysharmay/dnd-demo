@@ -7,12 +7,12 @@ import ShowAccordsTable from "./show-accords-table";
 
 export default function Project() {
   const { workspaceId, projectId } = useParams();
-  const { currentProjectName } = useWorkspaceStore();
+  const { currentProject } = useWorkspaceStore();
 
   if (!workspaceId || !projectId) return;
 
   return (
-    <AppContainer title={<div>{currentProjectName}</div>}>
+    <AppContainer title={<div>{currentProject?.name}</div>}>
       <div className="p-2">
         <Tabs defaultValue="accords">
           <TabsList className="">

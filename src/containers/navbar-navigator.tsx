@@ -99,7 +99,7 @@ export function ConcordSidebarNavigator() {
 }
 
 function NavTree({ workspaceId, item }: { workspaceId: string; item: Tree }) {
-  const [location, navigate] = useLocation();
+  const [location] = useLocation();
   if (!item.children || item.children.length === 0) {
     return (
       <SidebarMenuItem className="cursor-pointer hover:bg-sidebar-accent rounded">

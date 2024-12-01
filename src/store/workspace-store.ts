@@ -1,4 +1,9 @@
-import { SidebarWorkspaceSchema, UserSchema } from "@/types/api/user";
+import {
+  SidebarPageSchema,
+  SidebarProjectSchema,
+  SidebarWorkspaceSchema,
+  UserSchema,
+} from "@/types/api/user";
 import { create } from "zustand";
 
 type WorkspaceState = {
@@ -6,13 +11,15 @@ type WorkspaceState = {
   isWorkspaceDataLoading: boolean;
   workspaces: SidebarWorkspaceSchema[];
   currentWorkspace: SidebarWorkspaceSchema | undefined;
-  currentProjectName: string | undefined;
+  currentProject: SidebarProjectSchema | undefined;
+  currentPage: SidebarPageSchema | undefined;
 
   setCurrentUser: (currentUser: UserSchema) => void;
   setIsWorkspaceDataLoading: (flag: boolean) => void;
   setWorkspaces: (workspaces: SidebarWorkspaceSchema[]) => void;
   setCurrentWorkspace: (workspace: SidebarWorkspaceSchema | undefined) => void;
-  setCurrentProjectName: (projectname: string | undefined) => void;
+  setCurrentProject: (project: SidebarProjectSchema | undefined) => void;
+  setCurrentPage: (page: SidebarPageSchema | undefined) => void;
 };
 
 export const useWorkspaceStore = create<WorkspaceState>((set) => ({
@@ -27,13 +34,16 @@ export const useWorkspaceStore = create<WorkspaceState>((set) => ({
   isWorkspaceDataLoading: true,
   workspaces: [],
   currentWorkspace: undefined,
-  currentProjectName: undefined,
+  currentProject: undefined,
+  currentPage: undefined,
   setIsWorkspaceDataLoading: (flag: boolean) =>
     set({ isWorkspaceDataLoading: flag }),
   setCurrentWorkspace: (workspace: SidebarWorkspaceSchema | undefined) =>
     set({ currentWorkspace: workspace }),
-  setCurrentProjectName: (currentProjectName: string | undefined) =>
-    set({ currentProjectName }),
+  setCurrentProject: (currentProject: SidebarProjectSchema | undefined) =>
+    set({ currentProject }),
+  setCurrentPage: (currentPage: SidebarPageSchema | undefined) =>
+    set({ currentPage }),
   setWorkspaces: (workspaces: SidebarWorkspaceSchema[]) => set({ workspaces }),
 }));
 

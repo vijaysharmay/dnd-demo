@@ -75,7 +75,7 @@ export function WorkspaceSwitcher() {
   const [isCreateWorkspaceDialogOpen, setIsCreateWorkspaceDialogOpen] =
     useState(false);
 
-  const { workspaceId, projectId } = useParams();
+  const { workspaceId, projectId, pageId } = useParams();
 
   const { isPending, error, data } = useQuery({
     queryKey: ["getCurrentUser"],
@@ -114,7 +114,9 @@ export function WorkspaceSwitcher() {
     setCurrentWorkspace,
     isWorkspaceDataLoading,
     setIsWorkspaceDataLoading,
-    setCurrentProjectName,
+    setCurrentProject,
+    currentProject,
+    setCurrentPage,
   } = useWorkspaceStore();
 
   const { setAccords } = useAccordStore();
@@ -136,7 +138,6 @@ export function WorkspaceSwitcher() {
         ]);
         if (currentWorkspaceFromRouteParams) {
           setCurrentWorkspace(currentWorkspaceFromRouteParams.workspace);
-          
         }
       } else if (currentWorkspace) {
         setCurrentWorkspace(currentWorkspace);
@@ -145,17 +146,23 @@ export function WorkspaceSwitcher() {
       }
 
       if (projectId && currentWorkspace) {
-        const currentProjectFromRouteParams = find(
-          currentWorkspace.projects,
-          ["id", projectId]
-        );
+        const currentProjectFromRouteParams = find(currentWorkspace.projects, [
+          "id",
+          projectId,
+        ]);
         if (currentProjectFromRouteParams) {
-          setCurrentProjectName(
-            currentProjectFromRouteParams.name
-          );
-          setAccords(
-            currentProjectFromRouteParams.accords
-          );
+          setCurrentProject(currentProjectFromRouteParams);
+          setAccords(currentProjectFromRouteParams.accords);
+
+          if (pageId) {
+            const currentPageFromRouteParams = find(
+              currentProjectFromRouteParams.pages,
+              ["id", pageId]
+            );
+            if (currentPageFromRouteParams) {
+              setCurrentPage(currentPageFromRouteParams);
+            }
+          }
         }
       }
 
@@ -175,7 +182,9 @@ export function WorkspaceSwitcher() {
     currentWorkspace,
     data,
     isPending,
+    projectId,
     setAccords,
+    setCurrentProject,
     setCurrentUser,
     setCurrentWorkspace,
     setIsWorkspaceDataLoading,
@@ -441,7 +450,8 @@ export function WorkspaceSwitcher() {
                                             onSelectedValueChange={(memberId) =>
                                               setNewMember({
                                                 memberId,
-                                                role: newMember?.role,
+                                                role:
+                                                  newMember?.role || "DESIGNER",
                                               })
                                             }
                                             searchValue={searchValue}
