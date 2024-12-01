@@ -1,4 +1,4 @@
-import { libraryElements } from "@/elements";
+import { LibraryElementsRegister } from "@/elements";
 import { ComponentElementType } from "@/types";
 import { Active, DragOverlay, useDndMonitor } from "@dnd-kit/core";
 import { useState } from "react";
@@ -29,7 +29,7 @@ export default function DragOverlayWrapper() {
     <DragOverlay>
       {isLibraryItem ? (
         <LibraryListDragOverlay
-          element={libraryElements[elementType as ComponentElementType]}
+          element={LibraryElementsRegister[elementType as ComponentElementType]}
         />
       ) : (
         <div>No drag overlay found !</div>

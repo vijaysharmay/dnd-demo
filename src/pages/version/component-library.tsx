@@ -1,11 +1,11 @@
 import { Button } from "@/components/ui/button";
-import { libraryElements } from "@/elements";
+import { LibraryElementsRegister } from "@/elements";
 import { cn } from "@/lib/utils";
 import { ComponentElement, ComponentElementType } from "@/types";
 import { useDraggable } from "@dnd-kit/core";
 
 export function ComponentLibrary() {
-  const elementKeys = Object.keys(libraryElements);
+  const elementKeys = Object.keys(LibraryElementsRegister);
   return (
     <div className="py-2 pl-2 flex flex-wrap gap-2">
       <div className="text-center w-full font-semibold text-muted-foreground">
@@ -16,7 +16,7 @@ export function ComponentLibrary() {
           return (
             <LibraryListDraggableItem
               key={key}
-              element={libraryElements[key as ComponentElementType]}
+              element={LibraryElementsRegister[key as ComponentElementType]}
             />
           );
         })}

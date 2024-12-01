@@ -5,8 +5,8 @@ import {
   CreateBlockRequestSchema,
 } from "@/api/block";
 import { Skeleton } from "@/components/ui/skeleton";
-import { libraryElements } from "@/elements";
-import { blockToElement, cn, transformVersionSchema } from "@/lib/utils";
+import { LibraryElementsRegister } from "@/elements";
+import { BlockToElement, cn, TransformVersionSchema } from "@/lib/utils";
 import useElementStore from "@/store/element-store";
 import useVersionStore from "@/store/version-store";
 import { ComponentElementInstance, ComponentElementType } from "@/types";
@@ -187,7 +187,9 @@ function Designer({
         const isTop = over.data?.current?.isTopHalfDroppable;
         const isBottom = over.data?.current?.isBottomHalfDroppable;
         const newElement =
-          libraryElements[elementType as ComponentElementType].create(uuidv4());
+          LibraryElementsRegister[elementType as ComponentElementType].create(
+            uuidv4()
+          );
 
         if (hoveredElementIndex > -1 && (isTop || isBottom)) {
           if (isTop) {
@@ -268,10 +270,10 @@ function Designer({
 
   useEffect(() => {
     if (data) {
-      const transformed = transformVersionSchema(data);
+      const transformed = TransformVersionSchema(data);
       setCurrentVersion(data);
       const elements: ComponentElementInstance[] = transformed.blocks.map(
-        (block: BlockSchema) => blockToElement(block)
+        (block: BlockSchema) => BlockToElement(block)
       );
       setElements(elements);
     }

@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 import { ComponentElementInstance } from "@/types";
 import { HContainerPropsSchema } from "@/types/properties";
 import { isNull } from "lodash";
-import { libraryElements } from "..";
+import { LibraryElementsRegister } from "..";
 
 export const HContainerRenderComponent: React.FC<{
   elementInstance: ComponentElementInstance;
@@ -31,7 +31,7 @@ export const HContainerRenderComponent: React.FC<{
       {children.map((element: ComponentElementInstance | null) => {
         if (!isNull(element)) {
           const ChildRenderComponent =
-            libraryElements[element.type].renderComponent;
+            LibraryElementsRegister[element.type].renderComponent;
           return (
             <ChildRenderComponent key={element.id} elementInstance={element} />
           );

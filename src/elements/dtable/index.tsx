@@ -1,8 +1,11 @@
-import { randInt } from "@/lib/utils";
+import { RandInt } from "@/lib/utils";
 import { ComponentElement, DTable } from "@/types";
 import { Table } from "lucide-react";
 
-import { DTableDesignerComponent, DTableDragOverlayComponent } from "./designer";
+import {
+  DTableDesignerComponent,
+  DTableDragOverlayComponent,
+} from "./designer";
 import { DTablePropertiesComponent } from "./properties";
 import { DTableRenderComponent } from "./render";
 
@@ -12,7 +15,7 @@ export const DTableComponentElement: ComponentElement = {
     id,
     type: DTable,
     props: {
-      dTableId: `dTable-${randInt()}`,
+      dTableId: `dTable-${RandInt()}`,
       accordId: null,
       accord: null,
       dTableHeightInPx: "200px",

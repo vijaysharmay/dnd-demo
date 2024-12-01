@@ -1,7 +1,7 @@
 import {
   Barchart,
   Button,
-  ComponentElements,
+  ComponentElementRegister,
   DTable,
   Form,
   HContainer,
@@ -17,7 +17,7 @@ import { HContainerComponentElement } from "./hcontainer";
 import { InputComponentElement } from "./input";
 import { TextBlockComponentElement } from "./textblock";
 
-export const libraryElements: ComponentElements = {
+export const LibraryElementsRegister: ComponentElementRegister = {
   [TextBlock]: TextBlockComponentElement,
   [Input]: InputComponentElement,
   [Button]: ButtonComponentElement,

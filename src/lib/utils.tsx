@@ -7,7 +7,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { libraryElements } from "@/elements";
+import { LibraryElementsRegister } from "@/elements";
 import { Block, PreviewBlock } from "@/pages/app/published-apps";
 import { ComponentElementInstance, ComponentElementType } from "@/types";
 import { BlockSchema, VersionSchema } from "@/types/api/page";
@@ -36,11 +36,11 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function randInt() {
+export function RandInt() {
   return Math.floor(Math.random() * 1000) + 1;
 }
 
-export function convertJSONSchemaToZod(schema: JSONSchema7): ZodTypeAny {
+export function ConvertJSONSchemaToZod(schema: JSONSchema7): ZodTypeAny {
   const { required, properties } = schema;
 
   const zSchemaTypeMappings: Record<string, ZodTypeAny> = {
@@ -65,7 +65,7 @@ export function convertJSONSchemaToZod(schema: JSONSchema7): ZodTypeAny {
   return z.object(schemaObj).required();
 }
 
-export function createEmptyObjectFromSchema(schema: JSONSchema7) {
+export function CreateEmptyObjectFromSchema(schema: JSONSchema7) {
   const result: { [x: string]: string | number | boolean | object | null } = {};
   if (schema.properties) {
     const { properties } = schema;
@@ -82,7 +82,7 @@ export function createEmptyObjectFromSchema(schema: JSONSchema7) {
           result[key] = false;
           break;
         case "object":
-          result[key] = createEmptyObjectFromSchema(propSchema); // Recursive call for nested objects
+          result[key] = CreateEmptyObjectFromSchema(propSchema); // Recursive call for nested objects
           break;
         case "array":
           result[key] = [];
@@ -95,7 +95,7 @@ export function createEmptyObjectFromSchema(schema: JSONSchema7) {
   return result;
 }
 
-export function initFormChildren(
+export function InitFormChildren(
   parentId: string,
   schemaAsString: string
 ): (ComponentElementInstance | null)[] {
@@ -111,7 +111,7 @@ export function initFormChildren(
     if (schema.properties) {
       const propObj: JSONSchema7Definition = schema.properties[prop];
       const inputInstanceProps: InputPropsSchema = {
-        inputId: `input-${randInt()}`,
+        inputId: `input-${RandInt()}`,
         inputLabel: capitalize(prop),
         placeHolder: capitalize(prop),
         helperText: capitalize(prop),
@@ -122,7 +122,7 @@ export function initFormChildren(
           type: (propObj as JSONSchema7).type as JSONSchema4TypeName,
         },
       };
-      return libraryElements.Input.create(
+      return LibraryElementsRegister.Input.create(
         v4(),
         inputInstanceProps as CustomPropsSchema,
         parentId
@@ -143,7 +143,7 @@ export interface Tree {
   children?: Tree[];
 }
 
-export function convertToTree(data: SidebarWorkspaceSchema): Tree {
+export function ConvertToTree(data: SidebarWorkspaceSchema): Tree {
   const mapWorkspaceToTree = (workspace: SidebarWorkspaceSchema): Tree => ({
     id: workspace.id,
     name: workspace.name,
@@ -237,7 +237,7 @@ export function NodeOptionsItem({
   );
 }
 
-export function blockToElement(block: Block | BlockSchema) {
+export function BlockToElement(block: Block | BlockSchema) {
   const { id, blockType, parentId, children, props } = block;
   const type: ComponentElementType = blockType as ComponentElementType;
   const element: ComponentElementInstance = {
@@ -245,12 +245,12 @@ export function blockToElement(block: Block | BlockSchema) {
     type,
     props,
     parentId,
-    children: children?.map(blockToElement) ?? [],
+    children: children?.map(BlockToElement) ?? [],
   };
   return element;
 }
 
-export function previewBlockToElement(block: BlockSchema) {
+export function PreviewBlockToElement(block: BlockSchema) {
   const { id, blockType, parentId, children, props, depth, position } = block;
   const type: ComponentElementType = blockType as ComponentElementType;
   const element: ComponentElementInstance = {
@@ -260,19 +260,19 @@ export function previewBlockToElement(block: BlockSchema) {
     parentId,
     depth,
     position,
-    children: children?.map(previewBlockToElement) ?? [],
+    children: children?.map(PreviewBlockToElement) ?? [],
   };
   return element;
 }
 
-export function transformVersionSchema(version: VersionSchema): VersionSchema {
+export function TransformVersionSchema(version: VersionSchema): VersionSchema {
   return {
     ...version,
-    blocks: buildBlockHierarchy(version.blocks),
+    blocks: BuildBlockHierarchy(version.blocks),
   };
 }
 
-export function buildBlockHierarchy(blocks: BlockSchema[]): BlockSchema[] {
+export function BuildBlockHierarchy(blocks: BlockSchema[]): BlockSchema[] {
   const blockMap: Record<string, BlockSchema> = {};
   const rootBlocks: BlockSchema[] = [];
 
@@ -306,7 +306,7 @@ export function buildBlockHierarchy(blocks: BlockSchema[]): BlockSchema[] {
   return sortedRootBlocks;
 }
 
-export function buildPreviewBlockHierarchy(
+export function BuildPreviewBlockHierarchy(
   blocks: PreviewBlock[]
 ): PreviewBlock[] {
   const blockMap: Record<string, PreviewBlock> = {};
@@ -342,7 +342,9 @@ export function buildPreviewBlockHierarchy(
   return sortedRootBlocks;
 }
 
-export function getBaseNavigationUrl(params: DefaultParams): string | null {
+export function GetBaseNavigationUrl(
+  params: DefaultParams
+): string | undefined {
   const { workspaceId, projectId, pageId, versionId } = params;
 
   if (workspaceId) {

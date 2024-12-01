@@ -1,7 +1,7 @@
 import { Barchart, ComponentElement } from "@/types";
 import { BarchartPropsSchema } from "@/types/properties";
 
-import { randInt } from "@/lib/utils";
+import { RandInt } from "@/lib/utils";
 import { BarChart } from "lucide-react";
 import {
   BarchartDesignerComponent,
@@ -18,7 +18,7 @@ export const BarchartComponentElement: ComponentElement = {
     props: customProps
       ? customProps
       : {
-          barchartId: `barchart-${randInt()}`,
+          barchartId: `barchart-${RandInt()}`,
           barchartTitle: "Sample",
           barchartDescription: "This is a sample barchart",
           accord: null,

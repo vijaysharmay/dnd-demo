@@ -1,5 +1,5 @@
-import { libraryElements } from "@/elements";
-import { previewBlockToElement } from "@/lib/utils";
+import { LibraryElementsRegister } from "@/elements";
+import { PreviewBlockToElement } from "@/lib/utils";
 import { ComponentElementInstance } from "@/types";
 import { BlockSchema } from "@/types/api/page";
 import { isNull } from "lodash";
@@ -12,7 +12,7 @@ export default function Preview() {
     if (isNull(previewElements)) return;
     const blocks = JSON.parse(previewElements) as BlockSchema[];
     const elements: ComponentElementInstance[] = blocks.map(
-      previewBlockToElement
+      PreviewBlockToElement
     );
     setElements(elements);
   }, []);
@@ -20,7 +20,8 @@ export default function Preview() {
   return (
     <>
       {elements.map((element: ComponentElementInstance) => {
-        const RenderComponent = libraryElements[element.type].renderComponent;
+        const RenderComponent =
+          LibraryElementsRegister[element.type].renderComponent;
         return <RenderComponent key={element.id} elementInstance={element} />;
       })}
     </>

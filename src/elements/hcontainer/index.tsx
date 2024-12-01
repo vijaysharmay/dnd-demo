@@ -1,4 +1,4 @@
-import { randInt } from "@/lib/utils";
+import { RandInt } from "@/lib/utils";
 import { ComponentElement, HContainer } from "@/types";
 import { LayoutTemplate } from "lucide-react";
 
@@ -15,7 +15,7 @@ export const HContainerComponentElement: ComponentElement = {
     id,
     type: HContainer,
     props: {
-      hContainerId: `hContainer-${randInt()}`,
+      hContainerId: `hContainer-${RandInt()}`,
       hContainerHeightInPx: "100px",
       hContainerColumns: "One",
     },

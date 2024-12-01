@@ -9,8 +9,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  convertJSONSchemaToZod,
-  createEmptyObjectFromSchema,
+  ConvertJSONSchemaToZod,
+  CreateEmptyObjectFromSchema,
 } from "@/lib/utils";
 import { ComponentElementInstance } from "@/types";
 import { FormPropsSchema, InputPropsSchema } from "@/types/properties";
@@ -27,11 +27,11 @@ export const FormRenderComponent: React.FC<{
   const { props, children } = elementInstance;
   const { formHeightInPx, accord } = props as FormPropsSchema;
   const dataSchema: JSONSchema7 = accord ? JSON.parse(accord.accordSchema) : {};
-  const zDataSchema = convertJSONSchemaToZod(dataSchema);
+  const zDataSchema = ConvertJSONSchemaToZod(dataSchema);
   type FormSchema = z.infer<typeof zDataSchema>;
   const form = useForm<FormSchema>({
     resolver: zodResolver(zDataSchema),
-    defaultValues: createEmptyObjectFromSchema(dataSchema),
+    defaultValues: CreateEmptyObjectFromSchema(dataSchema),
   });
 
   const onSubmit: SubmitHandler<FormSchema> = (data) => {

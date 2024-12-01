@@ -1,4 +1,4 @@
-import { randInt } from "@/lib/utils";
+import { RandInt } from "@/lib/utils";
 import { Button, ComponentElement } from "@/types";
 import { ButtonPropsSchema } from "@/types/properties";
 import { ButtonIcon } from "@radix-ui/react-icons";
@@ -18,7 +18,7 @@ export const ButtonComponentElement: ComponentElement = {
     props: customProps
       ? customProps
       : {
-          buttonId: `button-${randInt()}`,
+          buttonId: `button-${RandInt()}`,
           buttonText: "Button",
           buttonVariant: "default",
           buttonType: "button",

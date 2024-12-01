@@ -3,7 +3,7 @@ import {
   CreateBlockRequestSchema,
   updateBlockPropsInPageVersion,
 } from "@/api/block";
-import { initFormChildren } from "@/lib/utils";
+import { InitFormChildren } from "@/lib/utils";
 import useAccordStore from "@/store/accord-store";
 import useElementStore from "@/store/element-store";
 import {
@@ -154,7 +154,7 @@ export const usePropertiesFormSubmit = ({
             accord,
           };
           updatedChildren = {
-            children: initFormChildren(activeElement.id, accord.accordSchema),
+            children: InitFormChildren(activeElement.id, accord.accordSchema),
           };
         }
       }

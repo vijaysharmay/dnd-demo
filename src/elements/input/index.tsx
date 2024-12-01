@@ -1,4 +1,4 @@
-import { randInt } from "@/lib/utils";
+import { RandInt } from "@/lib/utils";
 import { ComponentElement, Input as InputType } from "@/types";
 import { InputPropsSchema } from "@/types/properties";
 import { InputIcon } from "@radix-ui/react-icons";
@@ -15,7 +15,7 @@ export const InputComponentElement: ComponentElement = {
     props: customProps
       ? customProps
       : {
-          inputId: `input-${randInt()}`,
+          inputId: `input-${RandInt()}`,
           inputLabel: "Input Label",
           placeHolder: "This is a placeholder",
           helperText: "This is a helper text",

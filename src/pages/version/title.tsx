@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { buildBlockHierarchy } from "@/lib/utils";
+import { BuildBlockHierarchy } from "@/lib/utils";
 import useVersionStore from "@/store/version-store";
 import useWorkspaceStore from "@/store/workspace-store";
 import { Reviewer } from "@/types/api/page";
@@ -26,7 +26,7 @@ export default function VersionTitle() {
   const handlePreview = () => {
     sessionStorage.setItem(
       "previewElements",
-      JSON.stringify(buildBlockHierarchy(currentVersion.blocks))
+      JSON.stringify(BuildBlockHierarchy(currentVersion.blocks))
     );
     const baseUrl = `/workspace/${workspace.id}/project/${project.id}/page/${page.id}/version/${currentVersion.id}/preview`;
     window.open(baseUrl, "_blank");

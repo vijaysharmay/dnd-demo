@@ -1,4 +1,4 @@
-import { randInt } from "@/lib/utils";
+import { RandInt } from "@/lib/utils";
 import { ComponentElement, TextBlock } from "@/types";
 import { TextBlockPropsSchema } from "@/types/properties";
 
@@ -18,7 +18,7 @@ export const TextBlockComponentElement: ComponentElement = {
     props: customProps
       ? customProps
       : {
-          textBlockId: `textBlock-${randInt()}`,
+          textBlockId: `textBlock-${RandInt()}`,
           textBlockText: "TextBlock",
           textBlockType: "H6",
           textBlockStyle: "normal",

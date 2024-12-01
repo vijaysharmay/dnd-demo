@@ -1,4 +1,4 @@
-import { libraryElements } from "@/elements";
+import { LibraryElementsRegister } from "@/elements";
 import useElementStore from "@/store/element-store";
 import { ComponentElementInstance } from "@/types";
 
@@ -15,7 +15,7 @@ export default function Properties() {
       </VersionOptionWrapper>
     );
   const { type } = activeElement as ComponentElementInstance;
-  const PropertiesComponent = libraryElements[type].propertiesComponent;
+  const PropertiesComponent = LibraryElementsRegister[type].propertiesComponent;
 
   return (
     <VersionOptionWrapper title="Properties">

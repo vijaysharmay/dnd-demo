@@ -11,8 +11,8 @@ import {
   SidebarMenuItem,
   SidebarProvider,
 } from "@/components/ui/sidebar";
-import { libraryElements } from "@/elements";
-import { blockToElement, buildBlockHierarchy } from "@/lib/utils";
+import { LibraryElementsRegister } from "@/elements";
+import { BlockToElement, BuildBlockHierarchy } from "@/lib/utils";
 import { BlockSchema } from "@/types/api/page";
 import { useQuery } from "@tanstack/react-query";
 import { Link, Route, useParams, useRoute, useSearch } from "wouter";
@@ -90,7 +90,7 @@ function PageRenderer({
   blocks: Block[];
 }) {
   const [match] = useRoute(pageRoute);
-  console.log(blocks, buildBlockHierarchy(blocks));
+  console.log(blocks, BuildBlockHierarchy(blocks));
   if (match) {
     return (
       <div className="w-full">
@@ -106,10 +106,10 @@ function PageRenderer({
           </p>
         )}
         <div className="p-2 gap-4 h-full flex-col flex-1 m-auto overflow-y-auto justify-start gap-y-12">
-          {buildBlockHierarchy(blocks).map((block: BlockSchema) => {
-            const element = blockToElement(block);
+          {BuildBlockHierarchy(blocks).map((block: BlockSchema) => {
+            const element = BlockToElement(block);
             const RenderComponent =
-              libraryElements[element.type].renderComponent;
+              LibraryElementsRegister[element.type].renderComponent;
             return (
               <RenderComponent key={element.id} elementInstance={element} />
             );

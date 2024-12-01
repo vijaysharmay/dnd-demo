@@ -1,4 +1,4 @@
-import { randInt } from "@/lib/utils";
+import { RandInt } from "@/lib/utils";
 import { ComponentElement, Form } from "@/types";
 import { NotepadText } from "lucide-react";
 
@@ -15,12 +15,12 @@ export const FormComponentElement: ComponentElement = {
     props: customProps
       ? customProps
       : {
-          formId: `form-${randInt()}`,
+          formId: `form-${RandInt()}`,
           accordId: null,
           accord: null,
           formHeightInPx: "200px",
         },
-    children: [], //initFormChildren("JSONPlaceholderPosts")
+    children: [], //InitFormChildren("JSONPlaceholderPosts")
     parentId: parentId ? parentId : null,
   }),
   componentLibraryListItem: {

@@ -44,7 +44,7 @@ import {
   SidebarMenuSub,
 } from "@/components/ui/sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
-import { cn, convertToTree, NodeOptionsItem, Tree } from "@/lib/utils";
+import { cn, ConvertToTree, NodeOptionsItem, Tree } from "@/lib/utils";
 import useWorkspaceStore from "@/store/workspace-store";
 import { SidebarWorkspaceSchema } from "@/types/api/user";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -67,7 +67,7 @@ export function ConcordSidebarNavigator() {
   const { currentWorkspace, isWorkspaceDataLoading } = useWorkspaceStore();
 
   if (!currentWorkspace) return;
-  const workspaceTree = convertToTree(currentWorkspace);
+  const workspaceTree = ConvertToTree(currentWorkspace);
   const projects = workspaceTree.children;
 
   return (

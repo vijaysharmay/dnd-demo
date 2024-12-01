@@ -1,3 +1,4 @@
+import { JSONZType } from "./api/common";
 import { CustomPropsSchema, PropsSchema } from "./properties";
 
 export const Accordion = "Accordion";
@@ -118,7 +119,7 @@ export type ComponentLibraryListItem = {
 export type ComponentElementInstance = {
   id: string;
   type: ComponentElementType;
-  props: PropsSchema;
+  props: PropsSchema | typeof JSONZType;
   children: (ComponentElementInstance | null)[];
   parentId: string | null;
 };
@@ -137,6 +138,6 @@ export type ComponentElement = {
   propertiesComponent: React.FC<{ elementInstance: ComponentElementInstance }>;
 };
 
-export type ComponentElements = {
+export type ComponentElementRegister = {
   [key in ComponentElementType]: ComponentElement;
 };

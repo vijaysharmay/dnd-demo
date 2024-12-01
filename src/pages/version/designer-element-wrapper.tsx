@@ -1,5 +1,5 @@
 import { removeBlockFromPageVersion } from "@/api/block";
-import { libraryElements } from "@/elements";
+import { LibraryElementsRegister } from "@/elements";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import useElementStore from "@/store/element-store";
@@ -55,7 +55,8 @@ export default function DesignerElementWrapper({
     },
   });
 
-  const DesignerComponent = libraryElements[element.type].designerComponent;
+  const DesignerComponent =
+    LibraryElementsRegister[element.type].designerComponent;
 
   const getDesignerElementDeleteId = () =>
     `designerElementDelete-${element.id}`;
