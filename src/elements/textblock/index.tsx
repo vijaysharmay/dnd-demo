@@ -36,4 +36,5 @@ export const TextBlockComponentElement: ComponentElement = {
   dragOverlayComponent: TextBlockDragOverlayComponent,
   propertiesComponent: TextBlockPropertiesComponent,
   renderComponent: TextBlockRenderComponent,
+  showInDesignerPanel: true,
 };

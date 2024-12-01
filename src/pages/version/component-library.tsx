@@ -6,20 +6,18 @@ import { useDraggable } from "@dnd-kit/core";
 
 export function ComponentLibrary() {
   const elementKeys = Object.keys(LibraryElementsRegister);
+  const elements: ComponentElement[] = elementKeys
+    .map((key: string) => LibraryElementsRegister[key as ComponentElementType])
+    .filter((element) => element.showInDesignerPanel);
   return (
     <div className="py-2 pl-2 flex flex-wrap gap-2">
       <div className="text-center w-full font-semibold text-muted-foreground">
         Library
       </div>
       <div className="flex flex-col gap-2 w-full">
-        {elementKeys.map((key: string) => {
-          return (
-            <LibraryListDraggableItem
-              key={key}
-              element={LibraryElementsRegister[key as ComponentElementType]}
-            />
-          );
-        })}
+        {elements.map((element: ComponentElement, index: number) => (
+          <LibraryListDraggableItem key={index} element={element} />
+        ))}
       </div>
     </div>
   );

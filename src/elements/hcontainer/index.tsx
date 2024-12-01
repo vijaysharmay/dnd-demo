@@ -30,4 +30,5 @@ export const HContainerComponentElement: ComponentElement = {
   dragOverlayComponent: HContainerDragOverlayComponent,
   propertiesComponent: HContainerPropertiesComponent,
   renderComponent: HContainerRenderComponent,
+  showInDesignerPanel: true,
 };

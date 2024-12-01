@@ -31,4 +31,5 @@ export const FormComponentElement: ComponentElement = {
   dragOverlayComponent: FormDragOverlayComponent,
   propertiesComponent: FormPropertiesComponent,
   renderComponent: FormRenderComponent,
+  showInDesignerPanel: true,
 };

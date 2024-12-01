@@ -33,4 +33,5 @@ export const InputComponentElement: ComponentElement = {
   dragOverlayComponent: InputDragOverlayComponent,
   propertiesComponent: InputPropertiesComponent,
   renderComponent: InputRenderComponent,
+  showInDesignerPanel: false,
 };

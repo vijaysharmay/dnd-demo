@@ -39,4 +39,5 @@ export const BarchartComponentElement: ComponentElement = {
   dragOverlayComponent: BarchartDragOverlayComponent,
   propertiesComponent: BarchartPropertiesComponent,
   renderComponent: BarchartRenderComponent,
+  showInDesignerPanel: true,
 };

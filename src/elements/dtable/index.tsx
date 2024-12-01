@@ -31,4 +31,5 @@ export const DTableComponentElement: ComponentElement = {
   dragOverlayComponent: DTableDragOverlayComponent,
   propertiesComponent: DTablePropertiesComponent,
   renderComponent: DTableRenderComponent,
+  showInDesignerPanel: true,
 };

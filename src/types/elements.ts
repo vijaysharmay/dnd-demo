@@ -136,6 +136,7 @@ export type ComponentElement = {
   dragOverlayComponent: React.FC;
   renderComponent: React.FC<{ elementInstance: ComponentElementInstance }>;
   propertiesComponent: React.FC<{ elementInstance: ComponentElementInstance }>;
+  showInDesignerPanel: boolean;
 };
 
 export type ComponentElementRegister = {

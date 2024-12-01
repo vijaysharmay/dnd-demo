@@ -36,4 +36,5 @@ export const ButtonComponentElement: ComponentElement = {
   dragOverlayComponent: ButtonDragOverlayComponent,
   propertiesComponent: ButtonPropertiesComponent,
   renderComponent: ButtonRenderComponent,
+  showInDesignerPanel: false,
 };
