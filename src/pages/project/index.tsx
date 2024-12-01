@@ -3,6 +3,7 @@ import AppContainer from "@/containers/app-container";
 import { useParams } from "wouter";
 
 import useWorkspaceStore from "@/store/workspace-store";
+import { Logs, ReceiptText, Settings } from "lucide-react";
 import ShowAccordsTable from "./show-accords-table";
 
 export default function Project() {
@@ -16,12 +17,23 @@ export default function Project() {
       <div className="p-2">
         <Tabs defaultValue="accords">
           <TabsList className="">
-            <TabsTrigger value="accords">Accords</TabsTrigger>
-            <TabsTrigger value="settings">Settings</TabsTrigger>
+            <TabsTrigger value="accords">
+              <ReceiptText className="h-4 w-4 mr-1" />
+              Accords
+            </TabsTrigger>
+            <TabsTrigger value="changelog">
+              <Logs className="h-4 w-4 mr-1" />
+              Changelog
+            </TabsTrigger>
+            <TabsTrigger value="settings">
+              <Settings className="h-4 w-4 mr-1" />
+              Settings
+            </TabsTrigger>
           </TabsList>
           <TabsContent value="accords">
             <ShowAccordsTable workspaceId={workspaceId} projectId={projectId} />
           </TabsContent>
+          <TabsContent value="changelog"></TabsContent>
           <TabsContent value="settings"></TabsContent>
         </Tabs>
       </div>
