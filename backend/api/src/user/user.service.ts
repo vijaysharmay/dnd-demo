@@ -177,10 +177,10 @@ export class UserService {
                       select: {
                         id: true,
                         accordName: true,
-                        accordType: true,
                         accordSchema: true,
                         accordVersion: true,
                         accordAPIUrl: true,
+                        accordAPIUrlMethod: true,
                       },
                     },
                   },
@@ -242,10 +242,10 @@ export class UserService {
                   select: {
                     id: true,
                     accordName: true,
-                    accordType: true,
                     accordSchema: true,
                     accordVersion: true,
                     accordAPIUrl: true,
+                    accordAPIUrlMethod: true,
                   },
                 },
               },

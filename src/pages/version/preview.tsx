@@ -18,12 +18,12 @@ export default function Preview() {
   }, []);
 
   return (
-    <>
+    <div className="px-4 py-2">
       {elements.map((element: ComponentElementInstance) => {
         const RenderComponent =
           LibraryElementsRegister[element.type].renderComponent;
         return <RenderComponent key={element.id} elementInstance={element} />;
       })}
-    </>
+    </div>
   );
 }

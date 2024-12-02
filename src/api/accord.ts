@@ -1,4 +1,7 @@
-import { GetAccordResponseSchema, GetAccordZResponseSchema } from "@/types/api/accord";
+import {
+  GetAccordResponseSchema,
+  GetAccordZResponseSchema,
+} from "@/types/api/accord";
 import Ajv from "ajv";
 import { z } from "zod";
 
@@ -8,7 +11,6 @@ export const JSONSCHEMA = "JSON SCHEMA v7";
 export const CreateAccordRequestZSchema = z
   .object({
     accordName: z.string().min(1, "Accord Name Required"),
-    accordType: z.enum(["OPENAPI", "JSONSCHEMA"]),
     accordSchema: z.custom((value) => {
       try {
         const ajv = new Ajv();
@@ -27,7 +29,8 @@ export const CreateAccordRequestZSchema = z
       }
     }, "Invalid JSON Schema"),
     accordVersion: z.string().min(1, "Accord Version Required"),
-    accordAPIUrl: z.nullable(z.string()),
+    accordAPIUrl: z.optional(z.string()),
+    accordAPIUrlMethod: z.optional(z.string()),
   })
   .required();
 

@@ -12,11 +12,16 @@ import { useAccordStore } from "@/store/accord-store";
 import useVersionStore from "@/store/version-store";
 import { ComponentElementInstance } from "@/types";
 import { AccordSchema } from "@/types/api/accord";
-import { FormPropsSchema, FormPropsZSchema } from "@/types/properties";
+import {
+  apiMethods,
+  FormPropsSchema,
+  FormPropsZSchema,
+} from "@/types/properties";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { isEmpty, isNull } from "lodash";
 import { SubmitHandler, useForm } from "react-hook-form";
 
+import { cn } from "@/lib/utils";
 import { FormFieldRender } from "../common/form-fields";
 import { usePropertiesFormSubmit } from "../common/handlePropertiesFormSubmit";
 
@@ -80,6 +85,14 @@ export const FormPropertiesComponent: React.FC<{
                     {accords.map((accord: AccordSchema) => {
                       return (
                         <SelectItem key={accord.id} value={accord.id}>
+                          <span
+                            className={cn(
+                              "text-xs",
+                              apiMethods[accord.accordAPIUrlMethod ?? ""]
+                            )}
+                          >
+                            {accord.accordAPIUrlMethod}
+                          </span>{" "}
                           {accord.accordName}
                         </SelectItem>
                       );

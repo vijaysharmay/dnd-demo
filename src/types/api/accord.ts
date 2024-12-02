@@ -3,10 +3,10 @@ import { z } from "zod";
 export const AccordZSchema = z.object({
   id: z.string(),
   accordName: z.string(),
-  accordType: z.string(),
   accordSchema: z.string(),
   accordVersion: z.string(),
-  accordAPIUrl: z.string(),
+  accordAPIUrl: z.optional(z.string()),
+  accordAPIUrlMethod: z.optional(z.string()),
 });
 
 export const GetAccordZResponseSchema = z.array(AccordZSchema);

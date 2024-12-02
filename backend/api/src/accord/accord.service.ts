@@ -3,6 +3,7 @@ import { PrismaService } from 'src/prisma.service';
 import { v4 } from 'uuid';
 
 import { JwtService } from '@nestjs/jwt';
+import { APIMETHOD } from '@prisma/client';
 import { CreateAccordDto } from './dto/create-accord.dto';
 import { UpdateAccordDto } from './dto/update-accord.dto';
 
@@ -24,16 +25,20 @@ export class AccordService {
       accordName,
       accordAPIUrl,
       accordSchema,
-      accordType,
       accordVersion,
+      accordAPIUrlMethod,
     } = createAccordDto;
+    const apiMethod = APIMETHOD[accordAPIUrlMethod as keyof typeof APIMETHOD];
+    if (!apiMethod) {
+      throw new Error(`Invalid API method: ${accordAPIUrlMethod}`);
+    }
     return this.prisma.accord.create({
       data: {
         id: accordId,
         accordName,
         accordAPIUrl,
+        accordAPIUrlMethod: apiMethod,
         accordSchema,
-        accordType,
         accordVersion,
         owner: {
           connect: {
@@ -162,8 +167,16 @@ export class AccordService {
     accordId: string,
     updateAccordDto: UpdateAccordDto,
   ) {
+    const { accordAPIUrlMethod, ...rest } = updateAccordDto;
+    const apiMethod = APIMETHOD[accordAPIUrlMethod as keyof typeof APIMETHOD];
+    if (!apiMethod) {
+      throw new Error(`Invalid API method: ${accordAPIUrlMethod}`);
+    }
     return this.prisma.accord.update({
-      data: updateAccordDto,
+      data: {
+        accordAPIUrlMethod: apiMethod,
+        ...rest,
+      },
       where: {
         id: accordId,
         workspaceId,

@@ -21,11 +21,6 @@ enum UserRole {
   OWNER
 }
 
-enum AccordType {
-  OPENAPI
-  JSONSCHEMA
-}
-
 model User {
   id               String                      @id @map("id")
   fullName         String                      @map("full_name")
@@ -91,19 +86,27 @@ model Project {
   @@map("projects")
 }
 
+enum APIMETHOD {
+  GET
+  POST
+  PUT
+  PATCH
+  DELETE
+}
+
 model Accord {
-  id            String     @id @map("id")
-  accordName    String     @map("accord_name")
-  accordType    AccordType @map("accord_type")
-  accordSchema  Json       @map("accord_schema")
-  accordVersion String     @map("accord_version")
-  accordAPIUrl  String?    @map("accord_apiurl")
-  owner         User       @relation(fields: [ownerId], references: [id], name: "ownerOfAccord", onDelete: Cascade, onUpdate: Cascade)
-  ownerId       String     @map("owner_id")
-  project       Project    @relation(fields: [projectId], references: [id], name: "accordsInProject", onDelete: Cascade, onUpdate: Cascade)
-  projectId     String     @map("project_id")
-  workspace     Workspace  @relation(fields: [workspaceId], references: [id], name: "accordsInWorkspace", onDelete: Cascade, onUpdate: Cascade)
-  workspaceId   String     @map("workspace_id")
+  id                 String     @id @map("id")
+  accordName         String     @map("accord_name")
+  accordSchema       Json       @map("accord_schema")
+  accordVersion      String     @map("accord_version")
+  accordAPIUrl       String?    @map("accord_apiurl")
+  accordAPIUrlMethod APIMETHOD? @map("accord_apiurl_method")
+  owner              User       @relation(fields: [ownerId], references: [id], name: "ownerOfAccord", onDelete: Cascade, onUpdate: Cascade)
+  ownerId            String     @map("owner_id")
+  project            Project    @relation(fields: [projectId], references: [id], name: "accordsInProject", onDelete: Cascade, onUpdate: Cascade)
+  projectId          String     @map("project_id")
+  workspace          Workspace  @relation(fields: [workspaceId], references: [id], name: "accordsInWorkspace", onDelete: Cascade, onUpdate: Cascade)
+  workspaceId        String     @map("workspace_id")
 
   @@unique([workspaceId, projectId, accordName])
   @@map("accords")

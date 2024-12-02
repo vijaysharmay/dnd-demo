@@ -182,3 +182,11 @@ export type VariantsSchema =
   | typeof HContainerColumnVariants
   | string[]
   | typeof InputVariants;
+
+export const apiMethods: { [key: string]: string } = {
+  GET: "text-green-700",
+  POST: "text-orange-700",
+  PUT: "text-blue-700",
+  PATCH: "text-yellow-700",
+  DELETE: "text-red-700",
+};

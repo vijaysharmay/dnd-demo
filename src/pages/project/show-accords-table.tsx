@@ -1,11 +1,17 @@
-import { AccordSchema, deleteAccordInProjectWorkspace } from "@/api/accord";
+import { deleteAccordInProjectWorkspace } from "@/api/accord";
 import DataTable from "@/components/ui/data-table";
-import { SheetDescription, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import {
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import useAccordStore from "@/store/accord-store";
 import { ColumnMapping } from "@/types/datatable";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 
+import { AccordSchema } from "@/types/api/accord";
 import AccordForm from "./accord-form";
 
 export default function ShowAccordsTable({
@@ -40,8 +46,8 @@ export default function ShowAccordsTable({
     if (accords) {
       setColumns([
         { columnName: "Name", columnAttrName: "accordName" },
-        { columnName: "Type", columnAttrName: "accordType" },
         { columnName: "Version", columnAttrName: "accordVersion" },
+        { columnName: "API Method", columnAttrName: "accordAPIUrlMethod" },
         { columnName: "API URL", columnAttrName: "accordAPIUrl" },
       ]);
     }
@@ -91,12 +97,8 @@ function AccordRowForm({
         <SheetTitle>
           {mode === "create" ? "Add Accord" : "Edit Accord"}
         </SheetTitle>
-        <SheetDescription>
-          {mode === "create"
-            ? "Create a new Accord for the project."
-            : "Edit the selected Accord details."}
-        </SheetDescription>
       </SheetHeader>
+      <SheetDescription></SheetDescription>
       <AccordForm
         mode={mode}
         workspaceId={workspaceId}
