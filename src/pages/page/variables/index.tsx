@@ -1,5 +1,3 @@
-import DataTable from "@/components/ui/data-table";
-
-export default function VariablesHome() {
-  return <DataTable data={[]} columnMapping={[]} />;
+export default function index() {
+  return <div>index</div>;
 }

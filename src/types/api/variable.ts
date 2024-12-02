@@ -2,11 +2,8 @@ import { z } from "zod";
 
 export const ConcordVariableZSchema = z.object({
   id: z.string(),
-  accordName: z.string(),
-  accordType: z.string(),
-  accordSchema: z.string(),
-  accordVersion: z.string(),
-  accordAPIUrl: z.string(),
+  name: z.string(),
+  accordId: z.string().nullable(),
 });
 
 export const GetConcordVariableZResponseSchema = z.array(
@@ -16,3 +13,4 @@ export type GetConcordVariableResponseSchema = z.infer<
   typeof GetConcordVariableZResponseSchema
 >;
 export type ConcordVariableSchema = z.infer<typeof ConcordVariableZSchema>;
+ 
